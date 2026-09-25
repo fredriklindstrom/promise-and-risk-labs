@@ -1,0 +1,17 @@
+### 13:02:14 load lmstudio-community/Qwen3.6-27B-MLX-8bit
+### 13:02:21 prefill check
+### 13:02:27 batch=1 warmup
+### 13:02:39 batch=1 timed
+batch=1 generation_tps=12.206 prompt_tps=115.180 peak_memory=29.047 total_time=11.764
+### 13:02:51 batch=2 warmup
+### 13:03:05 batch=2 timed
+batch=2 generation_tps=22.479 prompt_tps=140.691 peak_memory=29.456 total_time=13.196
+### 13:03:18 batch=4 warmup
+### 13:03:37 batch=4 timed
+batch=4 generation_tps=32.521 prompt_tps=145.845 peak_memory=30.208 total_time=19.229
+### 13:03:57 batch=8 warmup
+### 13:04:42 batch=8 timed
+batch=8 generation_tps=27.138 prompt_tps=148.290 peak_memory=31.629 total_time=44.587
+### 13:05:27 batch=16 warmup
+### 13:06:20 batch=16 timed
+batch=16 generation_tps=50.695 prompt_tps=145.986 peak_memory=33.010 total_time=54.320

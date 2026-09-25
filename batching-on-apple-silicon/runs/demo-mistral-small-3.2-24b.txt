@@ -1,0 +1,18 @@
+### 12:57:49 load lmstudio-community/Mistral-Small-3.2-24B-Instruct-2506-MLX-8bit
+[transformers] The tokenizer you are loading from '~/.cache/huggingface/hub/models--lmstudio-community--Mistral-Small-3.2-24B-Instruct-2506-MLX-8bit/snapshots/692a38109525df4fe5a35b17af6eee5672415e17' with an incorrect regex pattern: https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503/discussions/84#69121093e8b480e709447d5e. This will lead to incorrect tokenization. You should set the `fix_mistral_regex=True` flag when loading this tokenizer to fix this issue.
+### 12:57:53 prefill check
+### 12:58:00 batch=1 warmup
+### 12:58:10 batch=1 timed
+batch=1 generation_tps=14.382 prompt_tps=125.723 peak_memory=25.200 total_time=9.993
+### 12:58:20 batch=2 warmup
+### 12:58:31 batch=2 timed
+batch=2 generation_tps=26.527 prompt_tps=159.208 peak_memory=25.362 total_time=11.247
+### 12:58:43 batch=4 warmup
+### 12:59:00 batch=4 timed
+batch=4 generation_tps=38.341 prompt_tps=164.338 peak_memory=25.661 total_time=16.446
+### 12:59:16 batch=8 warmup
+### 12:59:55 batch=8 timed
+batch=8 generation_tps=31.930 prompt_tps=167.527 peak_memory=25.940 total_time=38.136
+### 13:00:33 batch=16 warmup
+### 13:01:19 batch=16 timed
+batch=16 generation_tps=61.040 prompt_tps=169.631 peak_memory=26.511 total_time=45.532

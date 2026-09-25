@@ -1,0 +1,40 @@
+Running warmup..
+Timing with prompt_tokens=128, generation_tokens=128, batch_size=4.
+Trial 1:  prompt_tps=146.100, generation_tps=32.692, peak_memory=30.207, total_time=19.141
+Averages: prompt_tps=146.100, generation_tps=32.692, peak_memory=30.207
+Running warmup..
+Timing with prompt_tokens=128, generation_tokens=128, batch_size=5.
+Trial 1:  prompt_tps=146.093, generation_tps=33.854, peak_memory=30.621, total_time=23.253
+Averages: prompt_tps=146.093, generation_tps=33.854, peak_memory=30.621
+Running warmup..
+Timing with prompt_tokens=128, generation_tokens=128, batch_size=6.
+Trial 1:  prompt_tps=147.232, generation_tps=20.403, peak_memory=30.907, total_time=42.819
+Averages: prompt_tps=147.232, generation_tps=20.403, peak_memory=30.907
+Running warmup..
+Timing with prompt_tokens=128, generation_tokens=128, batch_size=7.
+Trial 1:  prompt_tps=147.659, generation_tps=23.752, peak_memory=31.263, total_time=43.747
+Averages: prompt_tps=147.659, generation_tps=23.752, peak_memory=31.263
+Running warmup..
+Timing with prompt_tokens=128, generation_tokens=128, batch_size=8.
+Trial 1:  prompt_tps=148.610, generation_tps=27.173, peak_memory=31.628, total_time=44.524
+Averages: prompt_tps=148.610, generation_tps=27.173, peak_memory=31.628
+Running warmup..
+Timing with prompt_tokens=128, generation_tokens=128, batch_size=9.
+Trial 1:  prompt_tps=146.348, generation_tps=29.883, peak_memory=31.628, total_time=46.362
+Averages: prompt_tps=146.348, generation_tps=29.883, peak_memory=31.628
+Running warmup..
+Timing with prompt_tokens=128, generation_tokens=128, batch_size=10.
+Trial 1:  prompt_tps=146.893, generation_tps=33.029, peak_memory=31.628, total_time=47.402
+Averages: prompt_tps=146.893, generation_tps=33.029, peak_memory=31.628
+Running warmup..
+Timing with prompt_tokens=128, generation_tokens=128, batch_size=11.
+Trial 1:  prompt_tps=147.083, generation_tps=36.140, peak_memory=31.628, total_time=48.460
+Averages: prompt_tps=147.083, generation_tps=36.140, peak_memory=31.628
+Running warmup..
+Timing with prompt_tokens=128, generation_tokens=128, batch_size=12.
+Trial 1:  prompt_tps=147.294, generation_tps=39.618, peak_memory=31.628, total_time=49.119
+Averages: prompt_tps=147.294, generation_tps=39.618, peak_memory=31.628
+Running warmup..
+Timing with prompt_tokens=128, generation_tokens=128, batch_size=16.
+Trial 1:  prompt_tps=148.517, generation_tps=51.430, peak_memory=33.010, total_time=53.505
+Averages: prompt_tps=148.517, generation_tps=51.430, peak_memory=33.010
