@@ -5,5 +5,6 @@ Hands-on measurements behind [Promise & Risk of AI](https://promiseandrisk.ai/la
 | Lab | Question | Episode |
 |---|---|---|
 | [batching-on-apple-silicon](batching-on-apple-silicon/) | How much more does one chip produce when it answers requests in batches? | Season 4 finale |
+| [mini-soc](mini-soc/) | Can a local model on one Mac do first-line security triage without being trusted to close anything? | Build log |
 
 Code is MIT-licensed. Results and write-ups are CC BY 4.0: reuse them, and credit Promise & Risk of AI.

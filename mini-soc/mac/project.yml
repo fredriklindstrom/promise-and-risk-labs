@@ -1,0 +1,58 @@
+name: QwenMiniSOC
+options:
+  bundleIdPrefix: com.fredrik.qwenminisoc
+  deploymentTarget:
+    macOS: "15.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    CODE_SIGN_IDENTITY: "Apple Development"
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: YOUR_TEAM_ID  # Xcode > Settings > Accounts; a free personal team works
+    MARKETING_VERSION: "0.1"
+    CURRENT_PROJECT_VERSION: "1"
+    ENABLE_HARDENED_RUNTIME: NO
+targets:
+  QwenMiniSOC:
+    type: application
+    platform: macOS
+    sources: [App, Shared]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fredrik.qwenminisoc.app
+        GENERATE_INFOPLIST_FILE: NO
+    info:
+      path: App/Info.plist
+      properties:
+        LSUIElement: true
+        CFBundleDisplayName: Qwen Mini SOC
+        CFBundleName: Qwen Mini SOC
+        CFBundleURLTypes:
+          - CFBundleURLName: com.fredrik.qwenminisoc.open
+            CFBundleURLSchemes: [qwenminisoc]
+    entitlements:
+      path: App/App.entitlements
+      properties: {}
+    dependencies:
+      - target: SOCWidget
+        embed: true
+  SOCWidget:
+    type: app-extension
+    platform: macOS
+    sources: [Widget, Shared]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fredrik.qwenminisoc.app.widget
+        GENERATE_INFOPLIST_FILE: NO
+    info:
+      path: Widget/Info.plist
+      properties:
+        CFBundleDisplayName: Qwen Mini SOC
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: Widget/Widget.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.temporary-exception.files.home-relative-path.read-only:
+          - /mini-soc/state/

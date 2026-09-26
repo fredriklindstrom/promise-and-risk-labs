@@ -1,0 +1,10 @@
+# runtime output describes a real network: never commit it
+state/
+config.json
+baseline_seed.json
+mac/build/
+mac/*.xcodeproj/
+__pycache__/
+# LoRA adapters and exported training data are trained on / made from a real network
+adapters/
+*.jsonl

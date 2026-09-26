@@ -1,0 +1,4 @@
+mcp==2.2.0
+mlx-lm==0.31.3
+requests==2.34.2
+urllib3==2.8.0  # the TLS pin relies on urllib3 honouring assert_fingerprint: verified on this version

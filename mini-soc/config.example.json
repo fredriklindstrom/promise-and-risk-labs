@@ -1,0 +1,14 @@
+{
+  "site_name": "home",
+  "host": "https://192.0.2.1",
+  "tls_sha256": "<sha256 of the console certificate, see README>",
+  "site": "default",
+  "key_file": "~/.config/mini-soc/api_key",
+  "poll_seconds": 120,
+  "event_overlap_seconds": 300,
+  "model": "lmstudio-community/Qwen3.8-27B-MLX-8bit",
+  "model_quant": "8bit",
+  "model_url": "http://127.0.0.1:8090/v1/chat/completions",
+  "triage_min_severity": "medium",
+  "notify": true
+}

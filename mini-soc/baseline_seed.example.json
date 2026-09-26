@@ -1,0 +1,7 @@
+{
+  "_note": "Known-normal items you have confirmed. Loaded into the baseline table on the first poll. Copy to baseline_seed.json.",
+  "admin_ip": [
+    {"value": "2001:db8::10", "note": "my laptop, remote admin"},
+    {"value": "127.0.0.1", "note": "the console itself"}
+  ]
+}

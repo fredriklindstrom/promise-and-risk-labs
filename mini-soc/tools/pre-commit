@@ -1,0 +1,11 @@
+#!/bin/bash
+# Security review before every commit that touches mini-soc/ (hard rule, 2026-09-26).
+# mark-reviewed.sh records the staged tree hash after a review passes; restaging invalidates it.
+git diff --cached --name-only | grep -q '^mini-soc/' || exit 0
+MARK="$(git rev-parse --git-dir)/security-review-ok"
+TREE="$(git write-tree)"
+if [ ! -f "$MARK" ] || [ "$(head -1 "$MARK")" != "$TREE" ]; then
+  echo "pre-commit: BLOCKED. mini-soc/ changes need a security review first (hard rule)."
+  echo "  Run /security-review on the staged changes, fix findings, then mini-soc/tools/mark-reviewed.sh \"<summary>\"."
+  exit 1
+fi
