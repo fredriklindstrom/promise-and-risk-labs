@@ -64,6 +64,54 @@ check("CSP forbids inline script", b"<script>" not in body)
 st, alerts = req("/api/alerts")
 check("classified alert is marked", json.loads(alerts)[0]["labelled"] is True)
 
+# segmentation endpoints
+db = store.connect()
+rid = store.seg_run_start(db, "m", "8bit", "v")
+store.seg_add_assignment(db, rid, {"mac": "aa:bb:cc:dd:ee:01", "rule_segment": "IOT", "final_segment": "IOT",
+                                   "status": "ok", "record": {"mac": "aa:bb:cc:dd:ee:01"}})
+store.seg_run_finish(db, rid, status="done")
+db.commit(); db.close()
+seg = json.dumps({"segment": "MEDIA", "note": "it's the TV"}).encode()
+check("segment label without X-MiniSOC refused", req(f"/api/segmentation/{rid}/aa:bb:cc:dd:ee:01/label", "POST", seg,
+      {"Content-Type": "application/json"})[0] == 403)
+check("unknown segment refused", req(f"/api/segmentation/{rid}/aa:bb:cc:dd:ee:01/label", "POST",
+      json.dumps({"segment": "ROOT"}).encode(), good)[0] == 400)
+check("device not in the run refused", req(f"/api/segmentation/{rid}/aa:bb:cc:dd:ee:99/label", "POST", seg, good)[0] == 404)
+check("malformed MAC in path refused", req(f"/api/segmentation/{rid}/aa:bb:cc:dd:ee/label", "POST", seg, good)[0] == 404)
+check("valid segment label accepted", req(f"/api/segmentation/{rid}/aa:bb:cc:dd:ee:01/label", "POST", seg, good)[0] == 200)
+st, body = req("/api/segmentation")
+check("segmentation view shows your call", json.loads(body)["devices"][0]["label"]["segment"] == "MEDIA")
+check("run start without X-MiniSOC refused", req("/api/segmentation/run", "POST", b"{}", {"Content-Type": "application/json"})[0] == 403)
+
+db = store.connect()
+store.upsert_device(db, store.device_row({"mac": "aa:bb:cc:dd:ee:07", "hostname": "<img src=x onerror=alert(1)>",
+                                          "is_wired": True, "sw_mac": "aa:bb:cc:00:11:22", "sw_port": 4,
+                                          "wired_rate_mbps": 1000, "last_seen": 1_700_000_000}), 1_700_000_000, active=True)
+aid2 = store.add_alert(db, "new_device", "medium", "aa:bb:cc:dd:ee:07", "New device", {}, "new_device:aa:bb:cc:dd:ee:07")
+db.commit(); db.close()
+st, body = req("/api/inventory")
+dev = next((x for x in json.loads(body)["devices"] if x["mac"] == "aa:bb:cc:dd:ee:07"), None) if st == 200 else None
+check("inventory lists every device with where it was seen", dev is not None and dev["port"] == 4 and dev["link_mbps"] == 1000
+      and dev["online"] is True)
+check("inventory wraps device-written names with who wrote them", dev and dev["hostname"]["written_by"].startswith("reported by the device"))
+check("inventory links the device's open alerts", dev and aid2 in dev["open_alerts"])
+check("inventory is read-only", req("/api/inventory", "POST", b"{}", good)[0] == 404)
+db = store.connect()
+store.baseline_deviation(db, "aa:bb:cc:dd:ee:07", "2026-09-28", "new_domain", "<b>x</b>.example", {}, 1_700_000_000)
+db.commit(); db.close()
+st, body = req("/api/baseline")
+bv = json.loads(body) if st == 200 else {}
+dv = (bv.get("deviations") or [{}])[0]
+check("baseline page lists deviations, domains wrapped", st == 200 and dv.get("key", {}).get("domain", {}).get("written_by"))
+verdict = json.dumps({"verdict": "expected", "note": "new app"}).encode()
+check("deviation verdict without X-MiniSOC refused",
+      req(f"/api/baseline/deviations/{dv.get('id')}/label", "POST", verdict, {"Content-Type": "application/json"})[0] == 403)
+check("unknown verdict refused", req(f"/api/baseline/deviations/{dv.get('id')}/label", "POST",
+                                     json.dumps({"verdict": "ignore"}).encode(), good)[0] == 400)
+check("verdict on a missing deviation refused", req("/api/baseline/deviations/999999/label", "POST", verdict, good)[0] == 404)
+check("valid verdict accepted", req(f"/api/baseline/deviations/{dv.get('id')}/label", "POST", verdict, good)[0] == 200)
+check("verdict shows in the false-alarm table", json.loads(req("/api/baseline")[1])["kinds"]["new_domain"]["expected"] == 1)
+
 srv.shutdown()
 print("\nWEBUI", "PASS" if not FAILS else f"FAIL ({len(FAILS)})")
 sys.exit(1 if FAILS else 0)

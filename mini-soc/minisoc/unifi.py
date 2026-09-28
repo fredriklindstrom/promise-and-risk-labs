@@ -1,7 +1,7 @@
 """Read-only UniFi Network client.
 
 Every request goes through _request(), which refuses anything not on the allowlist:
-GETs to four read endpoints, and POSTs only to the system-log *query* endpoint (UniFi
+GETs to a handful of read endpoints, and POSTs only to the system-log *query* endpoint (UniFi
 uses POST for log searches). Nothing here can change the controller, whatever rights
 the API key has.
 """
@@ -19,10 +19,26 @@ ALLOWED = [
     ("GET", re.compile(r"api/s/[\w-]+/stat/sta", re.ASCII)),
     ("GET", re.compile(r"api/s/[\w-]+/rest/user", re.ASCII)),
     ("GET", re.compile(r"api/s/[\w-]+/stat/device-basic", re.ASCII)),
+    ("GET", re.compile(r"api/s/[\w-]+/stat/device", re.ASCII)),  # read for radio BSSIDs; only those are kept
     ("GET", re.compile(r"api/self", re.ASCII)),
+    ("GET", re.compile(r"v2/api/fingerprint_devices/0", re.ASCII)),  # UniFi's fingerprint name table
     ("POST", re.compile(r"v2/api/site/[\w-]+/system-log/all", re.ASCII)),
+    ("POST", re.compile(r"v2/api/site/[\w-]+/traffic-flows", re.ASCII)),  # a query: flows the gateway routed
 ]
 MAX_LOG_PAGES = 52
+MAX_FLOW_PAGES = 20
+
+
+def _slim_flow(x):
+    """Only what the traffic summary uses; the rest of a flow record is dropped here."""
+    s, d = x.get("source") or {}, x.get("destination") or {}
+    s, d = (s if isinstance(s, dict) else {}), (d if isinstance(d, dict) else {})
+    td = x.get("traffic_data") if isinstance(x.get("traffic_data"), dict) else {}
+    doms = d.get("domains") if isinstance(d.get("domains"), list) else []
+    return {"time": x.get("time"), "direction": x.get("direction"), "action": x.get("action"),
+            "service": x.get("service"), "protocol": x.get("protocol"), "src_mac": s.get("mac"),
+            "dst_mac": d.get("mac"), "dst_ip": d.get("ip"), "dst_port": d.get("port"), "region": d.get("region"),
+            "domain": next((v for v in doms if isinstance(v, str)), None), "bytes": td.get("bytes_total")}
 
 
 class ReadOnlyViolation(RuntimeError):
@@ -76,6 +92,22 @@ class UniFi:
         me = d[0]
         return {k: me.get(k) for k in ("name", "is_owner", "is_super", "role", "permissions") if k in me}
 
+    def own_radios(self):
+        """Your UniFi devices and the exact BSSID of every network their radios broadcast. Only these
+        fields are kept; the rest of the (large) device record is dropped here."""
+        out = {"devices": [], "vaps": []}
+        for d in self._request("GET", f"api/s/{self.site}/stat/device").get("data", []):
+            mac = str(d.get("mac") or "").lower()
+            out["devices"].append({"mac": mac, "name": d.get("name"), "model": d.get("model")})
+            for v in d.get("vap_table") or []:
+                if v.get("bssid"):
+                    out["vaps"].append({"essid": v.get("essid"), "bssid": str(v["bssid"]).lower(),
+                                        "radio": v.get("radio"), "device_mac": mac, "device_name": d.get("name")})
+        return out
+
+    def fingerprint_table(self):
+        return self._request("GET", "v2/api/fingerprint_devices/0")
+
     def clients_active(self):
         return self._request("GET", f"api/s/{self.site}/stat/sta")["data"]
 
@@ -100,8 +132,24 @@ class UniFi:
             page += 1
 
 
+    def traffic_flows(self, since_ms, until_ms):
+        """Flows the gateway routed in the window. Sets self.flows_truncated when the page cap cut it short."""
+        rows, page = [], 0
+        self.flows_truncated = False
+        while True:
+            d = self._request("POST", f"v2/api/site/{self.site}/traffic-flows", json={
+                "timestampFrom": since_ms, "timestampTo": until_ms, "pageSize": 100, "pageNumber": page})
+            rows += [_slim_flow(x) for x in d.get("data") or [] if isinstance(x, dict)]
+            if not d.get("has_next"):
+                return rows
+            if page + 1 >= MAX_FLOW_PAGES:
+                self.flows_truncated = True
+                return rows
+            page += 1
+
+
 class Fixture:
-    """Same interface, served from a saved snapshot folder, for offline testing."""
+    """Same interface, served from a saved snapshot folder, for offline tests."""
 
     def __init__(self, snap_dir):
         import json

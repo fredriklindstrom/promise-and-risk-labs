@@ -16,7 +16,7 @@ import time
 import traceback
 from collections import defaultdict
 
-from . import actions, config, normalize, notify, rules, store, triage
+from . import actions, baseline, config, fingerprints, normalize, notify, rules, store, traffic, triage
 from .unifi import UniFi
 
 WHOAMI_EVERY = 3600
@@ -67,6 +67,8 @@ def merged_rows(active, known):
         r = store.device_row(c)
         base = rows.get(r["mac"], {})
         rows[r["mac"]] = {**base, **{k: v for k, v in r.items() if v is not None}}
+        if r.get("uplink_mac"):  # the live connection is one fact: don't fill its gaps from an older one
+            rows[r["mac"]].update({f: r.get(f) for f in store.UPLINK_FIELDS})
     return rows, {store.device_row(c)["mac"] for c in active}
 
 
@@ -130,12 +132,25 @@ def triage_backlog(db, cfg, now, rv):
 def poll(client, db, cfg, now=None, do_triage=True, do_notify=True):
     now = now or int(time.time())
     bootstrapped = store.get_meta(db, "bootstrapped", False)
+    env = cfg.get("site_environment")
+    store.set_meta(db, "site_environment", env if env in ("dense", "isolated") else "unknown")
     if do_notify:
         notify_pending(db, cfg)  # anything a previous poll committed but couldn't send
 
     if now - store.get_meta(db, "whoami_at", 0) > WHOAMI_EVERY:
         store.set_meta(db, "whoami", client.whoami())
         store.set_meta(db, "whoami_at", now)
+        fingerprints.load(client)  # refreshes the cached name table when it's over a week old
+        if hasattr(client, "own_radios"):
+            try:
+                radios = client.own_radios()
+                store.set_meta(db, "own_radios", radios)
+                # remember every name your radios have broadcast: a copy of a network that's off the air
+                # (a scheduled guest WLAN) is the most effective evil twin there is
+                known = set(store.get_meta(db, "known_ssids") or [])
+                store.set_meta(db, "known_ssids", sorted(known | {v["essid"] for v in radios["vaps"] if v.get("essid")}))
+            except Exception as ex:  # enrichment only: a failure here must not stop the poll
+                log(f"own_radios refresh failed: {type(ex).__name__}")
 
     candidates = []
     rows, active_macs = merged_rows(client.clients_active(), client.clients_known())
@@ -149,6 +164,15 @@ def poll(client, db, cfg, now=None, do_triage=True, do_notify=True):
         if bootstrapped and (is_new or changes):
             device_changes.append((mac, is_new, changes))
     store.mark_inactive_except(db, active_macs)
+    if hasattr(client, "traffic_flows") and now - (store.get_meta(db, "traffic_at") or 0) >= traffic.EVERY_S:
+        try:  # enrichment for segmentation: a failure here must not stop the poll
+            traffic.collect(db, client, now)
+        except Exception as ex:
+            log(f"traffic refresh failed: {type(ex).__name__}")
+        try:  # shadow mode: records deviations for the web UI, never notifies, never calls the model
+            baseline.update(db, now)
+        except Exception as ex:
+            log(f"baseline update failed: {type(ex).__name__}")
 
     cursor = store.get_meta(db, "event_cursor_ms")
     since = (cursor - cfg["event_overlap_seconds"] * 1000) if cursor else (now - BOOTSTRAP_EVENT_DAYS * 86400) * 1000

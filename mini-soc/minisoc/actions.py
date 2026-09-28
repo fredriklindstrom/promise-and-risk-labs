@@ -3,7 +3,7 @@ ever executed (no autonomous response). The model may only choose an ID from thi
 else is rejected and the rule's default stands.
 
 To add an action: add an entry here, map a rule to it in RULE_DEFAULTS if it's that rule's usual
-fix, and add a labelled evaluation case for it.
+fix, and add a test case for it.
 """
 
 ACTIONS = {

@@ -10,6 +10,10 @@ Every alert also carries a **recommended action** from a fixed catalogue (`minis
 
 A local **web UI** (`minisoc/webui.py`, http://127.0.0.1:8095) lists alerts and lets a person classify them: should it have fired, the correct assessment, the correct action, and why. Each classification is a training label; with the exact prompt the model saw, it exports as chat-format JSONL for LoRA fine-tuning with `mlx_lm.lora`. The desktop widget and menu-bar app open it.
 
+**Segmentation recommendations** (web UI button, or `python -m minisoc.segmentation`): the model proposes a network segment for each connected device from a fixed catalogue (Trusted, Media, Internet only, IoT, Cameras, Infrastructure, Guest, Identify first), with suggested VLANs and firewall policies. A device's own name can only lower its trust. Trusted and Infrastructure need controller evidence (the MAC vendor or UniFi's fingerprint) that doesn't contradict itself, and Trusted always waits for a person to confirm. Game consoles go to Internet only unless traffic shows your other devices reaching them, and isolating a device UniFi fingerprints as yours or as infrastructure waits for review. Advisory only: nothing is changed on the controller.
+
+An **inventory** page lists every device the controller has reported: UniFi's fingerprint (model, type, vendor, OS), the MAC vendor, first and last seen, the switch or access point it was last on with port, speed and signal, its address, its current VLAN and the recommended one, and links to its open alerts. Alert pages show the same connection details.
+
 No alert data leaves the machine. There's no cloud model and no cloud fallback.
 
 This folder is the code only. The runtime output describes a real home network, so it isn't published.
@@ -18,7 +22,7 @@ This folder is the code only. The runtime output describes a real home network, 
 
 | Guardrail | Where |
 |---|---|
-| Read-only: an allowlist of four GETs and the system-log query POST (full-path match); anything else raises before a request is sent. Redirects refused, system proxies ignored | `minisoc/unifi.py` |
+| Read-only: an allowlist of six GETs and two query POSTs, the system log and the flow log (full-path match); anything else raises before a request is sent. Redirects refused, system proxies ignored | `minisoc/unifi.py` |
 | The console's self-signed certificate is pinned by SHA-256, so an impostor on the network never receives the API key | `minisoc/unifi.py` |
 | The model annotates alerts and never opens, closes, silences or reorders one. Notifications are rule-driven, sent before triage and retried until delivered | `minisoc/triage.py`, `minisoc/watcher.py` |
 | Free text reaches the model wrapped with who wrote it (device, console user, audit log), plus a standing rule that free text is evidence, never instruction | `minisoc/normalize.py` |
@@ -46,6 +50,31 @@ This folder is the code only. The runtime output describes a real home network, 
 The first poll records every known device as the starting point and raises no alerts, apart from a summary, "identify this device" items for connected devices with no name, and "recently added device" items.
 
 Dedup only suppresses repeats while an alert is open: acknowledging it lets the same thing fire again. Don't add iCloud Private Relay or other shared egress addresses to the baseline; they vouch for everyone behind them.
+
+## Rogue access points
+
+UniFi's rogue-AP event carries two things the other side controls: the network name (SSID, set by whoever runs it) and the radio address (BSSID, which any radio can claim). The monitor keeps both as claims and compares them with your own radios (read hourly from `stat/device`, radio fields only) and with every network name your radios have broadcast. It names a pattern instead of reassuring, and never says "probably yours":
+
+| Pattern | What it means |
+|---|---|
+| clone | Another radio using the exact address of one of yours, whatever it calls its network |
+| evil twin | Your network name on an address shaped like one of your access points' |
+| impersonation | Your network name from hardware that isn't one of your access points, including a copy of one of your networks that's switched off |
+| look-alike | A name that folds to yours: case, spacing, accents, invisible or blank characters, punctuation, Greek or Cyrillic look-alike letters |
+| resembles | A name that contains yours or is a typo away (`Home-5G`, `Horne`): the usual shape of a phishing lure, or a neighbour's naming |
+| unknown | The list of your network names isn't available, so nothing can be compared |
+| confirm in UniFi | Not a network your access points broadcast, on an address shaped like your hardware's: its own mesh or setup radio, or a forgery |
+| foreign | Not your network name and not your hardware |
+
+`config.json` → `site_environment` (`dense`, `isolated` or `unknown`) changes only how a **foreign** or **resembling** network is read. Isolated raises both to high, because nothing else should be broadcasting there. Dense lowers a foreign network to low (a neighbour's, most likely), but only when its name is plainly ordinary; anything unusual keeps UniFi's severity, because a list of look-alike letters can never be complete. Clone, evil twin, impersonation and look-alike are high everywhere, since a crowded building is where an evil twin is easiest to run. UniFi's own high or critical is never lowered.
+
+## Traffic and baselines
+
+Every 15 minutes the watcher reads the gateway's flow log (`traffic-flows`) and keeps daily totals per device: internet services and domains, countries, gateway services, devices on other networks it talks to, and blocked flows. Storage is capped per device and day, because a device chooses its own destinations and ports.
+
+The gateway only sees traffic it routes. Two devices on the same network talk through the switch and never appear, so on a flat network "no local traffic seen" proves nothing. Every summary says so, and the model is told so.
+
+Each device gets a **baseline** of normal: services, main domains, countries, cross-network peers, its usual busy days, and the hours it's active. It learns for 14 days, then runs in **shadow mode**: deviations are listed on the web UI's Baseline page and never notified or sent to the model. A person marks each one expected or suspicious, which gives a false-alarm rate per kind of deviation before any of them is allowed to page. Anything that deviated stays out of later profiles until it's marked expected, and a day flagged for volume never raises the volume bar, so a slow ramp can't teach the baseline that it's normal. One check runs from day one: an IoT device moving over a gigabyte a day.
 
 ## Run it
 

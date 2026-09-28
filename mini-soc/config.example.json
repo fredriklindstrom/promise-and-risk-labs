@@ -10,5 +10,6 @@
   "model_quant": "8bit",
   "model_url": "http://127.0.0.1:8090/v1/chat/completions",
   "triage_min_severity": "medium",
-  "notify": true
+  "notify": true,
+  "site_environment": "unknown"
 }

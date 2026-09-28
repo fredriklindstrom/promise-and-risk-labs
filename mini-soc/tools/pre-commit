@@ -1,8 +1,32 @@
 #!/bin/bash
 # Security review before every commit that touches mini-soc/ (hard rule, 2026-09-26).
 # mark-reviewed.sh records the staged tree hash after a review passes; restaging invalidates it.
-git diff --cached --name-only | grep -q '^mini-soc/' || exit 0
-MARK="$(git rev-parse --git-dir)/security-review-ok"
+git diff --cached --quiet -- mini-soc/ && exit 0   # pathspec, not grep: survives quoted non-ASCII paths
+GIT_DIR="$(git rev-parse --git-dir)"
+
+# Publication deny-list. The terms live in untracked files inside .git, one per line: held-back lab
+# material and identifiers of the real network. publication-deny.txt matches anywhere,
+# publication-deny-words.txt only as whole words. Keeping them out of this script keeps them out of the
+# repository. A missing list blocks the commit.
+DENY="$GIT_DIR/publication-deny.txt"
+WORDS="$GIT_DIR/publication-deny-words.txt"
+for f in "$DENY" "$WORDS"; do
+  if [ ! -s "$f" ]; then
+    echo "pre-commit: BLOCKED. $f is missing or empty; the publication scan can't run."
+    exit 1
+  fi
+done
+HITS="$(git grep --cached -n -i -F -f "$DENY" -- . 2>&1)"; rc=$?
+if [ $rc -gt 1 ]; then echo "pre-commit: BLOCKED. publication scan failed: $HITS"; exit 1; fi
+WORD="$(git grep --cached -n -i -w -F -f "$WORDS" -- . 2>&1)"; rc=$?
+if [ $rc -gt 1 ]; then echo "pre-commit: BLOCKED. publication scan failed: $WORD"; exit 1; fi
+if [ -n "$HITS$WORD" ]; then
+  echo "pre-commit: BLOCKED. staged files contain held-back or identifying text:"
+  printf '%s\n%s\n' "$HITS" "$WORD" | sed '/^$/d' | head -20
+  exit 1
+fi
+
+MARK="$GIT_DIR/security-review-ok"
 TREE="$(git write-tree)"
 if [ ! -f "$MARK" ] || [ "$(head -1 "$MARK")" != "$TREE" ]; then
   echo "pre-commit: BLOCKED. mini-soc/ changes need a security review first (hard rule)."

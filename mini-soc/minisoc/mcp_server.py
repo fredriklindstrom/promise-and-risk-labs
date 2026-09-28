@@ -110,5 +110,21 @@ def list_baseline() -> str:
     return json.dumps(out, indent=1)
 
 
+@mcp.tool(description="The latest segmentation plan: proposed segment per connected device (after guards), "
+                      "suggested VLANs and policies, observations. Advisory only; nothing is applied.")
+def segmentation_plan() -> str:
+    from . import webui
+    db = _db()
+    try:
+        v = webui.segmentation_view(db)
+    finally:
+        db.close()
+    if v.get("run"):  # model free text wrapped like any other untrusted text
+        v["run"]["notes"] = {"text": v["run"]["notes"], "written_by": MODEL_TEXT}
+        for d in v["devices"]:
+            d["model_reason"] = {"text": d["model_reason"], "written_by": MODEL_TEXT} if d["model_reason"] else None
+    return json.dumps(v, indent=1)
+
+
 if __name__ == "__main__":
     mcp.run()

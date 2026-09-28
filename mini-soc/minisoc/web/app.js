@@ -62,6 +62,10 @@ async function renderList() {
         el("div", { class: "title" }, a.title,
           a.triage && a.triage.escalated ? el("span", { class: "tag esc" }, "escalated") : null,
           a.labelled ? el("span", { class: "tag lab" }, "classified") : null),
+        a.wifi ? el("div", { class: "sub" }, "SSID ",
+          el("span", { class: "untrusted inline" }, (a.wifi.ssid && a.wifi.ssid.text) || "?"),
+          a.wifi.bssid ? `  ·  BSSID ${a.wifi.bssid}` : "",
+          a.wifi.facts && a.wifi.facts.pattern ? `  ·  ${a.wifi.facts.pattern.split(":")[0]}` : "") : null,
         el("div", { class: "sub" },
           a.recommended_action && a.recommended_action.action
             ? `→ ${a.recommended_action.action_source === "model" ? "Qwen: " : ""}${a.recommended_action.action}` : "",
@@ -118,13 +122,63 @@ async function renderAlert(id) {
         el("td", {}, v.tier), el("td", {}, words(v.verdict)), el("td", {}, v.confidence || ""),
         el("td", {}, v.rule_version || ""), el("td", {}, fmt(v.created)), el("td", {}, v.human_decision || ""))))));
 
-  view.replaceChildren(
+  view.replaceChildren(...[  // replaceChildren would print a null as the text "null"
     el("p", {}, el("a", { href: "#/" }, "← Alerts")),
     el("h1", {}, a.title),
     el("p", {}, sev(a.severity), " ", el("span", { class: "muted" }, `${words(a.rule)} · #${a.id} · ${fmt(a.created)} · ${a.status}`)),
+    a.wifi ? wifiCard(a.wifi) : null,
+    a.connections && a.connections.length ? connectionCard(a.connections) : null,
     actionCard, modelCard, classifyForm(a),
     el("div", { class: "card" }, el("h2", {}, "Evidence"), renderValue(a.detail)),
-    verdicts);
+    verdicts].filter(Boolean));
+}
+
+function speed(mbps) {
+  if (!mbps) return "not reported";
+  return mbps >= 1000 ? `${+(mbps / 1000).toFixed(1)} Gbps` : `${mbps} Mbps`;
+}
+
+function connectionCard(cs) {
+  const wired = (c) => (c.link || "") === "wired";
+  return el("div", { class: "card" },
+    el("h2", {}, "Where it's connected"),
+    el("table", {},
+      el("thead", {}, el("tr", {}, ["device", "connected to", wired(cs[0]) || cs.length > 1 ? "port" : "network", "speed", "IP"].map((h) => el("th", {}, h)))),
+      el("tbody", {}, cs.map((c) => el("tr", {},
+        el("td", {}, c.mac, el("div", { class: "muted" }, c.active ? "online now" : `last seen ${fmt(c.last_seen)}`)),
+        el("td", {}, c.uplink_name || (c.uplink_mac ? "UniFi device" : "not reported"),
+          el("div", { class: "muted" }, [c.uplink_model, c.uplink_mac].filter(Boolean).join(" · "))),
+        el("td", {}, wired(c) ? (c.port ? `port ${c.port}` : "not reported") : (c.link || "Wi-Fi"),
+          !wired(c) && c.signal_dbm ? el("div", { class: "muted" }, `signal ${c.signal_dbm} dBm`) : null),
+        el("td", {}, speed(c.link_mbps)),
+        el("td", {}, c.ip || el("span", { class: "muted" }, "not reported")))))),
+    el("div", { class: "muted" }, "As UniFi last reported it. Names of UniFi devices are set in the console."));
+}
+
+function wifiCard(w) {
+  const f = w.facts || {};
+  const exact = f.bssid_is_one_of_your_radios || [];
+  const near = f.bssid_shares_bytes_with || [];
+  const nm = (x) => (x && x.text) || "";
+  return el("div", { class: "card" },
+    el("h2", {}, "The Wi-Fi network"),
+    el("p", { class: "action" }, f.pattern || ""),
+    el("dl", { class: "kv" },
+      el("dt", {}, "network name (SSID)"), el("dd", {}, renderValue(w.ssid)),
+      el("dt", {}, "hardware address (BSSID)"), el("dd", {}, w.bssid || "not recorded",
+        el("div", { class: "untrusted-note" }, `claimed by ${w.bssid_note}`)),
+      el("dt", {}, "channel · signal"), el("dd", {}, `${w.channel || "?"} · ${w.rssi || "?"}`),
+      el("dt", {}, "seen by"), el("dd", {}, w.nearest_ap || "?"),
+      el("dt", {}, "your surroundings"), el("dd", {}, `${f.site_environment || "unknown"}: ${f.site_environment_means || ""}`),
+      el("dt", {}, "one of your network names?"), el("dd", {},
+        f.ssid_is_one_of_yours === true ? "yes" : f.ssid_is_one_of_yours === false ? "no" : "unknown",
+        f.your_ssids && f.your_ssids.length ? el("span", { class: "muted" }, `  (yours: ${f.your_ssids.map((s) => (s && s.text) || "").join(", ")})`) : null),
+      el("dt", {}, "exact address of your radio?"), el("dd", {},
+        exact.length ? exact.map((x) => el("div", {}, `yes: ${nm(x.device)}'s ${nm(x.essid)} network (${x.bssid})`))
+          : f.radio_inventory_known ? "no" : "unknown (radio list not loaded yet)"),
+      el("dt", {}, "shares bytes with"), el("dd", {},
+        near.length ? near.map((d) => el("div", {}, `${nm(d.name) || d.model || "device"} (${d.mac})`)) : "none of your hardware")),
+    el("p", { class: "muted" }, "A BSSID is broadcast in the clear and any radio can claim one, so a resemblance never proves a network is yours. Confirm in UniFi which radio broadcasts it."));
 }
 
 function classifyForm(a) {
@@ -191,15 +245,237 @@ async function renderTraining() {
       el("div", { class: "untrusted" }, s.lora_command)));
 }
 
+// ---------------------------------------------------------------- segmentation
+let segPoll = null;
+
+function segLabel(segs, id) { const s = segs.find((x) => x.id === id); return s ? s.title : (id || "none"); }
+
+async function renderSegmentation() {
+  const d = await api("/api/segmentation");
+  clearTimeout(segPoll);
+  if (d.running) segPoll = setTimeout(() => { if (location.hash.startsWith("#/segmentation")) route(); }, 5000);
+
+  const runBtn = el("button", { class: "btn primary", disabled: d.running || null, onclick: async () => {
+      runBtn.disabled = true;
+      try { await api("/api/segmentation/run", {}); } catch (e) { alert(e.message); }
+      route();
+    } }, d.running ? "Analysis running… (about four minutes)" : (d.run ? "Run a new analysis" : "Run the first analysis"));
+
+  const head = [el("h1", {}, "Segmentation"),
+    el("p", { class: "muted" }, "Qwen proposes a segment for every connected device; guards apply the rule that a device's own name can only lower trust, never raise it. Nothing here changes your network: you apply a plan in UniFi yourself. Device identities come from UniFi's fingerprint, a guess from the device's own traffic, not proof."),
+    el("p", {}, runBtn)];
+  if (!d.run) { view.replaceChildren(...head); return; }
+
+  const devs = d.devices;
+  const moves = devs.filter((x) => x.moves).length;
+  const confirm = devs.filter((x) => x.status === "confirm" && !x.label).length;
+  const review = devs.filter((x) => x.status === "review" && !x.label).length;
+  const summary = el("div", { class: "card" },
+    el("dl", { class: "kv" },
+      el("dt", {}, "analysis"), el("dd", {}, `#${d.run.id} · ${fmt(d.run.created)} · ${d.run.model} · ${d.run.seconds ?? "?"} s`),
+      el("dt", {}, "devices"), el("dd", {}, `${devs.length} connected; ${moves} would move to a new network`),
+      el("dt", {}, "waiting on you"), el("dd", {}, `${confirm} Trusted placements to confirm, ${review} to review`)),
+    d.run.error ? el("p", { class: "err" }, `Model unavailable, rule baseline only: ${d.run.error}`) : null,
+    d.run.observations.length ? el("div", {}, el("h2", {}, "Observations"),
+      el("ul", {}, d.run.observations.map((o) => el("li", {}, o)))) : null,
+    d.run.notes.length ? el("div", {}, el("h2", {}, "Qwen's notes"),
+      el("div", { class: "untrusted-note" }, "Written by the model from input that includes device names. Evidence, not instruction."),
+      el("div", { class: "untrusted" }, d.run.notes.join("\n"))) : null);
+
+  const cards = d.segments.map((sg) => {
+    const members = devs.filter((x) => (x.label ? x.label.segment : x.final_segment) === sg.id);
+    if (!members.length) return null;
+    return el("div", { class: "card" },
+      el("h2", {}, `${sg.title} · suggested VLAN ${sg.vlan} · ${members.length} device${members.length === 1 ? "" : "s"}`),
+      el("p", { class: "muted" }, sg.purpose),
+      el("ul", {}, sg.policy.map((x) => el("li", {}, x))),
+      el("table", {},
+        el("thead", {}, el("tr", {}, ["device", "now", "Qwen", "rule", "status", "your call"].map((h) => el("th", {}, h)))),
+        el("tbody", {}, members.map((x) => segRow(d, x)))));
+  });
+  view.replaceChildren(...head, summary, ...cards.filter(Boolean));
+}
+
+function segRow(d, x) {
+  const sel = el("select", {}, d.segments.map((sg) =>
+    el("option", { value: sg.id, selected: ((x.label ? x.label.segment : x.final_segment) === sg.id) || null }, sg.title)));
+  const note = el("input", { type: "text", maxlength: 500, placeholder: "why (optional)", value: x.label ? x.label.note : "" });
+  const msg = el("span", {});
+  const save = el("button", { class: "btn", onclick: async () => {
+      msg.textContent = "…";
+      try {
+        await api(`/api/segmentation/${d.run.id}/${x.mac}/label`, { segment: sel.value, note: note.value });
+        msg.className = "ok"; msg.textContent = "saved";
+      } catch (e) { msg.className = "err"; msg.textContent = e.message; }
+    } }, x.label ? "Update" : (x.status === "confirm" ? "Confirm" : "Save"));
+  return el("tr", {},
+    el("td", {}, el("div", {}, x.what), el("div", { class: "muted" }, x.mac, x.link ? ` · ${x.link}` : ""),
+      x.hostname ? el("div", { class: "untrusted" }, x.hostname.text) : null,
+      x.name ? el("div", { class: "untrusted" }, x.name.text) : null),
+    el("td", {}, `${x.current_network || "?"}${x.current_vlan ? ` (VLAN ${x.current_vlan})` : ""}`, x.moves ? el("div", { class: "muted" }, "→ moves") : null),
+    el("td", {}, segLabel(d.segments, x.model_segment), x.model_confidence ? el("div", { class: "muted" }, x.model_confidence) : null,
+      x.model_reason ? el("div", { class: "untrusted" }, x.model_reason) : null),
+    el("td", {}, segLabel(d.segments, x.rule_segment)),
+    el("td", {}, x.label ? el("span", { class: "tag lab" }, "decided") :
+      el("span", { class: `tag ${x.status === "review" ? "esc" : ""}` }, x.status), x.note ? el("div", { class: "muted" }, x.note) : null),
+    el("td", {}, sel, note, save, " ", msg));
+}
+
+// ---------------------------------------------------------------- inventory
+const inv = { show: "all", q: "" };
+
+async function renderInventory() {
+  const d = await api("/api/inventory");
+  const txt = (x) => (x && x.text) || "";
+  const who = (x) => (x.fingerprint && x.fingerprint.model) || x.vendor || "unknown";
+  const hay = (x) => [x.mac, x.ip, txt(x.hostname), txt(x.name), x.vendor, x.network, x.link, x.uplink_name,
+    ...Object.values(x.fingerprint || {})].filter(Boolean).join(" ").toLowerCase();
+  const counts = { all: d.devices.length, online: d.devices.filter((x) => x.online).length };
+  counts.offline = counts.all - counts.online;
+  counts.unidentified = d.devices.filter((x) => !x.fingerprint).length;
+  counts.moves = d.devices.filter((x) => x.recommended.moves).length;
+  const keep = (x) => (inv.show === "all" || (inv.show === "online" ? x.online : inv.show === "offline" ? !x.online
+      : inv.show === "moves" ? x.recommended.moves : !x.fingerprint))
+    && (!inv.q || hay(x).includes(inv.q.toLowerCase()));
+
+  const body = el("tbody", {});
+  const shown = el("span", { class: "muted" });
+  const draw = () => {
+    const rows = d.devices.filter(keep);
+    shown.textContent = `${rows.length} of ${d.devices.length} devices`;
+    body.replaceChildren(...rows.map((x) => el("tr", {},
+      el("td", {}, el("div", {}, who(x)), el("div", { class: "muted" }, x.mac, x.mac_randomised ? " · private address" : ""),
+        x.name ? el("div", { class: "untrusted" }, x.name.text) : null,
+        x.hostname ? el("div", { class: "untrusted" }, x.hostname.text) : null,
+        x.open_alerts.length ? el("div", {}, x.open_alerts.map((id) => [el("a", { href: `#/alert/${id}` }, `#${id}`), " "])) : null,
+        baselineLine(x.baseline)),
+      el("td", {}, x.fingerprint
+        ? el("div", {}, [x.fingerprint.type, x.fingerprint.family].filter(Boolean).join(" · "),
+            el("div", { class: "muted" }, [x.fingerprint.vendor, x.fingerprint.os].filter(Boolean).join(" · ")))
+        : el("span", { class: "muted" }, "not fingerprinted"),
+        x.vendor ? el("div", { class: "muted" }, `MAC vendor: ${x.vendor}`) : null),
+      el("td", {}, x.online ? el("span", { class: "ok" }, "online now") : fmt(x.last_seen),
+        el("div", { class: "muted" }, `first seen ${fmt(x.first_seen)}`)),
+      el("td", {}, x.uplink_name || (x.uplink_mac ? "UniFi device" : el("span", { class: "muted" }, "not reported")),
+        el("div", { class: "muted" }, [(x.link || "") === "wired" ? (x.port ? `port ${x.port}` : "") : x.link,
+          x.link_mbps ? speed(x.link_mbps) : "", x.signal_dbm ? `${x.signal_dbm} dBm` : ""].filter(Boolean).join(" · "))),
+      el("td", {}, x.ip || el("span", { class: "muted" }, "none"), el("div", { class: "muted" }, x.network || "")),
+      el("td", {}, x.current_vlan === null ? el("span", { class: "muted" }, "?") : `VLAN ${x.current_vlan}`),
+      el("td", {}, recCell(x.recommended), trafficLine(x.traffic)))));
+  };
+
+  const filters = el("div", { class: "filters" },
+    ["all", "online", "offline", "unidentified", "moves"].map((k) => el("button", {
+      class: inv.show === k ? "on" : null,
+      onclick: (e) => { inv.show = k; e.target.parentNode.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b === e.target)); draw(); },
+    }, `${k} (${counts[k]})`)),
+    el("input", { type: "search", class: "search", placeholder: "search name, MAC, IP, model, switch…", value: inv.q,
+      oninput: (e) => { inv.q = e.target.value; draw(); } }));
+
+  view.replaceChildren(
+    el("h1", {}, "Inventory"),
+    el("p", { class: "muted" }, "Every device UniFi has reported, online first, then by when it was last seen. Identity comes "
+      + "from UniFi's fingerprint of each device's network behaviour (DHCP/mDNS): harder to fake than a name, not proof. "
+      + "UniFi hasn't fingerprinted every device; those show the MAC vendor only. Names are written by devices and console "
+      + "users, shown as plain text."),
+    el("p", { class: "muted" }, "Recommended VLAN: your own decision on the Segmentation page first, then the latest "
+      + "analysis there, then the device type. Traffic: " + d.traffic_visibility
+      + (d.traffic_since ? ` Collecting since ${fmt(d.traffic_since)}.` : " Not collected yet.")),
+    filters, el("p", {}, shown),
+    el("div", { class: "card scroll" }, el("table", {},
+      el("thead", {}, el("tr", {}, ["device", "UniFi fingerprint", "last seen", "where", "IP", "VLAN now", "recommended"]
+        .map((h) => el("th", {}, h)))),
+      body)));
+  draw();
+}
+
+function baselineLine(b) {
+  if (!b || b.state === "off") return null;
+  const text = b.state === "learning" ? `baseline: learning (${b.days_seen} of ${b.needs} days with traffic)`
+    : `baseline: ${b.services} services · ${b.domains} domains · ${b.regions} regions`;
+  return el("div", { class: "muted" }, text,
+    b.unreviewed ? [" · ", el("a", { href: "#/baseline" }, `${b.unreviewed} to review`)] : null);
+}
+
+// ---------------------------------------------------------------- baseline
+async function renderBaseline() {
+  const d = await api("/api/baseline");
+  const head = [
+    el("h1", {}, "Baseline"),
+    el("p", {}, el("span", { class: `tag ${d.mode === "shadow" ? "lab" : ""}` }, d.mode), " ",
+      d.mode === "learning" ? `Learning until ${fmt(d.learning_until)}: profiles build from each device's traffic; only the device-type check records anything.`
+        : d.mode === "shadow" ? "Shadow mode: deviations are recorded here and never notified, so their false-alarm rate can be measured first."
+        : "Traffic collection hasn't started yet."),
+    el("p", { class: "muted" }, `Each device's profile is re-learned daily from the last ${d.learn_days} days (today excluded) and is `
+      + `compared once it has ${d.min_days} days with traffic. Anything that deviated stays out of later profiles until you mark it expected. `
+      + "Only traffic that crosses the gateway is seen."),
+  ];
+  const kinds = el("div", { class: "card" }, el("h2", {}, "False-alarm measurement"),
+    el("table", {}, el("thead", {}, el("tr", {}, ["deviation", "recorded", "expected", "suspicious", "unreviewed"].map((h) => el("th", {}, h)))),
+      el("tbody", {}, Object.entries(d.kinds).map(([k, v]) => el("tr", {},
+        el("td", {}, words(k), el("div", { class: "muted" }, v.means)), el("td", {}, v.count), el("td", {}, v.expected),
+        el("td", {}, v.suspicious), el("td", {}, v.count - v.expected - v.suspicious))))));
+  const keyText = (k) => k.domain ? el("span", { class: "untrusted inline" }, k.domain.text)
+    : k.region ? `region ${k.region}` : k.device ? `device ${k.device}` : k.value;
+  const rows = d.deviations.map((x) => {
+    const note = el("input", { type: "text", maxlength: 500, placeholder: "why (optional)", value: x.note || "" });
+    const msg = el("span", {});
+    const btn = (v) => el("button", { class: "btn", onclick: async () => {
+        msg.textContent = "…";
+        try {
+          await api(`/api/baseline/deviations/${x.id}/label`, { verdict: v, note: note.value });
+          msg.className = "ok"; msg.textContent = v;
+        } catch (e) { msg.className = "err"; msg.textContent = e.message; }
+      } }, v);
+    return el("tr", {},
+      el("td", {}, x.what, el("div", { class: "muted" }, x.mac), x.name ? el("div", { class: "untrusted" }, x.name.text) : null),
+      el("td", {}, words(x.kind), el("div", {}, keyText(x.key)),
+        Object.keys(x.detail).length ? el("div", { class: "muted" }, Object.entries(x.detail).map(([k, v]) => `${words(k)}: ${v}`).join(" · ")) : null),
+      el("td", {}, x.day, el("div", { class: "muted" }, `last ${fmt(x.last_at)}`)),
+      el("td", {}, x.verdict ? el("span", { class: "tag lab" }, x.verdict) : null, note, btn("expected"), " ", btn("suspicious"), " ", msg));
+  });
+  view.replaceChildren(...head, kinds, el("div", { class: "card scroll" }, el("h2", {}, "Deviations"),
+    rows.length ? el("table", {}, el("thead", {}, el("tr", {}, ["device", "what changed", "day", "your verdict"].map((h) => el("th", {}, h)))),
+      el("tbody", {}, rows)) : el("p", { class: "muted" }, "None recorded yet.")));
+}
+
+function recCell(r) {
+  return el("div", {},
+    el("div", { class: r.moves ? "action" : "" }, `${r.moves ? "→ " : ""}${r.title} · VLAN ${r.vlan}`),
+    el("div", { class: "muted" }, r.source, r.status && r.status !== "ok" ? ` · ${r.status}` : ""),
+    r.check && r.traffic_note ? el("div", { class: "err" }, r.traffic_note) : null);  // blocked counts are in the traffic line
+}
+
+function bytes(n) {
+  const u = ["B", "KB", "MB", "GB", "TB"];
+  let i = 0;
+  while (n >= 1000 && i < u.length - 1) { n /= 1000; i++; }
+  return `${i ? n.toFixed(1) : n} ${u[i]}`;
+}
+
+function trafficLine(t) {
+  if (!t) return null;
+  const parts = [`internet ${bytes(t.internet_bytes)} (${t.internet_flows} flows${t.services.length ? `: ${t.services.join(", ")}` : ""})`,
+    `local peers seen ${t.local_peers}`];
+  if (t.from_internet_flows) parts.push(`${t.from_internet_flows} from the internet`);
+  if (t.blocked_flows) parts.push(`${t.blocked_flows} blocked`);
+  if (t.incomplete) parts.push("incomplete: some windows hit the page limit");
+  return el("div", { class: "muted" }, `last ${t.window_days} d: ${parts.join(" · ")}`);
+}
+
 // ---------------------------------------------------------------- routing
 async function route() {
   const h = location.hash || "#/";
   document.querySelectorAll("[data-nav]").forEach((a) =>
-    a.classList.toggle("active", (h.startsWith("#/training") ? "training" : "alerts") === a.dataset.nav));
+    a.classList.toggle("active", (h.startsWith("#/training") ? "training" : h.startsWith("#/segmentation") ? "segmentation"
+      : h.startsWith("#/inventory") ? "inventory" : h.startsWith("#/baseline") ? "baseline" : "alerts") === a.dataset.nav));
   try {
     const m = h.match(/^#\/alert\/(\d+)$/);
     if (m) await renderAlert(m[1]);
     else if (h.startsWith("#/training")) await renderTraining();
+    else if (h.startsWith("#/segmentation")) await renderSegmentation();
+    else if (h.startsWith("#/inventory")) await renderInventory();
+    else if (h.startsWith("#/baseline")) await renderBaseline();
     else await renderList();
   } catch (e) {
     view.replaceChildren(el("p", { class: "err" }, `Couldn't load: ${e.message}`));

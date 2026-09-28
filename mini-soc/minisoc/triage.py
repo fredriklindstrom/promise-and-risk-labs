@@ -1,4 +1,4 @@
-"""L2 triage: Qwen3.8-27B, resident behind mlx_lm.server (launchd: com.example.qwen-mini-soc.model).
+"""L2 triage: Qwen3.8-27B, resident behind mlx_lm.server (the .model job in launchd/).
 
 Tier model (Fredrik, 2026-09-26):
   L1 = the rules. Yes or no: an alert fires or it doesn't.
@@ -28,7 +28,10 @@ PLAYBOOK = """Rules that can raise an alert:
 - label_changed: a console alias (set by a user with write access) or a hostname (set by the device itself) changed.
 - config_change: an admin changed controller configuration. `known_normal` lists admin addresses the owner has confirmed.
 - admin_login_new_ip: an admin logged in from an address not seen before.
-- unifi_security_event: UniFi's own security detection (rogue AP, threat, IPS).
+- unifi_security_event: UniFi's own security detection (rogue AP, threat, IPS). For a rogue AP, a BSSID
+  that resembles or equals your hardware never settles it as benign: an impersonator copies exactly that.
+  Only a person confirming in UniFi which radio broadcasts it can. `site.environment` (set by the owner)
+  changes how likely a FOREIGN network is to be a neighbour's; it never softens a network that copies yours.
 - unfamiliar_event: an event category this system has no rule for.
 - hostname_collision: more than one recently seen device reports the same hostname.
 `facts.hostname_shared_with` lists other devices currently reporting the same hostname."""
@@ -48,8 +51,11 @@ SYSTEM = (
     '"action_reason": "<one sentence>", "next_step": "<one sentence>"}')
 
 
-def _messages(alert, known_normal, networks, notable_events):
-    ctx = {"known_normal": known_normal, "networks": networks,
+def _messages(alert, known_normal, networks, notable_events, site_environment="unknown"):
+    from .rules import ENVIRONMENTS
+    env = site_environment if isinstance(site_environment, str) and site_environment in ENVIRONMENTS else "unknown"
+    ctx = {"site": {"environment": env, "means": ENVIRONMENTS[env], "set_by": "the owner, in config.json"},
+           "known_normal": known_normal, "networks": networks,
            "recent_notable_events": notable_events,
            # alert last; the rule's default action is withheld so the model's pick is its own
            "alert": {k: alert[k] for k in ("id", "rule", "severity", "title")}
@@ -80,7 +86,7 @@ def escalated(verdict):
 
 
 def assess(alert, cfg, known_normal, networks, notable_events, log=print, retries=1):
-    msgs = _messages(alert, known_normal, networks, notable_events)
+    msgs = _messages(alert, known_normal, networks, notable_events, cfg.get("site_environment", "unknown"))
     prompt_hash = hashlib.sha256(json.dumps(msgs, sort_keys=True).encode()).hexdigest()[:16]
     raw, verdict, t0 = "", None, time.time()
     for attempt in range(retries + 1):  # malformed output is rejected and retried, never routed on
