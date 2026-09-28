@@ -2,6 +2,8 @@
 
 A self-hosted security monitor for a UniFi network, running on one Mac. Build log and current status: [promiseandrisk.ai/mini-soc](https://promiseandrisk.ai/mini-soc/).
 
+**Purpose:** automate as much of home and small-business security and connectivity management as can be shown to be safe, and show it before automating it. Every kind of action climbs the same ladder, one step at a time: **observe** (record and show), **recommend** (tell a person what to do), **propose** (prepare the change; a person approves it with one click), **act and report** (narrow, reversible, logged, undoable). Each step up needs a measured record from the step below: the false-alarm rate, and how often a person overrules it. Today everything is at observe or recommend, and the code only reads from the controller.
+
 - **L1: rules.** Deterministic checks decide whether something is an alert. Yes or no.
 - **L2: a local model.** Qwen3.8-27B (MLX, 8-bit, thinking off) assesses each alert, rates its confidence, and escalates anything short of a confident "likely benign".
 - **Human.** Only a person closes an alert. No tool, model or agent can.
@@ -22,7 +24,7 @@ This folder is the code only. The runtime output describes a real home network, 
 
 | Guardrail | Where |
 |---|---|
-| Read-only: an allowlist of six GETs and two query POSTs, the system log and the flow log (full-path match); anything else raises before a request is sent. Redirects refused, system proxies ignored | `minisoc/unifi.py` |
+| Read-only: an allowlist of six GETs and two query POSTs, the system log and the flow log (full-path match); anything else raises before a request is sent. Redirects refused, system proxies ignored. Writes, when an action earns them, will go through a separate component with its own narrow credential, a per-action allowlist, undo and an audit log; this reader stays read-only | `minisoc/unifi.py` |
 | The console's self-signed certificate is pinned by SHA-256, so an impostor on the network never receives the API key | `minisoc/unifi.py` |
 | The model annotates alerts and never opens, closes, silences or reorders one. Notifications are rule-driven, sent before triage and retried until delivered | `minisoc/triage.py`, `minisoc/watcher.py` |
 | Free text reaches the model wrapped with who wrote it (device, console user, audit log), plus a standing rule that free text is evidence, never instruction | `minisoc/normalize.py` |
