@@ -1,7 +1,7 @@
 #!/bin/bash
-# Security review before every commit that touches mini-soc/ (hard rule, 2026-09-26).
+# Every commit: publication deny-list scan of the whole staged tree.
+# Commits that touch mini-soc/: security review first (hard rule, 2026-09-26).
 # mark-reviewed.sh records the staged tree hash after a review passes; restaging invalidates it.
-git diff --cached --quiet -- mini-soc/ && exit 0   # pathspec, not grep: survives quoted non-ASCII paths
 GIT_DIR="$(git rev-parse --git-dir)"
 
 # Publication deny-list. The terms live in untracked files inside .git, one per line: held-back lab
@@ -10,15 +10,23 @@ GIT_DIR="$(git rev-parse --git-dir)"
 # repository. A missing list blocks the commit.
 DENY="$GIT_DIR/publication-deny.txt"
 WORDS="$GIT_DIR/publication-deny-words.txt"
+# Strip blank lines and Windows line endings into a temp copy, and block unless real terms remain: an empty
+# list would make git grep match nothing and pass. Full paths, so a different grep on PATH can't change this.
+TMP="$(mktemp -d)" || { echo "pre-commit: BLOCKED. can't create a temp dir for the publication scan."; exit 1; }
+trap 'rm -rf "$TMP"' EXIT
 for f in "$DENY" "$WORDS"; do
-  if [ ! -s "$f" ]; then
-    echo "pre-commit: BLOCKED. $f is missing or empty; the publication scan can't run."
+  out="$TMP/$(basename "$f")"
+  if [ ! -r "$f" ]; then echo "pre-commit: BLOCKED. $f is missing or unreadable."; exit 1; fi
+  /usr/bin/tr -d '\r' < "$f" | /usr/bin/grep -v '^[[:space:]]*$' > "$out"
+  st=("${PIPESTATUS[@]}")   # copy at once: the next command resets PIPESTATUS
+  if [ "${st[0]:-1}" != 0 ] || [ "${st[1]:-1}" != 0 ] || [ ! -s "$out" ]; then
+    echo "pre-commit: BLOCKED. $f has no usable terms; the publication scan can't run."
     exit 1
   fi
 done
-HITS="$(git grep --cached -n -i -F -f "$DENY" -- . 2>&1)"; rc=$?
+HITS="$(git grep --cached -n -i -F -f "$TMP/publication-deny.txt" -- . 2>&1)"; rc=$?
 if [ $rc -gt 1 ]; then echo "pre-commit: BLOCKED. publication scan failed: $HITS"; exit 1; fi
-WORD="$(git grep --cached -n -i -w -F -f "$WORDS" -- . 2>&1)"; rc=$?
+WORD="$(git grep --cached -n -i -w -F -f "$TMP/publication-deny-words.txt" -- . 2>&1)"; rc=$?
 if [ $rc -gt 1 ]; then echo "pre-commit: BLOCKED. publication scan failed: $WORD"; exit 1; fi
 if [ -n "$HITS$WORD" ]; then
   echo "pre-commit: BLOCKED. staged files contain held-back or identifying text:"
@@ -26,6 +34,8 @@ if [ -n "$HITS$WORD" ]; then
   exit 1
 fi
 
+# The security review gate covers mini-soc/ only; the publication scan above runs on every commit.
+git diff --cached --quiet -- mini-soc/ && exit 0   # pathspec, not grep: survives quoted non-ASCII paths
 MARK="$GIT_DIR/security-review-ok"
 TREE="$(git write-tree)"
 if [ ! -f "$MARK" ] || [ "$(head -1 "$MARK")" != "$TREE" ]; then

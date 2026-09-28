@@ -102,8 +102,17 @@ def learn(db, mac, now):
     return profile
 
 
-def check(db, mac, profile, fp_segment, now, current_mode):
-    """Deviations of today's traffic from the profile, as (kind, key, detail)."""
+def network_profile(profiles):
+    """What the whole network does normally: the union of every device's learned services and regions.
+    A device too new for its own profile is compared with this instead of getting a free week."""
+    grown = [p for p in profiles if p and p["days_seen"] >= MIN_DAYS]
+    return {"services": sorted({s for p in grown for s in p["services"]}),
+            "regions": sorted({r for p in grown for r in p["regions"]}), "devices": len(grown)}
+
+
+def check(db, mac, profile, fp_segment, now, current_mode, network=None):
+    """Deviations of today's traffic from the profile, as (kind, key, detail). A device without MIN_DAYS of
+    its own history (it joined after learning, or was quiet) is checked against the network instead."""
     today = _day(now)
     seen = observe(db, mac, today, today)
     out = []
@@ -113,7 +122,18 @@ def check(db, mac, profile, fp_segment, now, current_mode):
         # keyed by the day: volume is a daily measure, so each day over the line is its own entry
         out.append(("type_volume", today, {"bytes_today": day_bytes, "type": segments.SEGMENTS[fp_segment]["title"],
                                            "threshold": cap}))
-    if current_mode != "shadow" or not profile or profile["days_seen"] < MIN_DAYS:
+    if current_mode != "shadow":
+        return out
+    if not profile or profile["days_seen"] < MIN_DAYS:
+        young = {"young_device": True, "compared_with": "the whole network"}
+        if network and network["devices"]:
+            for kind, key in (("new_service", "services"), ("new_region", "regions")):
+                for x in sorted(seen[key] - set(network[key])):
+                    out.append((kind, str(x), young))
+        for x in sorted(seen["peers"]):  # a new device talking across networks is worth a look from day one
+            out.append(("new_peer", str(x), young))
+        if seen["blocked"]:
+            out.append(("first_blocked", "blocked", {**young, "flows_today": seen["blocked"]}))
         return out
     for kind, key in (("new_service", "services"), ("new_domain", "domains"), ("new_region", "regions"),
                       ("new_peer", "peers")):
@@ -137,12 +157,15 @@ def update(db, now=None):
         return 0
     relearn = store.get_meta(db, "baseline_learned_day") != _day(now)
     table = fingerprints.load()
+    devices = store.all_devices(db)
+    profiles = {d["mac"]: (learn(db, d["mac"], now) if relearn else store.baseline_get(db, d["mac"])) for d in devices}
+    network = network_profile(profiles.values())
     n = 0
-    for d in store.all_devices(db):
+    for d in devices:
         mac = d["mac"]
-        profile = learn(db, mac, now) if relearn else store.baseline_get(db, mac)
+        profile = profiles[mac]
         fp_segment = segments.baseline({"fingerprint": fingerprints.resolve(table, d)})
-        for kind, key, detail in check(db, mac, profile, fp_segment, now, m):
+        for kind, key, detail in check(db, mac, profile, fp_segment, now, m, network):
             n += store.baseline_deviation(db, mac, _day(now), kind, key, detail, now)
     if relearn:
         store.set_meta(db, "baseline_learned_day", _day(now))

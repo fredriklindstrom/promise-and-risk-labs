@@ -610,6 +610,20 @@ store.baseline_deviation(db, V, "2099-01-03", "new_domain", "c2.example", {}, t0
 for i in range(700):
     store.baseline_deviation(db, R, "2099-01-03", "new_domain", f"n{i}.example", {}, t0 + 1 + i)
 listed = store.baseline_deviations(db)
+Y = "aa:bb:cc:00:00:11"  # joins after learning: no week off, compared with the whole network
+store.upsert_device(db, store.device_row({"mac": Y, "is_wired": True}), t0, active=True)
+net = baseline.network_profile([prof, None, {**prof, "days_seen": 2}])
+check("network profile only counts devices with a grown baseline", net["devices"] == 1 and net["regions"] == ["US"])
+dy = time.strftime("%Y-%m-%d", time.localtime(t0))
+store.traffic_add(db, [(Y, dy, "internet", "cdn.hue.example", "HTTPS", 1, 10), (Y, dy, "region", "US", "*", 1, 0),
+                       (Y, dy, "region", "KP", "*", 1, 0), (Y, dy, "internet", "x.example", "UDP/5555", 1, 10),
+                       (Y, dy, "local_out", B, "SMB", 1, 10), (Y, dy, "blocked", "10.0.0.9", "SSH", 2, 0)], traffic.KEY_CAP)
+yk = {(k, key) for k, key, _ in baseline.check(db, Y, None, "IDENTIFY", t0, "shadow", net)}
+check("a new device's country the network never reaches is flagged", ("new_region", "KP") in yk and ("new_region", "US") not in yk)
+check("a new device's service the network never uses is flagged", ("new_service", "UDP/5555") in yk and ("new_service", "HTTPS") not in yk)
+check("a new device talking across networks, or blocked, is flagged from day one",
+      ("new_peer", B) in yk and ("first_blocked", "blocked") in yk)
+check("young-device checks wait for shadow mode", baseline.check(db, Y, None, "IDENTIFY", t0, "learning", net) == [])
 check("a flood from one device doesn't hide another's deviation", any(x["mac"] == V for x in listed)
       and sum(x["mac"] == R for x in listed) <= 20)
 check("folding past the cap keeps a local peer's name", store.traffic_add(db, [(B, "2099-01-01", "local_in", f"aa:bb:cc:00:01:{i:02x}",

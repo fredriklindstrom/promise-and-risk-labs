@@ -407,7 +407,7 @@ async function renderBaseline() {
         : d.mode === "shadow" ? "Shadow mode: deviations are recorded here and never notified, so their false-alarm rate can be measured first."
         : "Traffic collection hasn't started yet."),
     el("p", { class: "muted" }, `Each device's profile is re-learned daily from the last ${d.learn_days} days (today excluded) and is `
-      + `compared once it has ${d.min_days} days with traffic. Anything that deviated stays out of later profiles until you mark it expected. `
+      + `compared with its own history once it has ${d.min_days} days of traffic; until then (a device that joins later, or a quiet one) it's compared with the whole network: countries and services no device uses, any traffic across networks, any blocked flow. Anything that deviated stays out of later profiles until you mark it expected. `
       + "Only traffic that crosses the gateway is seen."),
   ];
   const kinds = el("div", { class: "card" }, el("h2", {}, "False-alarm measurement"),
