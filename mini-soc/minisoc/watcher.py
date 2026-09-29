@@ -79,6 +79,9 @@ def _skip_alert(what, ident, ex):
                 dedup_key=f"ingest:{what}:{ident}")
 
 
+DIGEST_EVERY_S = 3600  # repeats inside an open issue: at most one summary per issue per hour
+
+
 def notify_pending(db, cfg):
     """Rule-driven and retried every poll until sent. Runs before triage, so a slow or dead model
     can't delay or lose a notification, and the model's view never gates one."""
@@ -86,11 +89,28 @@ def notify_pending(db, cfg):
         return
     rows = db.execute("SELECT id FROM alerts WHERE notified=0 AND status='open' "
                       "AND severity IN ('medium','high') ORDER BY id").fetchall()
+    repeats = {}
     for r in rows:
         a = store.get_alert(db, r["id"])
-        if notify.mac(f"Qwen Mini SOC · {cfg['site_name']}", f"{a['severity'].upper()} · #{a['id']} {a['rule']}",
-                      a["title"]):
+        if store.issue_repeat(db, a):  # summarised per issue below, never dropped
+            repeats.setdefault(a["issue_id"], []).append(a)
+            continue
+        issue = a.get("issue_id") or a["id"]
+        head = f"{a['severity'].upper()} · #{issue} {a['rule']}" + ("" if issue == a["id"] else f" (occurrence #{a['id']})")
+        if notify.mac(f"Qwen Mini SOC · {cfg['site_name']}", head, a["title"]):
             store.mark_notified(db, a["id"])
+    now = int(time.time())
+    for issue, occ in repeats.items():
+        last = (db.execute("SELECT digest_at FROM alerts WHERE id=?", (issue,)).fetchone() or [None])[0] or 0
+        if now - last < DIGEST_EVERY_S:
+            continue  # stays pending: it goes out in the next summary for this issue
+        first = store.get_alert(db, issue)
+        if notify.mac(f"Qwen Mini SOC · {cfg['site_name']}",
+                      f"{max((o['severity'] for o in occ), key=config.SEVERITIES.index).upper()} · #{issue}: "
+                      f"{len(occ)} more occurrence{'s' if len(occ) > 1 else ''}", first["title"] if first else ""):
+            for o in occ:
+                store.mark_notified(db, o["id"], 2)
+            db.execute("UPDATE alerts SET digest_at=? WHERE id=?", (now, issue))
     db.commit()
 
 
@@ -251,7 +271,7 @@ def recommended_action(alert):
 
 def build_state(db, cfg):
     """Pure read: the MCP server calls this too, so it must not write anything."""
-    open_alerts = store.alerts(db, "open", limit=1000)
+    open_alerts = issues(db, "open")
     worst = max((config.SEVERITIES.index(a["severity"]) for a in open_alerts), default=0)
     last_ok = store.get_meta(db, "last_poll_ok")
     stale = not last_ok or time.time() - last_ok > 5 * cfg["poll_seconds"]
@@ -259,7 +279,7 @@ def build_state(db, cfg):
     who = store.get_meta(db, "whoami", {})
     # severity decides order; the model's view is only a tiebreak, so it can't push an alert out of view
     ordered = sorted(open_alerts, key=lambda a: (-config.SEVERITIES.index(a["severity"]),
-                                                 not (a.get("triage") or {}).get("escalated"), -a["created"]))
+                                                 not (a.get("triage") or {}).get("escalated"), -a["last_at"]))
     shown = [a for a in ordered if a["severity"] == "high"] + [a for a in ordered if a["severity"] != "high"][:20]
     return {
         "site": cfg["site_name"], "generated": int(time.time()), "status": status,
@@ -269,12 +289,35 @@ def build_state(db, cfg):
         "counts": {s: sum(a["severity"] == s for a in open_alerts) for s in config.SEVERITIES},
         "devices_active": len(store.all_devices(db, active_only=True)),
         "escalated": sum(bool((a.get("triage") or {}).get("escalated")) for a in open_alerts),
-        "open_alerts": [{"id": a["id"], "severity": a["severity"], "title": a["title"], "rule": a["rule"],
+        "open_alerts": [{"id": a["id"], "severity": a["severity"], "rule": a["rule"],
+                         "title": a["title"] + (f" · {a['occurrences']} occurrences" if a["occurrences"] > 1 else ""),
                          "created": a["created"], "assessment": (a.get("triage") or {}).get("assessment"),
                          "confidence": (a.get("triage") or {}).get("confidence"),
                          "escalated": (a.get("triage") or {}).get("escalated"),
                          **recommended_action(a)} for a in shown],
     }
+
+
+def issues(db, status="open", limit=500):
+    """One row per issue: its first alert, with severity raised to the worst open occurrence, the
+    occurrence count, when it last happened and how many of each kind. Pure read."""
+    q = ("SELECT * FROM alerts WHERE (issue_id IS NULL OR issue_id=id)" + (" AND status=?" if status else "")
+         + " ORDER BY created DESC, id DESC LIMIT ?")
+    firsts = [store.get_alert(db, r["id"]) for r in db.execute(q, (status, limit) if status else (limit,))]
+    out = []
+    for a in firsts:
+        occ = store.issue_occurrences(db, a["id"])
+        live = [o for o in occ if o["status"] == "open"] or occ
+        kinds = {}
+        for o in occ:
+            kinds[o["rule"]] = kinds.get(o["rule"], 0) + 1
+        if any(o["escalated"] for o in live):  # any open occurrence the model escalated escalates the issue
+            a = {**a, "triage": {**(a.get("triage") or {}), "escalated": True}}
+        out.append({**a, "severity": max((o["severity"] for o in live), key=config.SEVERITIES.index, default=a["severity"]),
+                    "occurrences": len(occ), "open_occurrences": sum(o["status"] == "open" for o in occ),
+                    "last_at": max((o["created"] for o in occ), default=a["created"]), "kinds": kinds,
+                    "macs": store.issue_macs(db, a["id"])})
+    return out
 
 
 def write_state(db, cfg):

@@ -77,7 +77,10 @@ MIGRATIONS = [("devices", "pending_count", "INTEGER DEFAULT 0"), ("devices", "pe
               ("seg_runs", "observations", "TEXT"),
               # where a client is plugged in: the UniFi switch/AP, the port (wired), negotiated speed, signal
               ("devices", "uplink_mac", "TEXT"), ("devices", "uplink_name", "TEXT"), ("devices", "uplink_port", "INTEGER"),
-              ("devices", "link_mbps", "INTEGER"), ("devices", "signal_dbm", "INTEGER")]
+              ("devices", "link_mbps", "INTEGER"), ("devices", "signal_dbm", "INTEGER"),
+              ("alerts", "issue_id", "INTEGER"),  # the first alert of an ongoing issue; its own id when it is that first
+              ("alerts", "issue_key", "TEXT"),  # on an issue's first alert: the exact set of devices it's about
+              ("alerts", "digest_at", "INTEGER")]  # on an issue's first alert: when repeats were last summarised
 
 
 def connect(path=None, readonly=False):
@@ -94,6 +97,15 @@ def connect(path=None, readonly=False):
     for table, col, decl in MIGRATIONS:
         if col not in {r["name"] for r in db.execute(f"PRAGMA table_info({table})")}:
             db.execute(f"ALTER TABLE {table} ADD COLUMN {col} {decl}")
+    if not get_meta(db, "issues_grouped"):  # once: group the alerts that were open before issues existed
+        for (aid,) in db.execute("SELECT id FROM alerts WHERE issue_id IS NULL ORDER BY id").fetchall():
+            a = db.execute("SELECT status, entity FROM alerts WHERE id=?", (aid,)).fetchone()
+            if a["status"] == "open":
+                attach_issue(db, aid, a["entity"], db.execute("SELECT rule FROM alerts WHERE id=?", (aid,)).fetchone()[0])
+            else:
+                db.execute("UPDATE alerts SET issue_id=id WHERE id=?", (aid,))
+        set_meta(db, "issues_grouped", True)
+        db.commit()
     return db
 
 
@@ -317,7 +329,64 @@ def add_alert(db, rule, severity, entity, title, detail, dedup_key, now=None):
     cur = db.execute("INSERT OR IGNORE INTO alerts(created,rule,severity,entity,title,detail,dedup_key) "
                      "VALUES(?,?,?,?,?,?,?)",
                      (now or int(time.time()), rule, severity, entity, title, json.dumps(detail), dedup_key))
-    return cur.lastrowid if cur.rowcount == 1 else None
+    if cur.rowcount != 1:
+        return None
+    attach_issue(db, cur.lastrowid, entity, rule)
+    return cur.lastrowid
+
+
+# issues: while one is open, alerts about exactly the same device(s) are occurrences of it ------------------
+UNGROUPED_RULES = {"unifi_security_event"}  # their entity is the reporting UniFi device, not the subject
+
+
+def entity_macs(entity):
+    """The devices an alert is about, or [] when it isn't about devices (site, IP, controller object)."""
+    parts = [p.strip().lower() for p in str(entity or "").split(",")]
+    return parts if parts and all(re.fullmatch(r"[0-9a-f]{2}(?::[0-9a-f]{2}){5}", p) for p in parts) else []
+
+
+def attach_issue(db, alert_id, entity, rule=None):
+    """Join the open issue about exactly the same set of devices, else start a new one. Exact match only:
+    an alert naming two devices (a hostname collision) never pulls either device's alerts into its issue,
+    so a device that copies your laptop's name can't gather the laptop's alerts under an issue you'd close
+    as 'the new device is fine'. Alerts not about devices are always their own issue."""
+    macs = sorted(set(entity_macs(entity)))
+    key = ",".join(macs) if macs and rule not in UNGROUPED_RULES else None
+    row = db.execute("SELECT id FROM alerts WHERE issue_id=id AND status='open' AND issue_key=? AND id<>? "
+                     "ORDER BY id LIMIT 1", (key, alert_id)).fetchone() if key else None
+    issue = row[0] if row else alert_id
+    db.execute("UPDATE alerts SET issue_id=?, issue_key=? WHERE id=?", (issue, key if issue == alert_id else None,
+                                                                        alert_id))
+    return issue
+
+
+def issue_occurrences(db, issue_id):
+    return [dict(r) for r in db.execute(
+        "SELECT id, created, rule, severity, title, status, triage IS NOT NULL triaged, "
+        "COALESCE(json_extract(triage, '$.escalated'), 0) escalated FROM alerts WHERE issue_id=? ORDER BY id", (issue_id,))]
+
+
+def issue_macs(db, issue_id):
+    r = db.execute("SELECT issue_key FROM alerts WHERE id=?", (issue_id,)).fetchone()
+    return (r[0] or "").split(",") if r and r[0] else []
+
+
+LOCKED_DEFAULTS = {"RESET_TAMPERED_LABEL"}  # a tamper call: never folded into a summary
+
+
+def issue_repeat(db, alert):
+    """True when an occurrence may be summarised with others instead of notifying on its own: a later
+    occurrence of the same kind, at no higher severity, that isn't high, a UniFi security detection or a
+    tamper call. Everything else notifies on its own. Every occurrence still goes to the model."""
+    issue = alert.get("issue_id")
+    if issue in (None, alert["id"]) or alert["severity"] == "high" or alert["rule"] in UNGROUPED_RULES:
+        return False
+    if ((alert.get("detail") or {}).get("default_action")) in LOCKED_DEFAULTS:
+        return False
+    prev = db.execute("SELECT rule, severity FROM alerts WHERE issue_id=? AND id<?", (issue, alert["id"])).fetchall()
+    order = ["info", "low", "medium", "high"]
+    return bool(prev) and alert["rule"] in {r["rule"] for r in prev} and \
+        order.index(alert["severity"]) <= max(order.index(r["severity"]) for r in prev)
 
 
 def alerts(db, status="open", limit=200):
@@ -346,16 +415,25 @@ def set_triage(db, alert_id, triage):
     db.execute("UPDATE alerts SET triage=? WHERE id=?", (json.dumps(triage), alert_id))
 
 
-def mark_notified(db, alert_id):
-    db.execute("UPDATE alerts SET notified=1 WHERE id=?", (alert_id,))
+def mark_notified(db, alert_id, how=1):
+    """1 = sent; 2 = grouped into an open issue that was already notified (a repeat, not news)."""
+    db.execute("UPDATE alerts SET notified=? WHERE id=?", (how, alert_id))
 
 
 def ack(db, alert_id, note=""):
     """Acknowledging frees the dedup key, so the same thing happening again raises a new alert
-    (dedup only suppresses repeats while an alert is still open)."""
+    (dedup only suppresses repeats while an alert is still open). Closing an issue's first alert closes
+    the whole issue: every open occurrence with it, and the next alert about those devices starts a new one.
+    Closing a later occurrence closes only that occurrence."""
+    now = int(time.time())
     cur = db.execute("UPDATE alerts SET status='acked', acked_at=?, ack_note=?, dedup_key=dedup_key||'#acked'||id "
-                     "WHERE id=? AND status='open'", (int(time.time()), note, alert_id))
-    return cur.rowcount == 1
+                     "WHERE id=? AND status='open'", (now, note, alert_id))
+    if cur.rowcount != 1:
+        return False
+    db.execute("UPDATE alerts SET status='acked', acked_at=?, ack_note=?, dedup_key=dedup_key||'#acked'||id "
+               "WHERE issue_id=? AND id<>? AND status='open'", (now, note or f"closed with issue #{alert_id}",
+                                                                 alert_id, alert_id))
+    return True
 
 
 # verdicts -----------------------------------------------------------------------------

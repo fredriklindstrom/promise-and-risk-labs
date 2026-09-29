@@ -61,7 +61,10 @@ async function renderList() {
       el("div", {},
         el("div", { class: "title" }, a.title,
           a.triage && a.triage.escalated ? el("span", { class: "tag esc" }, "escalated") : null,
-          a.labelled ? el("span", { class: "tag lab" }, "classified") : null),
+          a.labelled ? el("span", { class: "tag lab" }, "classified") : null,
+          a.occurrences > 1 ? el("span", { class: "tag" }, `${a.occurrences} occurrences`) : null),
+        a.occurrences > 1 ? el("div", { class: "sub" }, Object.entries(a.kinds || {}).map(([k, n]) => `${words(k)} ×${n}`).join(" · "),
+          `  ·  last ${fmt(a.last_at)}`) : null,
         a.wifi ? el("div", { class: "sub" }, "SSID ",
           el("span", { class: "untrusted inline" }, (a.wifi.ssid && a.wifi.ssid.text) || "?"),
           a.wifi.bssid ? `  ·  BSSID ${a.wifi.bssid}` : "",
@@ -127,10 +130,30 @@ async function renderAlert(id) {
     el("h1", {}, a.title),
     el("p", {}, sev(a.severity), " ", el("span", { class: "muted" }, `${words(a.rule)} · #${a.id} · ${fmt(a.created)} · ${a.status}`)),
     a.wifi ? wifiCard(a.wifi) : null,
+    a.issue && a.issue.occurrences.length > 1 ? issueCard(a) : null,
     a.connections && a.connections.length ? connectionCard(a.connections) : null,
     actionCard, modelCard, classifyForm(a),
     el("div", { class: "card" }, el("h2", {}, "Evidence"), renderValue(a.detail)),
     verdicts].filter(Boolean));
+}
+
+function issueCard(a) {
+  const i = a.issue;
+  const open = i.occurrences.filter((o) => o.status === "open").length;
+  return el("div", { class: "card scroll" },
+    el("h2", {}, i.is_first ? `Issue #${i.id} · ${i.occurrences.length} occurrences (${open} open)`
+      : `Occurrence of issue #${i.id}`),
+    !i.is_first ? el("p", {}, el("a", { href: `#/alert/${i.id}` }, `→ open issue #${i.id}`),
+      el("span", { class: "muted" }, " to see every occurrence and close the whole issue.")) : null,
+    el("p", { class: "muted" }, `Devices: ${i.macs.join(", ") || "none"}. Alerts about these devices join this issue while it's open. `
+      + "Every occurrence is assessed by Qwen. Repeats of the same kind are summarised in at most one notification an hour; "
+      + "anything high, a security detection, a tamper call, a new kind of alert or a higher severity notifies on its own. "
+      + "Closing the issue closes every occurrence; the next alert about these devices starts a new issue."),
+    el("table", {}, el("thead", {}, el("tr", {}, ["#", "when", "what", "severity", "status"].map((h) => el("th", {}, h)))),
+      el("tbody", {}, i.occurrences.map((o) => el("tr", {},
+        el("td", {}, o.id === a.id ? `#${o.id} (this)` : el("a", { href: `#/alert/${o.id}` }, `#${o.id}`)),
+        el("td", {}, fmt(o.created)), el("td", {}, words(o.rule), el("div", { class: "muted" }, o.title)),
+        el("td", {}, sev(o.severity)), el("td", {}, o.status, o.triaged ? el("div", { class: "muted" }, "assessed") : null))))));
 }
 
 function speed(mbps) {
@@ -217,7 +240,9 @@ function classifyForm(a) {
     el("fieldset", {}, el("legend", {}, "Why (becomes the reason in the training example; examples without one aren't exported)"),
       el("textarea", { name: "note", rows: 3, maxlength: 500 }, cur.note || "")),
     el("label", {}, el("input", { type: "checkbox", name: "close", checked: a.status === "open" ? null : true }),
-      a.status === "open" ? "Also close this alert" : "Alert is closed"),
+      a.status !== "open" ? "Alert is closed"
+        : a.issue && a.issue.is_first && a.issue.occurrences.length > 1 ? `Also close this issue (all ${a.issue.occurrences.length} occurrences)`
+        : a.issue && !a.issue.is_first ? "Also close this occurrence (the issue stays open)" : "Also close this alert"),
     el("div", {}, el("button", { class: "btn primary", type: "submit" }, cur.created ? "Update classification" : "Save classification"), " ", msg));
   return form;
 }

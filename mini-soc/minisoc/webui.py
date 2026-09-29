@@ -72,6 +72,9 @@ def alert_view(db, a, full=False):
         v["wifi"] = w
     if full:
         v["connections"] = connection_view(db, a)
+        issue = a.get("issue_id") or a["id"]
+        v["issue"] = {"id": issue, "is_first": issue == a["id"], "macs": store.issue_macs(db, issue),
+                      "occurrences": store.issue_occurrences(db, issue)}
         if t:
             v["triage"]["model_text"] = {k: t.get(k) for k in ("reason", "action_reason", "next_step")}
         v["detail"] = a["detail"]
@@ -109,10 +112,12 @@ def inventory_view(db):
     UniFi's fingerprint. Names are wrapped with who wrote them; nothing here is a verdict."""
     table = fingerprints.load()
     gear = {d.get("mac"): d for d in (store.get_meta(db, "own_radios") or {}).get("devices", []) if isinstance(d, dict)}
-    open_alerts = {}
+    open_alerts = {}  # open issues per device, by the issue's first alert
     for a in store.alerts(db, "open", limit=5000):
         for mac in str(a.get("entity") or "").split(","):
-            open_alerts.setdefault(mac.strip(), []).append(a["id"])
+            issue = a.get("issue_id") or a["id"]
+            if issue not in open_alerts.setdefault(mac.strip().lower(), []):
+                open_alerts[mac.strip().lower()].append(issue)
     devices = store.all_devices(db)
     net_vlan = {d["network"]: d["vlan"] for d in devices if d.get("network") and d.get("vlan") is not None}
     labels = store.seg_labels_latest_any(db)
@@ -424,8 +429,9 @@ class Handler(BaseHTTPRequestHandler):
                     raise Refused(400, "status must be open, acked or all")
                 db = _ro()
                 try:
-                    rows = store.alerts(db, None if status == "all" else status, limit=500)
-                    return self._send(200, [alert_view(db, a) for a in rows])
+                    rows = watcher.issues(db, None if status == "all" else status)
+                    return self._send(200, [{**alert_view(db, a), **{k: a[k] for k in (
+                        "severity", "occurrences", "open_occurrences", "last_at", "kinds", "macs")}} for a in rows])
                 finally:
                     db.close()
             m = re.fullmatch(r"/api/alerts/(\d{1,9})", u.path)

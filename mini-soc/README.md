@@ -51,7 +51,9 @@ This folder is the code only. The runtime output describes a real home network, 
 
 The first poll records every known device as the starting point and raises no alerts, apart from a summary, "identify this device" items for connected devices with no name, and "recently added device" items.
 
-Dedup only suppresses repeats while an alert is open: acknowledging it lets the same thing fire again. Don't add iCloud Private Relay or other shared egress addresses to the baseline; they vouch for everyone behind them.
+Dedup only suppresses repeats while an alert is open: acknowledging it lets the same thing fire again.
+
+**Issues.** While an issue is open, every alert about exactly the same device or set of devices is an occurrence of it. The alert list, widget and menu bar show one row per issue with an occurrence count, and the issue page lists every occurrence. Closing the issue's first alert closes all of them; the next alert about those devices starts a new issue. Grouping is by the exact device set, so an alert naming two devices (a hostname collision) never gathers either device's other alerts: a device that copies your laptop's name can't pull the laptop's alerts under an issue you'd close as fine. Grouping never keeps an occurrence from the model. Same-kind repeats are summarised in at most one notification per issue per hour; anything high, a UniFi security detection, a tamper call, a new kind of alert or a higher severity notifies on its own. Don't add iCloud Private Relay or other shared egress addresses to the baseline; they vouch for everyone behind them.
 
 ## Rogue access points
 

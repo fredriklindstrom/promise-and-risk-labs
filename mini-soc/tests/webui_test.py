@@ -110,6 +110,16 @@ check("unknown verdict refused", req(f"/api/baseline/deviations/{dv.get('id')}/l
                                      json.dumps({"verdict": "ignore"}).encode(), good)[0] == 400)
 check("verdict on a missing deviation refused", req("/api/baseline/deviations/999999/label", "POST", verdict, good)[0] == 404)
 check("valid verdict accepted", req(f"/api/baseline/deviations/{dv.get('id')}/label", "POST", verdict, good)[0] == 200)
+db = store.connect()
+first = store.add_alert(db, "label_changed", "medium", "aa:bb:cc:dd:ee:08", "Hostname changed", {}, "iss1")
+again = store.add_alert(db, "label_changed", "medium", "aa:bb:cc:dd:ee:08", "Hostname changed", {}, "iss2")
+db.commit(); db.close()
+row = next((x for x in json.loads(req("/api/alerts")[1]) if x["id"] == first), None)
+check("alert list shows the issue once, with its occurrence count", row and row["occurrences"] == 2
+      and not any(x["id"] == again for x in json.loads(req("/api/alerts")[1])))
+det = json.loads(req(f"/api/alerts/{again}")[1])
+check("an occurrence's page points to its issue and lists every occurrence",
+      det["issue"]["id"] == first and not det["issue"]["is_first"] and len(det["issue"]["occurrences"]) == 2)
 check("verdict shows in the false-alarm table", json.loads(req("/api/baseline")[1])["kinds"]["new_domain"]["expected"] == 1)
 
 srv.shutdown()

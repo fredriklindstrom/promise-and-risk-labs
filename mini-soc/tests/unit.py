@@ -630,5 +630,69 @@ check("folding past the cap keeps a local peer's name", store.traffic_add(db, [(
       f"TCP/{i}", 1, 1) for i in range(traffic.KEY_CAP + 5)], traffic.KEY_CAP) is None and db.execute(
       "SELECT COUNT(*) FROM traffic WHERE mac=? AND day='2099-01-01' AND peer='other'", (B,)).fetchone()[0] == 0)
 
+
+# issues: while one is open, alerts about exactly the same device(s) are occurrences of it
+from minisoc import notify as notify_mod
+db = db_tmp()
+D1, D2, D3 = "aa:bb:cc:00:20:01", "aa:bb:cc:00:20:02", "aa:bb:cc:00:20:03"
+a1 = store.add_alert(db, "label_changed", "medium", D1, "Hostname changed on D1", {}, "k1")
+a2 = store.add_alert(db, "label_changed", "medium", D1, "Hostname changed on D1", {}, "k2")
+a3 = store.add_alert(db, "hostname_collision", "medium", f"{D2},{D1}", "2 devices report the same hostname", {}, "k3")
+a3b = store.add_alert(db, "hostname_collision", "medium", f"{D1},{D2}", "2 devices report the same hostname", {}, "k3b")
+a4 = store.add_alert(db, "label_changed", "medium", D2, "Hostname changed on D2", {}, "k4")
+a6 = store.add_alert(db, "config_change", "medium", "site", "Config change", {}, "k6")
+a9 = store.add_alert(db, "unifi_security_event", "medium", D1, "IPS alert reported by D1", {}, "k9")
+iss = lambda i: store.get_alert(db, i)["issue_id"]
+check("repeats for one device join its issue", iss(a1) == a1 and iss(a2) == a1)
+check("an alert about two devices is its own issue, and the same pair again joins it", iss(a3) == a3 and iss(a3b) == a3)
+check("a device named in a pair keeps its own issue", iss(a4) == a4)
+check("site-wide alerts and UniFi security detections are never grouped", iss(a6) == a6 and iss(a9) == a9)
+rep = lambda i: store.issue_repeat(db, store.get_alert(db, i))
+check("a later same-kind occurrence may be summarised; the first may not", rep(a2) and not rep(a1) and rep(a3b) and not rep(a3))
+a7 = store.add_alert(db, "label_changed", "high", D1, "Hostname changed on D1", {}, "k7")
+a8 = store.add_alert(db, "label_changed", "medium", D1, "Alias changed on D1", {"default_action": "RESET_TAMPERED_LABEL"}, "k8")
+check("anything high, or a tamper call, always notifies on its own", not rep(a7) and not rep(a8))
+iv = {x["id"]: x for x in watcher.issues(db)}
+check("the issue list shows one row per issue with its count and worst severity",
+      set(iv) == {a1, a3, a4, a6, a9} and iv[a1]["occurrences"] == 4 and iv[a1]["severity"] == "high"
+      and iv[a3]["occurrences"] == 2 and store.issue_macs(db, a3) == sorted([D1, D2]))
+sent = []
+real_mac, notify_mod.mac = notify_mod.mac, (lambda *args: sent.append(args) or True)
+try:
+    watcher.notify_pending(db, {"notify": True, "site_name": "t"})
+    notified = {r["id"]: r["notified"] for r in db.execute("SELECT id, notified FROM alerts")}
+    check("repeats go out as one summary per issue, everything else on its own",
+          notified[a2] == 2 and notified[a3b] == 2 and all(notified[i] == 1 for i in (a1, a3, a4, a6, a7, a8, a9))
+          and sum("more occurrence" in x[1] for x in sent) == 2)
+    a10 = store.add_alert(db, "label_changed", "medium", D1, "Hostname changed on D1", {}, "k10")
+    n = len(sent)
+    watcher.notify_pending(db, {"notify": True, "site_name": "t"})
+    check("a repeat within the hour waits for the next summary, it isn't dropped",
+          len(sent) == n and store.get_alert(db, a10)["notified"] == 0)
+finally:
+    notify_mod.mac = real_mac
+# an attacker device copying a victim's hostname can't gather the victim's alerts under its own issue
+A, V = "aa:bb:cc:00:30:0a", "aa:bb:cc:00:30:0f"
+n1 = store.add_alert(db, "new_device", "medium", A, "New device A", {}, "n1")
+c1 = store.add_alert(db, "hostname_collision", "medium", f"{A},{V}", "A and V share a name", {}, "c1")
+v1 = store.add_alert(db, "label_changed", "medium", V, "Hostname changed on V", {}, "v1")
+v2 = store.add_alert(db, "label_changed", "medium", V, "Hostname changed on V", {}, "v2")
+check("the victim's alerts stay in the victim's own issue", iss(v1) == v1 and iss(v2) == v1 and iss(c1) == c1 and iss(n1) == n1)
+store.ack(db, n1, "new device is fine")
+check("closing the attacker's issue leaves the pair and the victim open",
+      all(store.get_alert(db, i)["status"] == "open" for i in (c1, v1, v2)))
+store.ack(db, a2, "just this one")
+check("closing an occurrence closes only that one", store.get_alert(db, a2)["status"] == "acked"
+      and store.get_alert(db, a1)["status"] == "open")
+store.ack(db, a1, "fixed the names")
+check("closing the issue closes every occurrence", all(store.get_alert(db, i)["status"] == "acked" for i in (a1, a7, a8, a10)))
+a11 = store.add_alert(db, "label_changed", "medium", D1, "Hostname changed on D1", {}, "k1")
+check("after the issue is closed, the same thing again starts a new issue", a11 and iss(a11) == a11)
+db.execute("UPDATE alerts SET issue_id=NULL, issue_key=NULL")
+store.set_meta(db, "issues_grouped", False); db.commit()
+db2 = store.connect(db.execute("PRAGMA database_list").fetchone()[2])
+check("existing open alerts are grouped once on upgrade", store.get_alert(db2, v2)["issue_id"] == v1
+      and store.get_alert(db2, a11)["issue_id"] == a11 and store.get_alert(db2, c1)["issue_id"] == c1)
+
 print("\nUNIT", "PASS" if not FAILS else f"FAIL ({len(FAILS)})")
 sys.exit(1 if FAILS else 0)

@@ -29,7 +29,8 @@ def _db():
 
 def _alert_view(a):
     v = {k: a[k] for k in ("id", "created", "rule", "severity", "entity", "title", "status",
-                           "detail", "acked_at", "ack_note")} | {"created_at": normalize.iso(a["created"])}
+                           "detail", "acked_at", "ack_note")} | {"created_at": normalize.iso(a["created"]),
+                                                                 "issue_id": a.get("issue_id") or a["id"]}
     ra = watcher.recommended_action(a)
     if ra["action_id"]:
         v["recommended_action"] = {**ra, "steps": actions.ACTIONS[ra["action_id"]]["steps"],
@@ -51,7 +52,7 @@ def status() -> str:
     return json.dumps(s, indent=1)
 
 
-@mcp.tool(description="Alerts, newest first. status: 'open' (default), 'acked', or 'all'.")
+@mcp.tool(description="Alerts, newest first. status: 'open' (default), 'acked', or 'all'. Alerts about the same device while its issue is open share an issue_id (the issue's first alert); each is one occurrence.")
 def list_alerts(status: str = "open", limit: int = 50) -> str:
     db = _db()
     out = [_alert_view(a) for a in store.alerts(db, None if status == "all" else status, limit)]
