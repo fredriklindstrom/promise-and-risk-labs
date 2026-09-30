@@ -9,7 +9,7 @@ import hashlib
 import functools
 import re
 
-from . import actions, normalize, store
+from . import actions, geo, normalize, store
 
 # Categories UniFi uses for day-to-day operational noise. Anything outside these (and outside
 # AUDIT, handled separately) is unfamiliar and gets surfaced rather than silently dropped.
@@ -410,20 +410,24 @@ def event_alerts(db, e):
     if cat == "AUDIT":
         ip = normalize.canonical_ip(ev.get("source_ip"))
         known = bool(ip) and store.baseline_has(db, "admin_ip", ip)
+        loc = geo.lookup(ip) if ip else None
+        # the title gets the database's place names only; the network owner's name stays wrapped in the detail
+        where = f" ({loc['summary'][:48]})" if loc and loc.get("summary") and loc["summary"] != "location unknown" else ""
         if key == "ADMIN_ACCESS":
             # a known address lowers severity but never hides the login
             return [dict(rule="admin_login" if known else "admin_login_new_ip",
                          severity="low" if known else "medium", entity=ip or "unknown",
-                         title=(f"Admin login from a known address: {ip}" if known
-                                else f"Admin login from an address not seen before: {ip or 'unknown address'}"),
-                         detail={"event": ev, "default_action": "CONFIRM_ADMIN_CHANGE"},
+                         title=(f"Admin login from a known address: {ip}{where}" if known
+                                else f"Admin login from an address not seen before: {ip or 'unknown address'}{where}"),
+                         detail={"event": ev, "location": loc, "default_action": "CONFIRM_ADMIN_CHANGE"},
                          dedup_key=f"event:{e['id']}" if (known or not ip) else f"admin_ip:{ip}")]
         # every configuration change gets looked at, whoever made it and from wherever
         obj = ev.get("object") or {}
         return [dict(rule="config_change", severity="medium", entity=obj.get("id") or "site",
                      title=f"{ev.get('title') or 'Config change'}: {obj.get('kind') or key} by {ev.get('actor')} "
-                           f"from {ip or 'unknown address'}{' (known address)' if known else ''}",
-                     detail={"event": ev, "default_action": "CONFIRM_ADMIN_CHANGE"}, dedup_key=f"event:{e['id']}")]
+                           f"from {ip or 'unknown address'}{' (known address)' if known else where}",
+                     detail={"event": ev, "location": loc, "default_action": "CONFIRM_ADMIN_CHANGE"},
+                     dedup_key=f"event:{e['id']}")]
     sev = "high" if (e.get("severity") or "").upper() in ("HIGH", "CRITICAL") else "medium"
     if SECURITY_KEY_MARKERS & set(key.split("_")):  # whole tokens, so IPS doesn't match IPSEC
         if ev.get("essid") or ev.get("bssid"):

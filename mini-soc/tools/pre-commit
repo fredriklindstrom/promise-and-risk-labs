@@ -24,13 +24,21 @@ for f in "$DENY" "$WORDS"; do
     exit 1
   fi
 done
-HITS="$(git grep --cached -n -i -F -f "$TMP/publication-deny.txt" -- . 2>&1)"; rc=$?
+# the whole staged tree, text files: the term lists (binaries are judged by the check below; compressed
+# bytes match short terms by chance).
+HITS="$(git grep --cached -n -I -i -F -f "$TMP/publication-deny.txt" -- . 2>&1)"; rc=$?
 if [ $rc -gt 1 ]; then echo "pre-commit: BLOCKED. publication scan failed: $HITS"; exit 1; fi
-WORD="$(git grep --cached -n -i -w -F -f "$TMP/publication-deny-words.txt" -- . 2>&1)"; rc=$?
+WORD="$(git grep --cached -n -I -i -w -F -f "$TMP/publication-deny-words.txt" -- . 2>&1)"; rc=$?
 if [ $rc -gt 1 ]; then echo "pre-commit: BLOCKED. publication scan failed: $WORD"; exit 1; fi
-if [ -n "$HITS$WORD" ]; then
+# every staged file (renames included), judged text or binary by the check itself, not by git: text gets
+# both term lists, binaries must be PNGs of standard chunks only. Its own failure blocks too.
+BIN="$(/usr/bin/python3 "$(git rev-parse --show-toplevel)/mini-soc/tools/publication_check.py" \
+        "$TMP/publication-deny.txt" "$TMP/publication-deny-words.txt" 2>&1)"; rc=$?
+if [ $rc -gt 1 ]; then echo "pre-commit: BLOCKED. publication check failed: $BIN"; exit 1; fi
+if [ $rc -eq 1 ] && [ -z "$BIN" ]; then echo "pre-commit: BLOCKED. publication check failed without saying why"; exit 1; fi
+if [ -n "$HITS$WORD$BIN" ]; then
   echo "pre-commit: BLOCKED. staged files contain held-back or identifying text:"
-  printf '%s\n%s\n' "$HITS" "$WORD" | sed '/^$/d' | head -20
+  printf '%s\n%s\n%s\n' "$HITS" "$WORD" "$BIN" | sed '/^$/d' | head -20
   exit 1
 fi
 

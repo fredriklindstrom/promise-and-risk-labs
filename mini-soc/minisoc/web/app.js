@@ -74,8 +74,10 @@ async function renderList() {
             ? `→ ${a.recommended_action.action_source === "model" ? "Qwen: " : ""}${a.recommended_action.action}` : "",
           a.triage && a.triage.assessment ? `  ·  model: ${words(a.triage.assessment)} (${a.triage.confidence || "?"})` : "")),
       el("div", { class: "meta" }, `#${a.id}`, el("br"), fmt(a.created)))));
+  const openCount = listFilter === "open" ? alerts.length : null;
   view.replaceChildren(
     el("h1", {}, "Alerts"), filters,
+    openCount ? el("p", {}, el("a", { class: "btn primary", href: "#/triage" }, `Triage mode: work through ${openCount} open issue${openCount === 1 ? "" : "s"} →`)) : null,
     alerts.length ? el("ul", { class: "list" }, rows) : el("p", { class: "muted" }, "Nothing here."));
 }
 
@@ -96,7 +98,7 @@ function renderValue(v) {
   return el("span", {}, v === null || v === undefined ? "" : String(v));
 }
 
-async function renderAlert(id) {
+async function renderAlert(id, mode) {
   const a = await api(`/api/alerts/${encodeURIComponent(id)}`);
   const ra = a.recommended_action || {};
   const t = a.triage || null;
@@ -126,13 +128,13 @@ async function renderAlert(id) {
         el("td", {}, v.rule_version || ""), el("td", {}, fmt(v.created)), el("td", {}, v.human_decision || ""))))));
 
   view.replaceChildren(...[  // replaceChildren would print a null as the text "null"
-    el("p", {}, el("a", { href: "#/" }, "← Alerts")),
+    mode ? mode.bar : el("p", {}, el("a", { href: "#/" }, "← Alerts")),
     el("h1", {}, a.title),
     el("p", {}, sev(a.severity), " ", el("span", { class: "muted" }, `${words(a.rule)} · #${a.id} · ${fmt(a.created)} · ${a.status}`)),
     a.wifi ? wifiCard(a.wifi) : null,
     a.issue && a.issue.occurrences.length > 1 ? issueCard(a) : null,
     a.connections && a.connections.length ? connectionCard(a.connections) : null,
-    actionCard, modelCard, classifyForm(a),
+    actionCard, modelCard, mode ? classifyForm(a, mode.onSaved, true) : classifyForm(a),
     el("div", { class: "card" }, el("h2", {}, "Evidence"), renderValue(a.detail)),
     verdicts].filter(Boolean));
 }
@@ -146,7 +148,7 @@ function issueCard(a) {
     !i.is_first ? el("p", {}, el("a", { href: `#/alert/${i.id}` }, `→ open issue #${i.id}`),
       el("span", { class: "muted" }, " to see every occurrence and close the whole issue.")) : null,
     el("p", { class: "muted" }, `Devices: ${i.macs.join(", ") || "none"}. Alerts about these devices join this issue while it's open. `
-      + "Every occurrence is assessed by Qwen. Repeats of the same kind are summarised in at most one notification an hour; "
+      + "Grouping never keeps an occurrence from Qwen. Repeats of the same kind are summarised in at most one notification an hour; "
       + "anything high, a security detection, a tamper call, a new kind of alert or a higher severity notifies on its own. "
       + "Closing the issue closes every occurrence; the next alert about these devices starts a new issue."),
     el("table", {}, el("thead", {}, el("tr", {}, ["#", "when", "what", "severity", "status"].map((h) => el("th", {}, h)))),
@@ -204,15 +206,18 @@ function wifiCard(w) {
     el("p", { class: "muted" }, "A BSSID is broadcast in the clear and any radio can claim one, so a resemblance never proves a network is yours. Confirm in UniFi which radio broadcasts it."));
 }
 
-function classifyForm(a) {
+function classifyForm(a, onSaved, closeByDefault) {
   const o = a.options;
   const cur = a.label || {};
   const t = a.triage || {};
   const radio = (name, value, text, checked) =>
     el("label", {}, el("input", { type: "radio", name, value, checked: checked || null, required: true }), text);
   const msg = el("span", {});
+  const save = el("button", { class: "btn primary", type: "submit" }, cur.created ? "Update classification" : "Save classification");
   const form = el("form", { class: "classify card", onsubmit: async (ev) => {
       ev.preventDefault();
+      if (save.disabled) return;
+      save.disabled = true;  // a double click must not land on the next issue in triage mode
       const f = new FormData(form);
       msg.className = ""; msg.textContent = "Saving…";
       try {
@@ -221,10 +226,11 @@ function classifyForm(a) {
           action: f.get("action") || null, note: f.get("note") || "", close: f.get("close") === "on",
         });
         msg.className = "ok"; msg.textContent = "Saved.";
-        setTimeout(route, 400);
-      } catch (e) { msg.className = "err"; msg.textContent = e.message; }
+        if (onSaved) onSaved(f.get("close") === "on"); else setTimeout(route, 400);
+      } catch (e) { msg.className = "err"; msg.textContent = e.message; save.disabled = false; }
     } },
     el("h2", {}, "Classify"),
+    closeByDefault && cur.created ? el("p", { class: "err" }, `You classified this before (${fmt(cur.created)}). Check your answers: saving will also close it.`) : null,
     el("p", { class: "muted" }, "Your answer is the training label: it records what the rule and Qwen should have said."),
     el("fieldset", {}, el("legend", {}, "Should this alert have fired?"),
       radio("should_fire", "yes", "Yes, worth a look", cur.should_fire !== "no"),
@@ -239,11 +245,11 @@ function classifyForm(a) {
         o.actions.map((x) => el("option", { value: x.id, selected: cur.action === x.id || null }, x.title)))),
     el("fieldset", {}, el("legend", {}, "Why (becomes the reason in the training example; examples without one aren't exported)"),
       el("textarea", { name: "note", rows: 3, maxlength: 500 }, cur.note || "")),
-    el("label", {}, el("input", { type: "checkbox", name: "close", checked: a.status === "open" ? null : true }),
+    el("label", {}, el("input", { type: "checkbox", name: "close", checked: a.status === "open" ? (closeByDefault || null) : true }),
       a.status !== "open" ? "Alert is closed"
         : a.issue && a.issue.is_first && a.issue.occurrences.length > 1 ? `Also close this issue (all ${a.issue.occurrences.length} occurrences)`
         : a.issue && !a.issue.is_first ? "Also close this occurrence (the issue stays open)" : "Also close this alert"),
-    el("div", {}, el("button", { class: "btn primary", type: "submit" }, cur.created ? "Update classification" : "Save classification"), " ", msg));
+    el("div", {}, save, " ", msg));
   return form;
 }
 
@@ -488,6 +494,63 @@ function trafficLine(t) {
   return el("div", { class: "muted" }, `last ${t.window_days} d: ${parts.join(" · ")}`);
 }
 
+// ---------------------------------------------------------------- triage mode
+// A snapshot of the open issues, worked through one at a time. Highest severity first, then what Qwen
+// escalated, then oldest. Saving with "close" ticked removes the issue from the queue and moves on.
+const tq = { ids: [], pos: 0, closed: 0, labelled: 0, skipped: new Set(), built: false };
+const SEV_ORDER = ["info", "low", "medium", "high"];
+
+async function buildQueue() {
+  const open = await api("/api/alerts?status=open");
+  open.sort((x, y) => (SEV_ORDER.indexOf(y.severity) - SEV_ORDER.indexOf(x.severity))
+    || (Number(!!(y.triage && y.triage.escalated)) - Number(!!(x.triage && x.triage.escalated)))
+    || (x.created - y.created));
+  Object.assign(tq, { ids: open.map((a) => a.id), pos: 0, closed: 0, labelled: 0, skipped: new Set(), built: true });
+}
+
+async function renderTriage(pos) {
+  if (!tq.built) await buildQueue();
+  if (!tq.ids.length || pos >= tq.ids.length) {
+    view.replaceChildren(
+      el("h1", {}, "Triage done"),
+      el("p", {}, `${tq.closed} closed · ${tq.labelled} classified · ${tq.skipped.size} skipped.`),
+      el("p", {}, el("a", { class: "btn", href: "#/", onclick: () => { tq.built = false; } }, "← Alerts"), " ",
+        tq.skipped.size ? el("a", { class: "btn primary", href: "#/triage/0",
+          onclick: () => { tq.ids = tq.ids.filter((i) => tq.skipped.has(i)); tq.skipped = new Set(); } }, "Go through the skipped ones") : null));
+    return;
+  }
+  tq.pos = Math.max(0, pos);
+  const id = tq.ids[tq.pos];
+  const go = (p) => { location.hash = `#/triage/${p}`; };
+  const bar = el("div", { class: "card triage-bar" },
+    el("strong", {}, `Triage · ${tq.pos + 1} of ${tq.ids.length}`),
+    el("span", { class: "muted" }, `  ${tq.closed} closed · ${tq.skipped.size} skipped · keys: j next, k previous`),
+    el("span", { class: "triage-nav" },
+      el("button", { class: "btn", disabled: tq.pos === 0 || null, onclick: () => go(tq.pos - 1) }, "← Previous"), " ",
+      el("button", { class: "btn", onclick: () => { tq.skipped.add(id); go(tq.pos + 1); } }, "Skip →"), " ",
+      el("a", { class: "btn", href: "#/", onclick: () => { tq.built = false; } }, "Exit")));
+  await renderAlert(id, { bar, onSaved: (closed) => {
+    tq.labelled += 1;
+    tq.skipped.delete(id);
+    if (closed) {  // out of the queue; the next one slides into this position
+      tq.closed += 1;
+      tq.ids.splice(tq.pos, 1);
+      go(tq.pos);
+      route();  // same hash: force the redraw
+    } else {
+      go(tq.pos + 1);
+    }
+  } });
+}
+
+document.addEventListener("keydown", (e) => {
+  const m = (location.hash || "").match(/^#\/triage(?:\/(\d+))?$/);
+  if (!m || e.metaKey || e.ctrlKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+  const at = Number(m[1] || 0);
+  if (e.key === "j") location.hash = `#/triage/${at + 1}`;
+  if (e.key === "k" && at > 0) location.hash = `#/triage/${at - 1}`;
+});
+
 // ---------------------------------------------------------------- routing
 async function route() {
   const h = location.hash || "#/";
@@ -496,7 +559,9 @@ async function route() {
       : h.startsWith("#/inventory") ? "inventory" : h.startsWith("#/baseline") ? "baseline" : "alerts") === a.dataset.nav));
   try {
     const m = h.match(/^#\/alert\/(\d+)$/);
+    const tm = h.match(/^#\/triage(?:\/(\d+))?$/);
     if (m) await renderAlert(m[1]);
+    else if (tm) { if (tm[1] === undefined) tq.built = false; await renderTriage(Number(tm[1] || 0)); }
     else if (h.startsWith("#/training")) await renderTraining();
     else if (h.startsWith("#/segmentation")) await renderSegmentation();
     else if (h.startsWith("#/inventory")) await renderInventory();

@@ -22,7 +22,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from . import actions, baseline, config, fingerprints, normalize, segments, segmentation, store, traffic, triage, watcher
+from . import actions, baseline, config, fingerprints, geo, normalize, segments, segmentation, store, traffic, triage, watcher
 
 HOST, PORT = "127.0.0.1", 8095
 WEB = Path(__file__).parent / "web"
@@ -30,7 +30,8 @@ STATIC = {"/": ("index.html", "text/html; charset=utf-8"),
           "/index.html": ("index.html", "text/html; charset=utf-8"),
           "/app.js": ("app.js", "text/javascript; charset=utf-8"),
           "/app.css": ("app.css", "text/css; charset=utf-8"),
-          "/brand-mark.svg": ("brand-mark.svg", "image/svg+xml")}
+          "/brand-mark.svg": ("brand-mark.svg", "image/svg+xml"),
+          "/mini-soc-mark.png": ("mini-soc-mark.png", "image/png")}
 ALLOWED_HOSTS = {f"127.0.0.1:{PORT}", f"localhost:{PORT}"}
 ALLOWED_ORIGINS = {f"http://{h}" for h in ALLOWED_HOSTS}
 SECURITY_HEADERS = {
@@ -78,6 +79,10 @@ def alert_view(db, a, full=False):
         if t:
             v["triage"]["model_text"] = {k: t.get(k) for k in ("reason", "action_reason", "next_step")}
         v["detail"] = a["detail"]
+        ev = (a["detail"] or {}).get("event") if isinstance(a["detail"], dict) else None
+        if a["rule"] in ("admin_login", "admin_login_new_ip", "config_change") and isinstance(ev, dict) \
+                and ev.get("source_ip") and "location" not in a["detail"]:  # alerts from before the lookup existed
+            v["detail"] = {**a["detail"], "location": geo.lookup(ev["source_ip"])}
         v["verdicts"] = [{k: r[k] for k in ("tier", "verdict", "confidence", "escalated", "rule_version", "model",
                                              "human_decision", "created")} for r in store.verdicts_for(db, a["id"])]
         v["label"] = store.latest_label(db, a["id"])

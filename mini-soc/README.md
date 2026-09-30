@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/mini-soc-logo.png" alt="Mini SOC logo: a shield with an eye" width="260"></p>
+
 # Mini SOC
 
 A self-hosted security monitor for a UniFi network, running on one Mac. Build log and current status: [promiseandrisk.ai/mini-soc](https://promiseandrisk.ai/mini-soc/).

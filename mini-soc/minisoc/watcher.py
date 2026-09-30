@@ -16,7 +16,7 @@ import time
 import traceback
 from collections import defaultdict
 
-from . import actions, baseline, config, fingerprints, normalize, notify, rules, store, traffic, triage
+from . import actions, baseline, config, fingerprints, geo, normalize, notify, rules, store, traffic, triage
 from .unifi import UniFi
 
 WHOAMI_EVERY = 3600
@@ -171,6 +171,13 @@ def poll(client, db, cfg, now=None, do_triage=True, do_notify=True):
                 store.set_meta(db, "known_ssids", sorted(known | {v["essid"] for v in radios["vaps"] if v.get("essid")}))
             except Exception as ex:  # enrichment only: a failure here must not stop the poll
                 log(f"own_radios refresh failed: {type(ex).__name__}")
+
+    if now - (store.get_meta(db, "geo_refresh_at") or 0) >= geo.REFRESH_EVERY_S:
+        store.set_meta(db, "geo_refresh_at", now)  # one attempt a day, success or not
+        try:  # enrichment: this month's location databases, once they're published
+            geo.refresh(now, log)
+        except Exception as ex:
+            log(f"geo refresh failed: {type(ex).__name__}")
 
     candidates = []
     rows, active_macs = merged_rows(client.clients_active(), client.clients_known())

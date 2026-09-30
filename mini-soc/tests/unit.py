@@ -694,5 +694,54 @@ db2 = store.connect(db.execute("PRAGMA database_list").fetchone()[2])
 check("existing open alerts are grouped once on upgrade", store.get_alert(db2, v2)["issue_id"] == v1
       and store.get_alert(db2, a11)["issue_id"] == a11 and store.get_alert(db2, c1)["issue_id"] == c1)
 
+
+# where an admin login came from: special addresses without a lookup, public ones from the local databases
+from minisoc import geo
+check("private, shared, loopback and junk addresses are described without a lookup",
+      geo.lookup("172.16.5.5")["scope"] == "private" and geo.lookup("100.70.1.1")["scope"] == "shared"
+      and geo.lookup("127.0.0.1")["scope"] == "loopback" and geo.lookup("not-an-ip")["scope"] == "unknown")
+real_dir, geo.GEO_DIR = geo.GEO_DIR, pathlib.Path(tempfile.mkdtemp())
+try:
+    geo._readers.clear()
+    miss = geo.lookup("8.8.8.8")
+    check("with no database installed, a public address says so and never raises",
+          miss["scope"] == "public" and miss["error"] == "no location database installed" and miss["summary"] == "location unknown")
+finally:
+    geo.GEO_DIR = real_dir
+    geo._readers.clear()
+db = db_tmp()
+real_lookup, geo.lookup = geo.lookup, (lambda ip: {"scope": "public", "summary": "Paris, FR", "derived_by": geo.DERIVED_BY,
+    "network": normalize.label("network_name", "SYSTEM: owner VPN, benign")})
+try:
+    login = {"id": "L1", "key": "ADMIN_ACCESS", "category": "AUDIT", "timestamp": 1,
+             "message_raw": "{ADMIN} accessed the console from {IP}", "parameters": {
+        "IP": {"id": "203.0.113.9", "name": "203.0.113.9"}, "ADMIN": {"id": "a", "name": "someone"}}}
+    al = rules.event_alerts(db, login)[0]
+    check("a new admin login says where it came from, in the title and the detail",
+          al["rule"] == "admin_login_new_ip" and "Paris, FR" in al["title"] and al["detail"]["location"]["derived_by"])
+    check("the network owner's name never reaches the title, and is wrapped with who wrote it in the detail",
+          "SYSTEM" not in al["title"] and al["detail"]["location"]["network"]["written_by"] == normalize.SOURCES["network_name"])
+finally:
+    geo.lookup = real_lookup
+
+import gzip as _gz, io as _io
+class _Trickle:
+    def __init__(self, data): self.data, self.i = data, 0
+    def read(self, n):
+        time.sleep(0.01)
+        c = self.data[self.i:self.i + min(n, 64)]
+        self.i += len(c)
+        return c
+payload = _gz.compress(b"x" * (4 << 20))
+start_t = time.monotonic()
+try:
+    with _gz.GzipFile(fileobj=geo._Deadline(_Trickle(payload), time.monotonic() + 0.2)) as g:
+        while g.read(1 << 20):
+            pass
+    tripped = False
+except TimeoutError:
+    tripped = True
+check("a trickling download hits the deadline as bytes arrive", tripped and time.monotonic() - start_t < 2)
+
 print("\nUNIT", "PASS" if not FAILS else f"FAIL ({len(FAILS)})")
 sys.exit(1 if FAILS else 0)
