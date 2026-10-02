@@ -134,6 +134,7 @@ async function renderAlert(id, mode) {
     a.wifi ? wifiCard(a.wifi) : null,
     a.issue && a.issue.occurrences.length > 1 ? issueCard(a) : null,
     a.connections && a.connections.length ? connectionCard(a.connections) : null,
+    a.detail && Array.isArray(a.detail.flows) ? flowCard(a.detail.flows) : null,
     actionCard, modelCard, mode ? classifyForm(a, mode.onSaved, true) : classifyForm(a),
     el("div", { class: "card" }, el("h2", {}, "Evidence"), renderValue(a.detail)),
     verdicts].filter(Boolean));
@@ -156,6 +157,31 @@ function issueCard(a) {
         el("td", {}, o.id === a.id ? `#${o.id} (this)` : el("a", { href: `#/alert/${o.id}` }, `#${o.id}`)),
         el("td", {}, fmt(o.created)), el("td", {}, words(o.rule), el("div", { class: "muted" }, o.title)),
         el("td", {}, sev(o.severity)), el("td", {}, o.status, o.triaged ? el("div", { class: "muted" }, "assessed") : null))))));
+}
+
+function flowCard(flows) {
+  if (!flows.length) return el("div", { class: "card muted" }, "No matching flow found in the gateway's flow log for this event.");
+  const who = (x) => !x ? "" : typeof x === "string" ? x
+    : [x.name && x.name.text, x.hostname && x.hostname.text].filter(Boolean)[0] || x.mac;
+  const end = (e) => el("div", {},
+    el("div", {}, `${e.ip || "?"}${e.port !== undefined ? `:${e.port}` : ""}`),
+    el("div", { class: "muted" }, e.mac ? `MAC ${e.mac}` : ""),
+    e.mac_is ? el("div", { class: typeof e.mac_is === "string" ? "muted" : "" },
+      typeof e.mac_is === "string" ? e.mac_is : el("span", {}, "your device ", el("span", { class: "untrusted inline" }, who(e.mac_is)),
+        e.mac_is.ip ? ` (its address ${e.mac_is.ip})` : "")) : null,
+    e.ip_belongs_to ? el("div", {}, "address belongs to ", el("span", { class: "untrusted inline" }, who(e.ip_belongs_to)),
+      ` (${e.ip_belongs_to.mac})`) : null);
+  return el("div", { class: "card scroll" },
+    el("h2", {}, "The blocked flow (from the gateway's flow log)"),
+    el("table", {}, el("thead", {}, el("tr", {}, ["when", "rule", "source", "destination", "protocol"].map((h) => el("th", {}, h)))),
+      el("tbody", {}, flows.map((f) => el("tr", {},
+        el("td", {}, f.time || "", el("div", { class: "muted" }, [f.action, f.risk && `risk ${f.risk}`, f.direction].filter(Boolean).join(" · "))),
+        el("td", {}, (f.rules || []).map((r) => el("div", {}, [r.name, r.category && words(r.category).toLowerCase()].filter(Boolean).join(" · "))),
+          el("div", { class: "muted" }, f.network || "")),
+        el("td", {}, end(f.source)), el("td", {}, end(f.destination)),
+        el("td", {}, [f.protocol, f.service].filter(Boolean).join(" · ")))))),
+    flows.some((f) => f.facts && f.facts.length) ? el("div", {}, el("h2", {}, "What doesn't add up"),
+      el("ul", {}, [...new Set(flows.flatMap((f) => f.facts || []))].map((t) => el("li", {}, t)))) : null);
 }
 
 function speed(mbps) {

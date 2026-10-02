@@ -77,10 +77,14 @@ def typed_event(e):
         ev["changes_made"] = pv("COUNT")
     if "DEVICE" in used:
         ev["device"] = {"mac": pv("DEVICE", "id"), "model_name": pv("DEVICE")}
-    if "CLIENT" in used:
-        c = p.get("CLIENT") or {}
-        ev["client"] = {"mac": c.get("id"), "hostname": label("hostname", c.get("hostname")),
-                        "display_name": label("display_name", c.get("name"))}
+    for key, field in (("CLIENT", "client"), ("SRC_CLIENT", "source_client"), ("DST_CLIENT", "destination_client")):
+        if key in used:
+            c = p.get(key) if isinstance(p.get(key), dict) else {}
+            ev[field] = {"mac": c.get("id"), "hostname": label("hostname", c.get("hostname")),
+                         "display_name": label("display_name", c.get("name"))}
+    for key, field in (("SRC_IP", "source_address"), ("DST_IP", "destination_address")):
+        if key in used:
+            ev[field] = canonical_ip(pv(key, "id"))
     for k in ("PLATFORM", "MESH_PARENT", "NEAREST_AP", "CHANNEL", "RSSI", "WAN_ID",
               "ISP_NAME", "PORT", "VERSION"):
         if k in used:

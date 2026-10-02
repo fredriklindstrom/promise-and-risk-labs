@@ -428,7 +428,7 @@ def event_alerts(db, e):
                            f"from {ip or 'unknown address'}{' (known address)' if known else where}",
                      detail={"event": ev, "location": loc, "default_action": "CONFIRM_ADMIN_CHANGE"},
                      dedup_key=f"event:{e['id']}")]
-    sev = "high" if (e.get("severity") or "").upper() in ("HIGH", "CRITICAL") else "medium"
+    sev = "high" if (e.get("severity") or "").upper() in ("HIGH", "VERY_HIGH", "CRITICAL") else "medium"
     if SECURITY_KEY_MARKERS & set(key.split("_")):  # whole tokens, so IPS doesn't match IPSEC
         if ev.get("essid") or ev.get("bssid"):
             ev["facts"] = wifi_facts(db, (ev.get("essid") or {}).get("text"), (ev.get("bssid") or {}).get("value"))

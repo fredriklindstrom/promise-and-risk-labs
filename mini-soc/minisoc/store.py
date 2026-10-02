@@ -411,6 +411,13 @@ def get_alert(db, alert_id):
     return a
 
 
+def update_alert_detail(db, alert_id, detail, title=None):
+    if title:
+        db.execute("UPDATE alerts SET detail=?, title=? WHERE id=?", (json.dumps(detail), title, alert_id))
+    else:
+        db.execute("UPDATE alerts SET detail=? WHERE id=?", (json.dumps(detail), alert_id))
+
+
 def set_triage(db, alert_id, triage):
     db.execute("UPDATE alerts SET triage=? WHERE id=?", (json.dumps(triage), alert_id))
 

@@ -16,7 +16,7 @@ import time
 import traceback
 from collections import defaultdict
 
-from . import actions, baseline, config, fingerprints, geo, normalize, notify, rules, store, traffic, triage
+from . import actions, baseline, config, evidence, fingerprints, geo, normalize, notify, rules, store, traffic, triage
 from .unifi import UniFi
 
 WHOAMI_EVERY = 3600
@@ -80,6 +80,51 @@ def _skip_alert(what, ident, ex):
 
 
 DIGEST_EVERY_S = 3600  # repeats inside an open issue: at most one summary per issue per hour
+
+
+def attach_flows(client, db, e, a):
+    """The blocked flow behind a security event, so the alert shows source and destination. Enrichment:
+    a failure is noted in the alert and never stops it."""
+    try:
+        flows = evidence.find_flows(client, db, e)
+    except Exception as ex:
+        a["detail"]["flows_error"] = type(ex).__name__
+        return
+    if flows is not None:
+        a["detail"]["flows"] = flows
+        a["title"] = a["title"] + evidence.title_suffix(flows)
+
+
+BACKFILL_DAYS = 14
+FLOWS_INLINE = 2           # security events enriched inside the poll that raised them
+FLOWS_BUDGET_S = 20        # all flow enrichment in one poll; anyone can trigger security events from outside
+
+
+def backfill_flows(client, db, now, limit=3, deadline=None):
+    """Open security alerts raised before flow evidence existed get it once (a few per poll)."""
+    rows = db.execute("SELECT id FROM alerts WHERE rule='unifi_security_event' AND status='open' AND created>? "
+                      "ORDER BY id DESC", (now - BACKFILL_DAYS * 86400,)).fetchall()
+    done = 0
+    for (aid,) in rows:
+        a = store.get_alert(db, aid)
+        det = a.get("detail") if isinstance(a.get("detail"), dict) else None
+        if not det or "flows" in det or "flows_error" in det:
+            continue
+        if done >= limit or (deadline and time.monotonic() > deadline):
+            break
+        raw = store.raw_event(db, (det.get("event") or {}).get("id"))
+        if not raw:
+            continue
+        # added, never replaced: the alert keeps what Qwen assessed and what was labelled
+        det["event_full"] = normalize.typed_event(raw)  # with the source and destination the event names
+        cand = {"detail": det, "title": a["title"]}
+        attach_flows(client, db, raw, cand)
+        if "flows" not in cand["detail"] and "flows_error" not in cand["detail"]:
+            cand["detail"]["flows"] = []
+        if cand["title"] != a["title"]:
+            cand["detail"]["title_before"] = a["title"]
+        store.update_alert_detail(db, aid, cand["detail"], cand["title"] if cand["title"] != a["title"] else None)
+        done += 1
 
 
 def notify_pending(db, cfg):
@@ -204,6 +249,7 @@ def poll(client, db, cfg, now=None, do_triage=True, do_notify=True):
     cursor = store.get_meta(db, "event_cursor_ms")
     since = (cursor - cfg["event_overlap_seconds"] * 1000) if cursor else (now - BOOTSTRAP_EVENT_DAYS * 86400) * 1000
     fresh = []
+    flow_deadline, inline_left = time.monotonic() + FLOWS_BUDGET_S, FLOWS_INLINE
     events = client.events_since(since)
     for e in sorted(events, key=lambda e: e.get("timestamp") or 0):
         try:
@@ -236,11 +282,21 @@ def poll(client, db, cfg, now=None, do_triage=True, do_notify=True):
         candidates += rules.collision_alerts(db, now)
         for e in fresh:
             try:
-                candidates += rules.event_alerts(db, e)
+                found = rules.event_alerts(db, e)
+                for a in found:  # a few inline, within a time budget; the backfill picks up the rest
+                    if a["rule"] == "unifi_security_event" and inline_left > 0 and time.monotonic() < flow_deadline:
+                        attach_flows(client, db, e, a)
+                        inline_left -= 1
+                candidates += found
             except Exception as ex:
                 candidates.append(_skip_alert("event", e.get("id") or normalize.event_fingerprint(e), ex))
 
     new_ids = [i for i in (store.add_alert(db, now=now, **a) for a in candidates) if i]
+    if bootstrapped and hasattr(client, "traffic_flows"):
+        try:
+            backfill_flows(client, db, now, deadline=flow_deadline)
+        except Exception as ex:
+            log(f"flow backfill failed: {type(ex).__name__}")
     new_alerts = [store.get_alert(db, i) for i in new_ids]
     rv = rule_version()
     for a in new_alerts:  # L1: the rule said yes

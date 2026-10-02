@@ -82,6 +82,31 @@ The gateway only sees traffic it routes. Two devices on the same network talk th
 
 Each device gets a **baseline** of normal: services, main domains, countries, cross-network peers, its usual busy days, and the hours it's active. It learns for 14 days, then runs in **shadow mode**: deviations are listed on the web UI's Baseline page and never notified or sent to the model. A person marks each one expected or suspicious, which gives a false-alarm rate per kind of deviation before any of them is allowed to page. Anything that deviated stays out of later profiles until it's marked expected, and a day flagged for volume never raises the volume bar, so a slow ramp can't teach the baseline that it's normal. One check runs from day one: an IoT device moving over a gigabyte a day. A device with less than a week of its own history (one that joins later, or a quiet one) is compared with the whole network instead: a country or service no device uses, any traffic across networks, any blocked flow.
 
+## Security events: the blocked flow behind them
+
+UniFi's "Threat Detected and Blocked" event names only a client and an address. For each one, the watcher
+looks up the matching blocked flow in the gateway's flow log: source and destination addresses and ports,
+protocol, the IPS rule and its risk, and which of your devices owns each address. It also states plainly
+what doesn't add up, for example a source address on none of your networks, a device sending with someone
+else's address, or a packet addressed back to its own sender. The title adds the rule and the two addresses
+(never a name a device chose). Outside traffic can trigger these events, so enrichment is bounded: two
+events inside the poll, three more per poll afterwards, one 20-second budget.
+
+## Where an admin login came from
+
+Admin login and configuration-change alerts carry the source address's location from local copies of the
+DB-IP Lite city and network databases in `state/geo/`. **IP geolocation by [DB-IP](https://db-ip.com),
+CC BY 4.0.** No address is sent anywhere: the watcher downloads the current month's files from DB-IP once
+they're published (one attempt a day, about 65 MB compressed the first time) and looks up locally. It's an
+estimate, and a VPN or iCloud Private Relay shows the relay's location. Titles carry only the database's place
+names; the network's registered name, which its owner chooses, stays in the detail, wrapped with who wrote it.
+
+## Triage mode
+
+On the web UI's Alerts page, **Triage mode** takes the open issues in order (highest severity, then what the
+model escalated, then oldest) one at a time with the classify form, "close" ticked. Saving moves to the next;
+Skip and Previous (keys j and k) move without saving.
+
 ## Run it
 
 Requires Apple Silicon, Python 3.12, and a UniFi OS console reachable from the Mac.

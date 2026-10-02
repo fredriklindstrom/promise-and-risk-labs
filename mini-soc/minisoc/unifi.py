@@ -35,10 +35,16 @@ def _slim_flow(x):
     s, d = (s if isinstance(s, dict) else {}), (d if isinstance(d, dict) else {})
     td = x.get("traffic_data") if isinstance(x.get("traffic_data"), dict) else {}
     doms = d.get("domains") if isinstance(d.get("domains"), list) else []
+    pols = x.get("policies") if isinstance(x.get("policies"), list) else []
+    net = x.get("in") if isinstance(x.get("in"), dict) else {}
     return {"time": x.get("time"), "direction": x.get("direction"), "action": x.get("action"),
             "service": x.get("service"), "protocol": x.get("protocol"), "src_mac": s.get("mac"),
+            "src_ip": s.get("ip"), "src_port": s.get("port"), "src_subnet": s.get("subnet"),
             "dst_mac": d.get("mac"), "dst_ip": d.get("ip"), "dst_port": d.get("port"), "region": d.get("region"),
-            "domain": next((v for v in doms if isinstance(v, str)), None), "bytes": td.get("bytes_total")}
+            "domain": next((v for v in doms if isinstance(v, str)), None), "bytes": td.get("bytes_total"),
+            "risk": x.get("risk"), "network": net.get("network_name"),
+            "policies": [{"type": p.get("type"), "category": p.get("ips_category"), "name": p.get("name")}
+                         for p in pols[:3] if isinstance(p, dict)]}
 
 
 class ReadOnlyViolation(RuntimeError):
@@ -132,7 +138,7 @@ class UniFi:
             page += 1
 
 
-    def traffic_flows(self, since_ms, until_ms):
+    def traffic_flows(self, since_ms, until_ms, max_pages=MAX_FLOW_PAGES):
         """Flows the gateway routed in the window. Sets self.flows_truncated when the page cap cut it short."""
         rows, page = [], 0
         self.flows_truncated = False
@@ -142,7 +148,7 @@ class UniFi:
             rows += [_slim_flow(x) for x in d.get("data") or [] if isinstance(x, dict)]
             if not d.get("has_next"):
                 return rows
-            if page + 1 >= MAX_FLOW_PAGES:
+            if page + 1 >= max_pages:
                 self.flows_truncated = True
                 return rows
             page += 1
