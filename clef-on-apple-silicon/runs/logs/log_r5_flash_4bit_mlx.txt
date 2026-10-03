@@ -1,0 +1,49 @@
+loaded in 3.04s, active 4.69 GB
+accuracy pass: {'n': 60, 'median_latency_s': 0.5921, 'median_input_tokens': 267.5, 'peak_gb': 5.73}
+  250 tok rep 1: 0.53s
+  250 tok rep 2: 0.53s
+  250 tok rep 3: 0.53s
+  250 tok rep 4: 0.53s
+  250 tok rep 5: 0.53s
+sweep: {'target': 250, 'input_tokens': 252, 'reps': 5, 'median_s': 0.533, 'min_s': 0.533, 'max_s': 0.534, 'tok_per_s': 472.5, 'peak_gb': 5.63}
+  500 tok rep 1: 1.03s
+  500 tok rep 2: 1.03s
+  500 tok rep 3: 1.03s
+  500 tok rep 4: 1.03s
+  500 tok rep 5: 1.03s
+sweep: {'target': 500, 'input_tokens': 502, 'reps': 5, 'median_s': 1.027, 'min_s': 1.027, 'max_s': 1.032, 'tok_per_s': 488.7, 'peak_gb': 5.77}
+  2000 tok rep 1: 4.01s
+  2000 tok rep 2: 4.00s
+  2000 tok rep 3: 4.00s
+  2000 tok rep 4: 4.00s
+  2000 tok rep 5: 4.00s
+sweep: {'target': 2000, 'input_tokens': 1996, 'reps': 5, 'median_s': 4.005, 'min_s': 4.003, 'max_s': 4.006, 'tok_per_s': 498.4, 'peak_gb': 6.0}
+  8000 tok rep 1: 16.35s
+  8000 tok rep 2: 16.34s
+  8000 tok rep 3: 16.35s
+  8000 tok rep 4: 16.35s
+  8000 tok rep 5: 16.35s
+sweep: {'target': 8000, 'input_tokens': 8002, 'reps': 5, 'median_s': 16.346, 'min_s': 16.341, 'max_s': 16.353, 'tok_per_s': 489.6, 'peak_gb': 6.37}
+  32000 tok rep 1: 73.07s
+  32000 tok rep 2: 73.13s
+  32000 tok rep 3: 73.03s
+sweep: {'target': 32000, 'input_tokens': 31954, 'reps': 3, 'median_s': 73.071, 'min_s': 73.03, 'max_s': 73.13, 'tok_per_s': 437.3, 'peak_gb': 9.3}
+DONE /Users/fredrik/clef-bench/results/metrics_r5_flash_4bit_mlx.json
+      369.40 real         4.62 user         7.55 sys
+          5959385088  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              732133  page reclaims
+                   6  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                   8  voluntary context switches
+               51443  involuntary context switches
+        114478377622  instructions retired
+         39526420955  cycles elapsed
+         32473044680  peak memory footprint

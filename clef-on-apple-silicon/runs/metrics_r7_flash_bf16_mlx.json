@@ -1,0 +1,109 @@
+{
+ "run": "r7_flash_bf16_mlx",
+ "backend": "mlxc",
+ "path": "/Users/fredrik/clef-bench/models/clef-flash-bf16-mlx",
+ "device": "mps",
+ "env": {
+  "python": "3.12.14",
+  "platform": "macOS-27.0.1-arm64-arm-64bit"
+ },
+ "env_vars": {},
+ "started": "2026-10-02 19:20:18",
+ "errors": [],
+ "load_s_first": 4.01,
+ "mem_after_load_gb": 17.75,
+ "load_s_second": 1.36,
+ "loaded": true,
+ "accuracy_pass": {
+  "n": 60,
+  "median_latency_s": 0.5155,
+  "median_input_tokens": 267.5,
+  "peak_gb": 17.96
+ },
+ "sweep": [
+  {
+   "target": 250,
+   "input_tokens": 252,
+   "reps": 5,
+   "median_s": 0.445,
+   "min_s": 0.445,
+   "max_s": 0.446,
+   "tok_per_s": 566.2,
+   "peak_gb": 17.9,
+   "times": [
+    0.446,
+    0.445,
+    0.445,
+    0.445,
+    0.445
+   ]
+  },
+  {
+   "target": 500,
+   "input_tokens": 502,
+   "reps": 5,
+   "median_s": 0.802,
+   "min_s": 0.802,
+   "max_s": 0.803,
+   "tok_per_s": 625.7,
+   "peak_gb": 18.03,
+   "times": [
+    0.803,
+    0.802,
+    0.802,
+    0.802,
+    0.802
+   ]
+  },
+  {
+   "target": 2000,
+   "input_tokens": 1996,
+   "reps": 5,
+   "median_s": 3.041,
+   "min_s": 3.021,
+   "max_s": 3.042,
+   "tok_per_s": 656.3,
+   "peak_gb": 18.45,
+   "times": [
+    3.021,
+    3.041,
+    3.041,
+    3.042,
+    3.041
+   ]
+  },
+  {
+   "target": 8000,
+   "input_tokens": 8002,
+   "reps": 5,
+   "median_s": 12.165,
+   "min_s": 12.164,
+   "max_s": 12.178,
+   "tok_per_s": 657.8,
+   "peak_gb": 18.92,
+   "times": [
+    12.178,
+    12.164,
+    12.164,
+    12.165,
+    12.165
+   ]
+  },
+  {
+   "target": 32000,
+   "input_tokens": 31954,
+   "reps": 3,
+   "median_s": 55.753,
+   "min_s": 55.736,
+   "max_s": 55.775,
+   "tok_per_s": 573.1,
+   "peak_gb": 21.91,
+   "times": [
+    55.775,
+    55.753,
+    55.736
+   ]
+  }
+ ],
+ "finished": "2026-10-02 19:25:04"
+}

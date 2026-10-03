@@ -1,0 +1,22 @@
+18:39:41 watchdog start pattern=bench.py --run r4_flash baseline_swap=42687MB
+18:44:11 watchdog end
+18:44:47 watchdog start pattern=bench.py --run r5_ baseline_swap=42679MB
+18:45:42 watchdog end
+18:45:47 watchdog start pattern=bench.py --run r5_ baseline_swap=42671MB
+18:51:58 watchdog end
+18:59:34 watchdog start pattern=bench.py --run r1_ baseline_swap=42663MB
+19:00:17 KILL swap=47547MB (+4884) free=37%
+19:00:17 watchdog end
+19:01:01 watchdog start pattern=mlx_vlm.convert baseline_swap=47677MB
+19:01:25 watchdog end
+19:01:32 watchdog start pattern=bench.py --run r6_ baseline_swap=47669MB
+19:08:45 KILL swap=54081MB (+6412) free=29%
+19:08:45 watchdog end
+19:09:15 watchdog start pattern=bench.py --run r6x_ baseline_swap=55541MB
+19:19:07 watchdog end
+19:19:16 watchdog start pattern=mlx_vlm.convert baseline_swap=55125MB
+19:19:39 watchdog start pattern=bench.py --run r7_ baseline_swap=55109MB
+19:19:40 watchdog end
+19:19:42 watchdog end
+19:20:18 watchdog start pattern=bench.py --run r7_ baseline_swap=55109MB
+19:25:07 watchdog end

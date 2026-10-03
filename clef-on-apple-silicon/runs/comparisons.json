@@ -1,0 +1,76 @@
+{
+ "r1_clef_bf16_torch": null,
+ "r6_clef_bf16_mlx": null,
+ "r2_clef_8bit_mlx": {
+  "n": 60,
+  "agreement_pct": 100.0,
+  "mean_abs_diff": 0.0017,
+  "max_abs_diff": 0.017,
+  "flips_0_5": 0,
+  "flips_0_8": 0,
+  "disagreements": []
+ },
+ "r3_clef_4bit_mlx": {
+  "n": 60,
+  "agreement_pct": 100.0,
+  "mean_abs_diff": 0.0115,
+  "max_abs_diff": 0.1413,
+  "flips_0_5": 0,
+  "flips_0_8": 1,
+  "disagreements": []
+ },
+ "r4_flash_bf16_torch": null,
+ "r7_flash_bf16_mlx": {
+  "n": 60,
+  "agreement_pct": 100.0,
+  "mean_abs_diff": 0.0019,
+  "max_abs_diff": 0.0157,
+  "flips_0_5": 0,
+  "flips_0_8": 0,
+  "disagreements": []
+ },
+ "r5_flash_4bit_mlx": {
+  "n": 60,
+  "agreement_pct": 96.7,
+  "mean_abs_diff": 0.0296,
+  "max_abs_diff": 0.3265,
+  "flips_0_5": 1,
+  "flips_0_8": 0,
+  "disagreements": [
+   {
+    "id": "route-18",
+    "question": "queue",
+    "ref_answer": "technical",
+    "ref_p": 0.5207,
+    "run_answer": "account_access",
+    "run_p": 0.4547
+   },
+   {
+    "id": "cmd-20",
+    "question": "safe",
+    "ref_answer": "true",
+    "ref_p": 0.7773,
+    "run_answer": "false",
+    "run_p": 0.5492
+   }
+  ]
+ },
+ "r5b_flash_4bit_mlxc": {
+  "n": 60,
+  "agreement_pct": 98.3,
+  "mean_abs_diff": 0.0297,
+  "max_abs_diff": 0.3289,
+  "flips_0_5": 1,
+  "flips_0_8": 0,
+  "disagreements": [
+   {
+    "id": "cmd-20",
+    "question": "safe",
+    "ref_answer": "true",
+    "ref_p": 0.7773,
+    "run_answer": "false",
+    "run_p": 0.5516
+   }
+  ]
+ }
+}

@@ -1,0 +1,21 @@
+17:52:31 START mlx-community/clef-4bit
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+/Users/fredrik/.cache/huggingface/hub/models--mlx-community--clef-4bit/snapshots/d004817dc77fc70916d21be82d951d8028ae3a5c
+17:55:13 DONE mlx-community/clef-4bit
+17:55:13 START TrevorJS/clef-flash-mlx-4bit
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+/Users/fredrik/.cache/huggingface/hub/models--TrevorJS--clef-flash-mlx-4bit/snapshots/6d4dc3ff7f43fba6065f1caef5c7a135315dfc8d
+17:56:05 DONE TrevorJS/clef-flash-mlx-4bit
+17:56:05 START mlx-community/clef-8bit
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+/Users/fredrik/.cache/huggingface/hub/models--mlx-community--clef-8bit/snapshots/ffcdb6132b3cc94e523860321dd9ed58bc1ee9a1
+18:00:30 DONE mlx-community/clef-8bit
+18:00:30 START Cloudflare/clef-flash
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+/Users/fredrik/.cache/huggingface/hub/models--Cloudflare--clef-flash/snapshots/17f0b0ad64efb65d273590632833508766b2aae6
+18:03:04 DONE Cloudflare/clef-flash
+18:03:04 START Cloudflare/clef
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+/Users/fredrik/.cache/huggingface/hub/models--Cloudflare--clef/snapshots/2f3de3dd85f379784083b0814d997ab627200f0c
+18:10:22 DONE Cloudflare/clef
+ALLDONE

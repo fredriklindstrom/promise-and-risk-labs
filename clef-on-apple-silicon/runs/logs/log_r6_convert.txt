@@ -1,0 +1,42 @@
+<frozen runpy>:128: RuntimeWarning: 'mlx_vlm.convert' found in sys.modules after import of package 'mlx_vlm', but prior to execution of 'mlx_vlm.convert'; this may result in unpredictable behaviour
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/fredrik/clef-bench/.venv-mlx/lib/python3.12/site-packages/mlx_vlm/convert.py", line 567, in <module>
+    main()
+  File "/Users/fredrik/clef-bench/.venv-mlx/lib/python3.12/site-packages/mlx_vlm/convert.py", line 559, in main
+    convert(**vars(args))
+  File "/Users/fredrik/clef-bench/.venv-mlx/lib/python3.12/site-packages/mlx_vlm/convert.py", line 392, in convert
+    processor.save_pretrained(mlx_path)
+  File "/Users/fredrik/clef-bench/.venv-mlx/lib/python3.12/site-packages/transformers/processing_utils.py", line 1161, in save_pretrained
+    attribute.save_pretrained(save_directory)
+  File "/Users/fredrik/clef-bench/.venv-mlx/lib/python3.12/site-packages/transformers/tokenization_utils_tokenizers.py", line 618, in save_pretrained
+    return super().save_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fredrik/clef-bench/.venv-mlx/lib/python3.12/site-packages/transformers/tokenization_utils_base.py", line 2120, in save_pretrained
+    save_files = self._save_pretrained(
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fredrik/clef-bench/.venv-mlx/lib/python3.12/site-packages/transformers/tokenization_utils_tokenizers.py", line 1177, in _save_pretrained
+    self.backend_tokenizer.save(tokenizer_file)
+Exception: Permission denied (os error 13)
+Calling `python -m mlx_vlm.convert ...` directly is deprecated. Use `mlx_vlm.convert ...` or `python -m mlx_vlm convert ...` instead.
+[INFO] Loading
+[INFO] Using dtype: bfloat16
+       22.53 real         2.23 user        15.09 sys
+          9456975872  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              586713  page reclaims
+                 189  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+               23251  voluntary context switches
+               62103  involuntary context switches
+         82887135271  instructions retired
+         54842651057  cycles elapsed
+          9436388600  peak memory footprint

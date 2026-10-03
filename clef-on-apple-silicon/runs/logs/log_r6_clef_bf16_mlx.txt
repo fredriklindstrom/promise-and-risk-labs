@@ -1,0 +1,26 @@
+loaded in 23.92s, active 51.2 GB
+accuracy pass: {'n': 60, 'median_latency_s': 1.8227, 'median_input_tokens': 267.5, 'peak_gb': 51.41}
+  250 tok rep 1: 1.68s
+  250 tok rep 2: 1.63s
+  250 tok rep 3: 1.58s
+  250 tok rep 4: 1.65s
+  250 tok rep 5: 1.61s
+sweep: {'target': 250, 'input_tokens': 252, 'reps': 5, 'median_s': 1.625, 'min_s': 1.584, 'max_s': 1.676, 'tok_per_s': 155.0, 'peak_gb': 51.36}
+  500 tok rep 1: 2.77s
+  500 tok rep 2: 2.77s
+  500 tok rep 3: 2.77s
+  500 tok rep 4: 2.77s
+  500 tok rep 5: 2.79s
+sweep: {'target': 500, 'input_tokens': 502, 'reps': 5, 'median_s': 2.772, 'min_s': 2.766, 'max_s': 2.787, 'tok_per_s': 181.1, 'peak_gb': 51.52}
+  2000 tok rep 1: 10.49s
+  2000 tok rep 2: 10.48s
+  2000 tok rep 3: 10.48s
+  2000 tok rep 4: 10.48s
+  2000 tok rep 5: 10.49s
+sweep: {'target': 2000, 'input_tokens': 1996, 'reps': 5, 'median_s': 10.481, 'min_s': 10.478, 'max_s': 10.488, 'tok_per_s': 190.4, 'peak_gb': 51.98}
+  8000 tok rep 1: 41.95s
+  8000 tok rep 2: 41.90s
+  8000 tok rep 3: 41.90s
+  8000 tok rep 4: 41.91s
+  8000 tok rep 5: 41.91s
+sweep: {'target': 8000, 'input_tokens': 8002, 'reps': 5, 'median_s': 41.905, 'min_s': 41.904, 'max_s': 41.95, 'tok_per_s': 191.0, 'peak_gb': 52.75}

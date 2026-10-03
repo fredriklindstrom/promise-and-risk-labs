@@ -1,0 +1,13 @@
+{
+ "run": "r1_clef_bf16_torch",
+ "backend": "torch",
+ "device": "mps",
+ "loaded": false,
+ "errors": [
+  {
+   "stage": "load",
+   "error": "Stopped by the benchmark's memory watchdog at 33% of weight loading (19:00:17): swap grew +4.9 GB in ~40 s (42.7 -> 47.5 GB) while system free memory was 37%. Trajectory projected memory exhaustion before load completed; PyTorch/transformers appears to stage weights through CPU memory before copying to MPS (transient ~2x). Not retried: same pattern as the 2026-09-17 kernel panic. PYTORCH_MPS_HIGH_WATERMARK_RATIO=1.0 (cap 77.8 GB) was set; it was not the limit hit."
+  }
+ ],
+ "notes": "BF16 accuracy reference for Clef 27B taken from run 6 (MLX BF16 conversion of the same Cloudflare weights). Runtime parity justified by run 7 vs run 4 on Clef-flash: MLX BF16 vs PyTorch BF16 agree 60/60, max |dp| 0.016."
+}

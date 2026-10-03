@@ -1,0 +1,109 @@
+{
+ "run": "r5b_flash_4bit_mlxc",
+ "backend": "mlxc",
+ "path": "/Users/fredrik/.cache/huggingface/hub/models--mlx-community--clef-flash-4bit/snapshots/140bf7e037f5fa95a96535feca112f46c15927cf",
+ "device": "mps",
+ "env": {
+  "python": "3.12.14",
+  "platform": "macOS-27.0.1-arm64-arm-64bit"
+ },
+ "env_vars": {},
+ "started": "2026-10-02 18:53:05",
+ "errors": [],
+ "load_s_first": 12.82,
+ "mem_after_load_gb": 5.77,
+ "load_s_second": 0.97,
+ "loaded": true,
+ "accuracy_pass": {
+  "n": 60,
+  "median_latency_s": 0.5953,
+  "median_input_tokens": 267.5,
+  "peak_gb": 6.35
+ },
+ "sweep": [
+  {
+   "target": 250,
+   "input_tokens": 252,
+   "reps": 5,
+   "median_s": 0.536,
+   "min_s": 0.535,
+   "max_s": 0.537,
+   "tok_per_s": 470.5,
+   "peak_gb": 6.26,
+   "times": [
+    0.537,
+    0.535,
+    0.536,
+    0.535,
+    0.536
+   ]
+  },
+  {
+   "target": 500,
+   "input_tokens": 502,
+   "reps": 5,
+   "median_s": 1.034,
+   "min_s": 1.033,
+   "max_s": 1.04,
+   "tok_per_s": 485.6,
+   "peak_gb": 6.41,
+   "times": [
+    1.034,
+    1.034,
+    1.04,
+    1.033,
+    1.033
+   ]
+  },
+  {
+   "target": 2000,
+   "input_tokens": 1996,
+   "reps": 5,
+   "median_s": 4.022,
+   "min_s": 4.02,
+   "max_s": 4.023,
+   "tok_per_s": 496.3,
+   "peak_gb": 6.62,
+   "times": [
+    4.02,
+    4.022,
+    4.023,
+    4.022,
+    4.022
+   ]
+  },
+  {
+   "target": 8000,
+   "input_tokens": 8002,
+   "reps": 5,
+   "median_s": 16.392,
+   "min_s": 16.389,
+   "max_s": 16.402,
+   "tok_per_s": 488.2,
+   "peak_gb": 7.0,
+   "times": [
+    16.402,
+    16.392,
+    16.389,
+    16.392,
+    16.393
+   ]
+  },
+  {
+   "target": 32000,
+   "input_tokens": 31954,
+   "reps": 3,
+   "median_s": 72.84,
+   "min_s": 72.799,
+   "max_s": 72.929,
+   "tok_per_s": 438.7,
+   "peak_gb": 9.92,
+   "times": [
+    72.929,
+    72.799,
+    72.84
+   ]
+  }
+ ],
+ "finished": "2026-10-02 18:59:23"
+}

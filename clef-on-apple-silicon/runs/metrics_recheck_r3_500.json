@@ -1,0 +1,36 @@
+{
+ "run": "recheck_r3_500",
+ "backend": "mlxc",
+ "path": "/Users/fredrik/.cache/huggingface/hub/models--mlx-community--clef-4bit/snapshots/d004817dc77fc70916d21be82d951d8028ae3a5c",
+ "device": "mps",
+ "env": {
+  "python": "3.12.14",
+  "platform": "macOS-27.0.1-arm64-arm-64bit"
+ },
+ "env_vars": {},
+ "started": "2026-10-02 19:25:31",
+ "errors": [],
+ "load_s_first": 5.8,
+ "mem_after_load_gb": 15.19,
+ "loaded": true,
+ "sweep": [
+  {
+   "target": 500,
+   "input_tokens": 502,
+   "reps": 5,
+   "median_s": 3.574,
+   "min_s": 3.573,
+   "max_s": 3.575,
+   "tok_per_s": 140.5,
+   "peak_gb": 15.83,
+   "times": [
+    3.575,
+    3.573,
+    3.574,
+    3.574,
+    3.573
+   ]
+  }
+ ],
+ "finished": "2026-10-02 19:26:02"
+}

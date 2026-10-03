@@ -1,0 +1,107 @@
+{
+ "run": "r4_flash_bf16_torch",
+ "backend": "torch",
+ "path": "/Users/fredrik/.cache/huggingface/hub/models--Cloudflare--clef-flash/snapshots/17f0b0ad64efb65d273590632833508766b2aae6",
+ "device": "mps",
+ "env": {
+  "python": "3.12.14",
+  "platform": "macOS-27.0.1-arm64-arm-64bit"
+ },
+ "env_vars": {
+  "PYTORCH_MPS_LOW_WATERMARK_RATIO": "0.9",
+  "PYTORCH_MPS_HIGH_WATERMARK_RATIO": "1.0"
+ },
+ "started": "2026-10-02 18:39:40",
+ "errors": [
+  {
+   "stage": "sweep 32000",
+   "error": "MPSGraph abort: Failed to allocate MTLBuffer of 65347719424 B for oversized fused alloc"
+  }
+ ],
+ "load_s_first": 30.58,
+ "mem_after_load_gb": 17.75,
+ "load_s_second": 3.8,
+ "loaded": true,
+ "accuracy_pass": {
+  "n": 60,
+  "median_latency_s": 1.0104,
+  "median_input_tokens": 267.5,
+  "peak_gb": 18.97
+ },
+ "sweep": [
+  {
+   "target": 250,
+   "input_tokens": 252,
+   "reps": 5,
+   "median_s": 0.779,
+   "min_s": 0.776,
+   "max_s": 0.861,
+   "tok_per_s": 323.5,
+   "peak_gb": 18.98,
+   "times": [
+    0.861,
+    0.779,
+    0.778,
+    0.779,
+    0.776
+   ]
+  },
+  {
+   "target": 500,
+   "input_tokens": 502,
+   "reps": 5,
+   "median_s": 1.477,
+   "min_s": 1.473,
+   "max_s": 1.844,
+   "tok_per_s": 339.8,
+   "peak_gb": 19.03,
+   "times": [
+    1.844,
+    1.484,
+    1.473,
+    1.475,
+    1.477
+   ]
+  },
+  {
+   "target": 2000,
+   "input_tokens": 1996,
+   "reps": 5,
+   "median_s": 5.542,
+   "min_s": 5.531,
+   "max_s": 6.024,
+   "tok_per_s": 360.2,
+   "peak_gb": 20.77,
+   "times": [
+    6.024,
+    5.542,
+    5.543,
+    5.531,
+    5.532
+   ]
+  },
+  {
+   "target": 8000,
+   "input_tokens": 8002,
+   "reps": 5,
+   "median_s": 23.064,
+   "min_s": 23.061,
+   "max_s": 23.295,
+   "tok_per_s": 346.9,
+   "peak_gb": 32.27,
+   "times": [
+    23.295,
+    23.061,
+    23.064,
+    23.069,
+    23.062
+   ]
+  },
+  {
+   "target": 32000,
+   "input_tokens": 31954,
+   "error": "process aborted: MPSGraph failed assertion 'Failed to allocate MTLBuffer of 65347719424 B for oversized fused alloc' (65.3 GB = 16 attention heads x 32K x 32K x fp32: SDPA on MPS materialises the full attention matrix). No swap; watchdog did not trigger."
+  }
+ ],
+ "notes": "Linear-attention layers ran on transformers' pure-PyTorch fallback (fla / causal-conv1d not installed; CUDA-only). No PYTORCH_ENABLE_MPS_FALLBACK needed. PYTORCH_MPS_HIGH_WATERMARK_RATIO=1.0 (cap 77.8 GB)."
+}

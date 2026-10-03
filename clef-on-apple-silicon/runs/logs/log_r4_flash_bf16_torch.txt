@@ -1,0 +1,51 @@
+[transformers] The fast path is not available because one of the required library is not installed. Falling back to torch implementation. To install follow https://github.com/fla-org/flash-linear-attention#installation and https://github.com/Dao-AILab/causal-conv1d
+
+
+loaded in 30.58s, active 17.75 GB
+accuracy pass: {'n': 60, 'median_latency_s': 1.0104, 'median_input_tokens': 267.5, 'peak_gb': 18.97}
+  250 tok rep 1: 0.86s
+  250 tok rep 2: 0.78s
+  250 tok rep 3: 0.78s
+  250 tok rep 4: 0.78s
+  250 tok rep 5: 0.78s
+sweep: {'target': 250, 'input_tokens': 252, 'reps': 5, 'median_s': 0.779, 'min_s': 0.776, 'max_s': 0.861, 'tok_per_s': 323.5, 'peak_gb': 18.98}
+  500 tok rep 1: 1.84s
+  500 tok rep 2: 1.48s
+  500 tok rep 3: 1.47s
+  500 tok rep 4: 1.47s
+  500 tok rep 5: 1.48s
+sweep: {'target': 500, 'input_tokens': 502, 'reps': 5, 'median_s': 1.477, 'min_s': 1.473, 'max_s': 1.844, 'tok_per_s': 339.8, 'peak_gb': 19.03}
+  2000 tok rep 1: 6.02s
+  2000 tok rep 2: 5.54s
+  2000 tok rep 3: 5.54s
+  2000 tok rep 4: 5.53s
+  2000 tok rep 5: 5.53s
+sweep: {'target': 2000, 'input_tokens': 1996, 'reps': 5, 'median_s': 5.542, 'min_s': 5.531, 'max_s': 6.024, 'tok_per_s': 360.2, 'peak_gb': 20.77}
+  8000 tok rep 1: 23.29s
+  8000 tok rep 2: 23.06s
+  8000 tok rep 3: 23.06s
+  8000 tok rep 4: 23.07s
+  8000 tok rep 5: 23.06s
+sweep: {'target': 8000, 'input_tokens': 8002, 'reps': 5, 'median_s': 23.064, 'min_s': 23.061, 'max_s': 23.295, 'tok_per_s': 346.9, 'peak_gb': 32.27}
+/AppleInternal/Library/BuildRoots/4~CV2iugCS017GRPdEjj32gfBJXr8YaxAcCWYlUuw/Library/Caches/com.apple.xbs/TemporaryDirectory.WK6jPd/Sources/MetalPerformanceShadersGraph/mpsgraph/MetalPerformanceShadersGraph/Runtimes/MPSRuntime/Operations/GPUMemrefOps.mm:696: failed assertion `Failed to allocate MTLBuffer of 65347719424 B for oversized fused alloc.'
+time: command terminated abnormally
+      269.04 real        27.69 user        22.17 sys
+          2781151232  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+             -869229  page reclaims
+             1169852  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                2563  voluntary context switches
+              126989  involuntary context switches
+        493586562452  instructions retired
+        162374608895  cycles elapsed
+         48196063552  peak memory footprint
+/Users/fredrik/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/multiprocessing/resource_tracker.py:279: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '

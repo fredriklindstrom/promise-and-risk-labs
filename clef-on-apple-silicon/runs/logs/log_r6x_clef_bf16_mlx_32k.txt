@@ -1,0 +1,24 @@
+loaded in 13.24s, active 51.2 GB
+  32000 tok rep 1: 188.51s
+  32000 tok rep 2: 188.45s
+  32000 tok rep 3: 188.47s
+sweep: {'target': 32000, 'input_tokens': 31954, 'reps': 3, 'median_s': 188.471, 'min_s': 188.454, 'max_s': 188.512, 'tok_per_s': 169.5, 'peak_gb': 56.99}
+DONE /Users/fredrik/clef-bench/results/metrics_r6x_clef_bf16_mlx_32k.json
+      590.41 real         3.05 user        36.15 sys
+         38621659136  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+             3433275  page reclaims
+                 120  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                4331  voluntary context switches
+              406794  involuntary context switches
+        289240883603  instructions retired
+        122833974454  cycles elapsed
+         65958420008  peak memory footprint
