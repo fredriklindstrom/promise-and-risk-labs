@@ -1,0 +1,5 @@
+mlx==0.32.2
+mlx-lm==0.31.3
+huggingface-hub==2.2.0
+pyyaml==6.0.3
+transformers==5.19.0

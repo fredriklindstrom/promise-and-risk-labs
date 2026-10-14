@@ -1,0 +1,27 @@
+# environments and builds
+.venv/
+.venv-*/
+__pycache__/
+.build/
+app/BenchMonitor/build/
+# your machine's runs and results (they contain your username, hardware and sometimes hostname)
+runs/
+results/
+# your own manifests (they can name your reference voice and its transcript); the examples stay tracked
+manifest*.yaml
+!manifest*.example.yaml
+*.lock.json
+# local hooks (e.g. stop other GPU services before a run)
+scripts/*.local.sh
+# media and weights never belong in git
+*.wav
+*.mp4
+*.mov
+*.gguf
+*.safetensors
+inputs/scene.txt
+inputs/broll_prompts.txt
+# Bench Monitor snapshots and downloaded runtimes (mlx-serve)
+app/BenchMonitor/screenshots/
+/tools/
+.DS_Store

@@ -1,0 +1,4 @@
+Leo Tolstoy, War and Peace (trans. Louise and Aylmer Maude), Project Gutenberg eBook #2600, public domain in the US.
+Fetched 2026-10-11 from https://www.gutenberg.org/cache/epub/2600/pg2600.txt; Gutenberg header/licence boilerplate and the
+table of contents stripped (text starts at 'BOOK ONE: 1805'), runs of blank lines collapsed.
+sha256(context_corpus.txt) = 91b0aad8f0ca5b91543a172e44d158086452a0fcdcc1dd092fcc21ea532716d2

@@ -9,5 +9,6 @@ Hands-on measurements behind [Promise & Risk of AI](https://promiseandrisk.ai/la
 | [guardrails-on-apple-silicon](guardrails-on-apple-silicon/) | Does running an AI guardrail locally make its verdicts repeatable? Six guard models on the cards ChatGPT, Gemini and Mistral made | Tuesday episode, Dec 2026 |
 | [jais-3-on-apple-silicon](jais-3-on-apple-silicon/) | Do IFM's Jais 3 32B and 36B-A4B run on a 96 GB Mac Studio, and does IFM's Arabic accuracy claim hold? | Model evaluation, Oct 2026 |
 | [mini-soc](mini-soc/) | Can a local model on one Mac do first-line security triage without being trusted to close anything? | Build log |
+| [what-runs-on-a-mac](what-runs-on-a-mac/) | Which local AI models actually run on a Mac, and how fast? Language models, voice and video, measured and rerunnable. | Nov 17, 2026 |
 
 Code is MIT-licensed. Results and write-ups are CC BY 4.0: reuse them, and credit Promise & Risk of AI.

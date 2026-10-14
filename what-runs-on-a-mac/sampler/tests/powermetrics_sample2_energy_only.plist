@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+<key>is_delta</key><true/>
+<key>elapsed_ns</key><integer>1003125000</integer>
+<key>hw_model</key><string>Mac14,14</string>
+<key>kern_osversion</key><string>26A434</string>
+<key>timestamp</key><date>2026-10-20T01:12:04Z</date>
+<key>processor</key>
+<dict>
+  <key>clusters</key><array><dict><key>name</key><string>E-Cluster</string><key>freq_hz</key><real>1020000000</real></dict></array>
+  <key>cpu_energy</key><integer>4521</integer>
+  <key>gpu_energy</key><integer>31877</integer>
+  <key>ane_energy</key><integer>0</integer>
+</dict>
+<key>gpu</key>
+<dict>
+  <key>freq_hz</key><real>1398000000</real>
+  <key>idle_ratio</key><real>0.03</real>
+  <key>gpu_energy</key><integer>31877</integer>
+</dict>
+</dict>
+</plist>

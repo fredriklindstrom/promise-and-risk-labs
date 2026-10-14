@@ -1,0 +1,417 @@
+# Example profile for a 64–128 GB Apple-silicon Mac (measured on an M2 Max 96 GB).
+# Every model is pinned to a full commit SHA. Run `python -m bench.download` (or `--verify` for models you already have):
+# the harness refuses to load anything without a verified hash record. Read every repo's licence before downloading.
+# Never run a manifest you didn't write or read: it chooses which files are downloaded and which binaries run.
+#
+# Voice: media.voice.references is empty on purpose. Add {id, file, text} for a reference voice YOU have the right to
+# clone (your own recording and its exact transcript). Video (MiniMax H3) is not included: its licence requires your own
+# authorisation from MiniMax; the runner code is in bench/media/ if you have one.
+machine:
+  label: describe your Mac here (the harness also records the real hardware on every row)
+  iogpu_wired_limit_mb: 0
+disk_guard:
+  internal_path: /System/Volumes/Data
+  internal_floor_gb: 150
+  internal_warn_gb: 250
+  external_path: /Volumes/__none__
+  external_floor_gb: 0
+  check_every_s: 30
+settings:
+  temperature: 0
+  seed: 17
+  max_output_tokens: 512
+  warmup_reps: 1
+  timed_reps: 3
+  prompt_cache: false
+  context_source: inputs/context_corpus.txt
+  needle: The archive password is HELIOTROPE-4471.
+  needle_answer: HELIOTROPE-4471
+  needle_depths:
+  - 0
+  - 25
+  - 50
+  - 75
+  - 100
+  needle_tries: 3
+  allowed_weight_formats:
+  - safetensors
+  - gguf
+models:
+  qwen38-27b:
+    name: Qwen 3.8 27B
+    arch: dense
+    params: 27B
+    active_params: null
+    template_kwargs:
+      enable_thinking: false
+  qwen36-35b-a3b:
+    name: Qwen 3.6 35B-A3B
+    arch: moe
+    params: 35B
+    active_params: 3B
+    template_kwargs:
+      enable_thinking: false
+  llama33-70b:
+    name: Llama 3.3 70B Instruct
+    arch: dense
+    params: 70B
+    active_params: null
+  gpt-oss-120b:
+    name: gpt-oss-120b
+    arch: moe
+    params: 117B
+    active_params: 5.1B
+    template_kwargs:
+      reasoning_effort: low
+  qwen38-flash-next:
+    name: Qwen3.8-Flash-Next
+    arch: moe
+    params: null
+    active_params: null
+    template_kwargs:
+      enable_thinking: false
+variants:
+- id: qwen27b-mlx4
+  model: qwen38-27b
+  quant: MLX 4-bit
+  file_format: mlx-safetensors
+  runner: mlx
+  repo: lmstudio-community/Qwen3.8-27B-MLX-4bit
+  revision: 6067b15cf581666a4aecf6af3afaba4bb5efc20c
+  size_gb: 16.1
+  licence: apache-2.0
+  contexts:
+  - 1024
+  - 8192
+  - 32768
+  - 131072
+  needle:
+  - 32768
+  - 131072
+- id: qwen27b-mlx8
+  model: qwen38-27b
+  quant: MLX 8-bit
+  file_format: mlx-safetensors
+  runner: mlx
+  repo: lmstudio-community/Qwen3.8-27B-MLX-8bit
+  revision: 241ebb5f1d60b122fd653da658836a55feb9e2b0
+  size_gb: 29.5
+  licence: apache-2.0
+  contexts:
+  - 1024
+  - 8192
+  - 32768
+- id: qwen27b-q4km
+  model: qwen38-27b
+  quant: GGUF Q4_K_M
+  file_format: gguf
+  runner: llamacpp
+  repo: lmstudio-community/Qwen3.8-27B-GGUF
+  revision: 5a7da681f60570ab5b439a587e912d2e5eddb582
+  file: Qwen3.8-27B-Q4_K_M.gguf
+  size_gb: 16.81
+  licence: apache-2.0
+  contexts:
+  - 1024
+  - 8192
+  - 32768
+  - 131072
+  needle:
+  - 32768
+  - 131072
+- id: qwen27b-q8
+  model: qwen38-27b
+  quant: GGUF Q8_0
+  file_format: gguf
+  runner: llamacpp
+  repo: lmstudio-community/Qwen3.8-27B-GGUF
+  revision: 5a7da681f60570ab5b439a587e912d2e5eddb582
+  file: Qwen3.8-27B-Q8_0.gguf
+  size_gb: 29.05
+  licence: apache-2.0
+  contexts:
+  - 1024
+  - 8192
+  - 32768
+- id: qwen27b-ollama
+  model: qwen38-27b
+  quant: NVFP4 (Ollama default)
+  quant_note: 'Ollama''s default tag on Mac: safetensors NVFP4 on Ollama''s MLX runner'
+  file_format: ollama
+  runner: ollama
+  size_gb: 18.17
+  contexts:
+  - 1024
+  - 8192
+  - 32768
+  ollama_tag: qwen3.8:27b
+  ollama_digest: 47951e4a6661
+  tokenizer_repo: lmstudio-community/Qwen3.8-27B-MLX-8bit
+  tokenizer_revision: 241ebb5f1d60b122fd653da658836a55feb9e2b0
+  licence: apache-2.0
+- id: qwen27b-mtplx
+  model: qwen38-27b
+  quant: MTPLX 4-bit (FP16)
+  quant_note: flat 4-bit Bare-Speed pack, FP16 build for M1/M2, carries MTP heads
+  file_format: mlx-safetensors
+  runner: mtplx
+  repo: Youssofal/Qwen3.8-27B-MTPLX-Bare-Speed-FP16
+  revision: b360801951518da3e7ec6de84b6691476e5c91e2
+  size_gb: 16.3
+  licence: apache-2.0
+  contexts:
+  - 1024
+  - 8192
+  - 32768
+- id: qwen36-mlx4
+  model: qwen36-35b-a3b
+  quant: MLX 4-bit
+  file_format: mlx-safetensors
+  runner: mlx
+  repo: mlx-community/Qwen3.6-35B-A3B-4bit
+  revision: 38740b847e4cb78f352aba30aa41c76e08e6eb46
+  size_gb: 20.4
+  licence: apache-2.0
+  contexts:
+  - 1024
+  - 32768
+- id: qwen36-q4km
+  model: qwen36-35b-a3b
+  quant: GGUF Q4_K_M
+  file_format: gguf
+  runner: llamacpp
+  repo: lmstudio-community/Qwen3.6-35B-A3B-GGUF
+  revision: 68a34855558af61cbef0324d31f411be8a506b08
+  file: Qwen3.6-35B-A3B-Q4_K_M.gguf
+  size_gb: 21.17
+  licence: apache-2.0
+  contexts:
+  - 1024
+  - 32768
+- id: llama70b-mlx4
+  model: llama33-70b
+  quant: MLX 4-bit
+  file_format: mlx-safetensors
+  runner: mlx
+  repo: mlx-community/Llama-3.3-70B-Instruct-4bit
+  revision: de2dfaf56839b7d0e834157d2401dee02726874d
+  size_gb: 39.7
+  licence: llama3.3
+  contexts:
+  - 1024
+  - 32768
+- id: llama70b-q4km
+  model: llama33-70b
+  quant: GGUF Q4_K_M
+  file_format: gguf
+  runner: llamacpp
+  repo: lmstudio-community/Llama-3.3-70B-Instruct-GGUF
+  revision: 3a489fd247ce24848d8d8a3fadd707088665681f
+  file: Llama-3.3-70B-Instruct-Q4_K_M.gguf
+  size_gb: 42.52
+  licence: llama3.3
+  contexts:
+  - 1024
+  - 32768
+- id: gptoss-mlx
+  model: gpt-oss-120b
+  quant: MXFP4 native
+  quant_note: 'OpenAI''s native release: MXFP4 experts, bf16 attention/router/embeddings'
+  file_format: mlx-safetensors
+  runner: mlx
+  repo: openai/gpt-oss-120b
+  revision: b5c939de8f754692c1647ca79fbf85e8c1e70f8a
+  allow_patterns:
+  - model-*.safetensors
+  - model.safetensors.index.json
+  - '*.json'
+  - chat_template.jinja
+  - LICENSE
+  - USAGE_POLICY
+  size_gb: 65.0
+  licence: apache-2.0
+  contexts:
+  - 1024
+  - 8192
+  - 32768
+  - 131072
+  needle:
+  - 32768
+  - 131072
+- id: gptoss-gguf
+  model: gpt-oss-120b
+  quant: MXFP4 native (GGUF)
+  quant_note: ggml-org GGUF of the native MXFP4 release
+  file_format: gguf
+  runner: llamacpp
+  repo: ggml-org/gpt-oss-120b-GGUF
+  revision: 238abdd290bb874b90a5da1b4549881b7d05c091
+  file: gpt-oss-120b-MXFP4.gguf
+  size_gb: 63.39
+  licence: apache-2.0
+  contexts:
+  - 1024
+  - 8192
+  - 32768
+  - 131072
+  needle:
+  - 32768
+  - 131072
+- id: flashnext-omlx4
+  model: qwen38-flash-next
+  quant: MLX 4-bit, PLE on SSD
+  quant_note: group size 32; n-gram (PLE) table SSD-mmapped by oMLX
+  file_format: mlx-safetensors
+  runner: omlx
+  repo: mlx-community/Qwen3.8-Flash-Next-4bit
+  revision: 07b5dc6c54600a359b87f1e53e7adf6351c72a2c
+  size_gb: 111.5
+  licence: qwen-community-1.0
+  contexts:
+  - 1024
+  - 32768
+  env:
+    OMLX_QWEN4_PLE_MODE: mmap
+# Flash-Next on other runners, default GPU limit. Optional: download by name. mlx-serve is not installed by setup.sh:
+# put the release at tools/mlx-serve-26.10.1/mlx-serve. ngram_table.bin is safetensors under a .bin name, hash-verified,
+# and bench.download refuses it if it doesn't parse as safetensors.
+- id: flashnext-mtplx4
+  model: qwen38-flash-next
+  quant: MTPLX 4-bit Bare Speed, n-gram table on SSD
+  quant_note: flat 4-bit, 16-bit norms and MTP head, 32 GB table streamed from SSD
+  file_format: mlx-safetensors
+  runner: mtplx
+  repo: Youssofal/Qwen3.8-Flash-Next-MTPLX-Bare-Speed
+  revision: 4285a4a04041511bf6581f543fdbfd154c93a608
+  size_gb: 106.3
+  licence: qwen-community-1.0
+  contexts:
+  - 1024
+  - 32768
+  optional: true
+- id: flashnext-mlxserve47
+  model: qwen38-flash-next
+  quant: mlx-serve iQ-MLX 4.7 bpw, n-gram table on SSD
+  quant_note: 75 GB resident by its card, 32 GB table mmapped
+  file_format: mlx-safetensors
+  runner: mlxserve
+  repo: ddalcu/Qwen3.8-Flash-Next-MLX-Serve-iQ-MLX-4.7bpw
+  revision: a0e89db090a3e4b2e8ea2118fe9d0324d3854aca
+  data_files:
+  - ngram_table.bin
+  size_gb: 107.3
+  licence: qwen-community-1.0
+  contexts:
+  - 1024
+  - 32768
+  needle:
+  - 32768
+  optional: true
+- id: flashnext-mlxserve33
+  model: qwen38-flash-next
+  quant: mlx-serve iQ-MLX 3.3 bpw, n-gram table on SSD
+  quant_note: 52 GB resident by its card, lower quality than 4-bit, 32 GB table mmapped
+  file_format: mlx-safetensors
+  runner: mlxserve
+  repo: ddalcu/Qwen3.8-Flash-Next-MLX-Serve-iQ-MLX-3.3bpw
+  revision: 4fabeb5ee1ef4577cb24a58b495341b5b85c866c
+  data_files:
+  - ngram_table.bin
+  size_gb: 86.4
+  licence: qwen-community-1.0
+  contexts:
+  - 1024
+  - 32768
+  needle:
+  - 32768
+  optional: true
+- id: flashnext-ds4q4
+  model: qwen38-flash-next
+  quant: DS4 Q4 via mlx-serve's embedded ds4 engine, n-gram table on SSD
+  quant_note: 69.74 GiB resident by DS4's docs, 95.37 GiB BF16 table read from disk
+  file_format: gguf
+  runner: mlxserve
+  repo: antirez/qwen3.8-flash-next-gguf
+  revision: d600fe1a43d2e1cdcadb85144ce3142f66f9eefe
+  file: Qwen3.8-Flash-Next-Q4.gguf
+  serve_args:
+  - --engine
+  - ds4
+  tok_from:
+  - ddalcu/Qwen3.8-Flash-Next-MLX-Serve-iQ-MLX-4.7bpw
+  - a0e89db090a3e4b2e8ea2118fe9d0324d3854aca
+  size_gb: 177.3
+  licence: qwen-community-1.0
+  contexts:
+  - 1024
+  - 32768
+  needle:
+  - 32768
+  optional: true
+runners:
+  mlx:
+    python: .venv/bin/python
+  llamacpp:
+    binary: llama-server
+  ollama:
+    binary: /Applications/Ollama.app/Contents/Resources/ollama
+  omlx:
+    python: .venv-omlx/bin/python
+  mtplx:
+    python: .venv-mtplx/bin/python
+media:
+  voice:
+    script: inputs/scene.txt
+    engines:
+    - id: chatterbox-mlx
+      name: Chatterbox Multilingual (MLX)
+      kind: chatterbox-mlx
+      repo: mlx-community/chatterbox-fp16
+      revision: 4923fcca09086356aeab5191a2348c5a17a23694
+      deps:
+      - repo: mlx-community/S3TokenizerV2
+        revision: e0c9886f0e1c35ae85b1f27277416fb19fc72bec
+      python: .venv-voice/bin/python
+      licence: see the model card
+    - id: qwen3tts-1.7b
+      name: Qwen3-TTS 1.7B Base (MLX)
+      kind: qwen3-tts
+      repo: mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16
+      revision: a6eb4f68e4b056f1215157bb696209bc82a6db48
+      python: .venv-voice/bin/python
+      licence: see the model card
+    - id: moss-8b
+      name: MOSS-TTS v1.5 8B
+      kind: moss
+      repo: OpenMOSS-Team/MOSS-TTS-v1.5
+      revision: cdd3b911b1585e3f2dbc7775ef10f9926f58850a
+      deps:
+      - repo: OpenMOSS-Team/MOSS-Audio-Tokenizer-v2
+        revision: f6e20e543b33d2c252a7ef71bdf8aa71e5ff9169
+      python: .venv-voice/bin/python
+      licence: see the model card
+    - id: moss-local
+      name: MOSS Local-Transformer v1.5 (MLX)
+      kind: moss-local
+      repo: mlx-community/MOSS-TTS-Local-Transformer-v1.5-bf16
+      revision: ae0e2a9d3cdb4e8702905b273116677bab52fd45
+      deps:
+      - repo: mlx-community/MOSS-Audio-Tokenizer-v2-bf16
+        revision: 1ffc0359a93ee0dc1ae6667d536906d6551190df
+      python: .venv-voice/bin/python
+      licence: see the model card
+    - id: qwen3tts-0.6b
+      name: Qwen3-TTS 0.6B Base (MLX)
+      kind: qwen3-tts
+      repo: mlx-community/Qwen3-TTS-12Hz-0.6B-Base-bf16
+      revision: 1eccf1cb2519b5a4e8a95b5f0544f3303568164f
+      python: .venv-voice/bin/python
+      licence: see the model card
+    references: []
+  h3:
+    builds: []
+    settings: {}
+    queue: []
+report:
+  disclaimer: '> Measured on one Mac under the conditions listed below; your Mac, macOS version and open apps will give different numbers.'
+record_foreground_apps: false
