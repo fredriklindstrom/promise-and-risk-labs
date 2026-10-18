@@ -1,0 +1,60 @@
+{
+ "tokenizers": {
+  "Jais 3 (32B and 36B-A4B)": "~/.cache/huggingface/hub/models--IFM--Jais-3-MoVA-36B-A4B-MLX-4bit/snapshots/03a84009d9e04f33f84d64b22194eae9d900fcbe/tokenizer.json",
+  "Qwen 3.8 27B": "~/.cache/huggingface/hub/models--lmstudio-community--Qwen3.8-27B-MLX-4bit/snapshots/6067b15cf581666a4aecf6af3afaba4bb5efc20c/tokenizer.json",
+  "Llama 3.3 70B": "~/.cache/huggingface/hub/models--mlx-community--Llama-3.3-70B-Instruct-4bit/snapshots/de2dfaf56839b7d0e834157d2401dee02726874d/tokenizer.json",
+  "gpt-oss-120b": "~/.cache/huggingface/hub/models--openai--gpt-oss-120b/snapshots/b5c939de8f754692c1647ca79fbf85e8c1e70f8a/tokenizer.json"
+ },
+ "texts": {
+  "arb": {
+   "article 1": {
+    "chars": 116,
+    "words": 19
+   },
+   "full text": {
+    "chars": 7315,
+    "words": 1283
+   }
+  },
+  "eng": {
+   "article 1": {
+    "chars": 170,
+    "words": 30
+   },
+   "full text": {
+    "chars": 10269,
+    "words": 1681
+   }
+  }
+ },
+ "counts": {
+  "Jais 3 (32B and 36B-A4B)": {
+   "arb article 1": 31,
+   "arb full text": 1611,
+   "eng article 1": 32,
+   "eng full text": 1867,
+   "vocab": 250624
+  },
+  "Qwen 3.8 27B": {
+   "arb article 1": 42,
+   "arb full text": 2192,
+   "eng article 1": 33,
+   "eng full text": 1942,
+   "vocab": 248077
+  },
+  "Llama 3.3 70B": {
+   "arb article 1": 48,
+   "arb full text": 2721,
+   "eng article 1": 33,
+   "eng full text": 1887,
+   "vocab": 128256
+  },
+  "gpt-oss-120b": {
+   "arb article 1": 44,
+   "arb full text": 2245,
+   "eng article 1": 33,
+   "eng full text": 1888,
+   "vocab": 200019
+  }
+ }
+}

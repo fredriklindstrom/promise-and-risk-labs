@@ -1,0 +1,18 @@
+{
+ "model": "jais3-36b-a4b",
+ "repo": "IFM/Jais-3-MoVA-36B-A4B-MLX-4bit",
+ "n": 100,
+ "sampled_from": 13690,
+ "seed": 17,
+ "correct": 85.0,
+ "accuracy_pct": 85.0,
+ "wilson95_pct": [
+  76.7,
+  90.7
+ ],
+ "ifm_reported_pct": 87.7,
+ "invalid": 1,
+ "cut_at_max_tokens": 1,
+ "out_tokens_median": 380,
+ "out_tokens_max": 16384
+}

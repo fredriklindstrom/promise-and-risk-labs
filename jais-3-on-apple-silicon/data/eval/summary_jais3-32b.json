@@ -1,0 +1,18 @@
+{
+ "model": "jais3-32b",
+ "repo": "IFM/Jais-3-32B-MLX-4bit",
+ "n": 100,
+ "sampled_from": 13690,
+ "seed": 17,
+ "correct": 86.0,
+ "accuracy_pct": 86.0,
+ "wilson95_pct": [
+  77.9,
+  91.5
+ ],
+ "ifm_reported_pct": 88.6,
+ "invalid": 3,
+ "cut_at_max_tokens": 3,
+ "out_tokens_median": 479,
+ "out_tokens_max": 16384
+}

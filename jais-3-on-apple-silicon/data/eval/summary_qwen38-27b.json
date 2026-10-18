@@ -1,0 +1,18 @@
+{
+ "model": "qwen38-27b",
+ "repo": "lmstudio-community/Qwen3.8-27B-MLX-4bit",
+ "n": 100,
+ "sampled_from": 13690,
+ "seed": 17,
+ "correct": 80.0,
+ "accuracy_pct": 80.0,
+ "wilson95_pct": [
+  71.1,
+  86.7
+ ],
+ "ifm_reported_pct": 85.8,
+ "invalid": 3,
+ "cut_at_max_tokens": 2,
+ "out_tokens_median": 267,
+ "out_tokens_max": 16384
+}
