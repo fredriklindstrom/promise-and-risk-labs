@@ -59,6 +59,11 @@ check("traversal refused", req("/../config.json")[0] == 404)
 bad = json.dumps({"should_fire": "yes", "assessment": "likely_benign", "action": "NO_ACTION"}).encode()
 check("action outside the rule's list refused", req(f"/api/alerts/{aid}/label", "POST", bad, good)[0] == 400)
 check("valid classification accepted", req(f"/api/alerts/{aid}/label", "POST", label, good)[0] == 200)
+full = json.dumps({"should_fire": "yes", "assessment": "likely_benign", "action": "RENAME_DEVICE", "note": "😀" * 500,
+                   "checks": "😀" * 2000, "action_reason": "😀" * 1000, "seen_ids": list(range(10**8, 10**8 + 1000))}).encode()
+check("a classification at every limit, all of it escaped, still fits the body cap",
+      len(full) > 50000 and req(f"/api/alerts/{aid}/label", "POST", full, good)[0] == 200)
+check("a body past the cap is refused", req(f"/api/alerts/{aid}/label", "POST", b" " * 70000, good)[0] == 413)
 code, body = req("/")
 check("CSP forbids inline script", b"<script>" not in body)
 st, alerts = req("/api/alerts")

@@ -45,7 +45,7 @@ SECURITY_HEADERS = {
 }
 SHOULD_FIRE = ("yes", "no")
 TRAINING_TARGET = 300  # a first LoRA run on this task needs a few hundred labelled examples
-MAX_BODY = 8192
+MAX_BODY = 65536  # a classify: up to 1000 occurrence ids and 3,500 characters of notes, which JSON may escape 12x
 
 
 class Refused(Exception):

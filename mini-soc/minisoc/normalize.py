@@ -24,6 +24,7 @@ SOURCES = {
     "object": "label of the changed object, as recorded in the audit log",
     "ssid": "network name broadcast by that access point: whoever runs it chooses it",
     "device_name": "name an admin gave the UniFi device",
+    "firewall_rule": "name a console admin gave the firewall policy that matched",
     "network_name": "name of the network the address belongs to, registered by that network's owner: whoever runs it chooses it",
     "domain": "domain the device connected to, from its DNS lookup or TLS name: whoever runs that domain chose it",
 }

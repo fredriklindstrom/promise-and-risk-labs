@@ -185,7 +185,7 @@ def triage_backlog(db, cfg, now, rv):
             log("triage: time budget spent, the rest carry over")
             break
         try:
-            mini_checks = [c for c in investigation.checks(db, a) if c["check"] != "Qwen's assessment"]
+            mini_checks = [c for c in investigation.checks(db, a, for_model=True) if c["check"] != "Qwen's assessment"]
             t = triage.assess(a, cfg, known, nets, notable, log, checks=mini_checks)
         except Exception as ex:  # the alert stands without triage, and says so
             log(f"triage failed for alert {a['id']}: {ex!r}")

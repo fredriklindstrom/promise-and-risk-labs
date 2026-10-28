@@ -121,12 +121,32 @@ def find_flows(client, db, e):
     return out
 
 
+def admin_named(r):
+    """A firewall policy's name is typed by a console admin; an IPS rule's name comes with its signature."""
+    return isinstance(r, dict) and r.get("type") != "INTRUSION_PREVENTION" and bool(r.get("name"))
+
+
+def rule_text(r):
+    """A matched rule where only controller text belongs: an IPS rule by its name, a firewall policy by its
+    category or type."""
+    return (r.get("category") or r.get("type")) if admin_named(r) else (r.get("name") or r.get("category"))
+
+
+def wrap_rule_names(detail):
+    """An alert's detail with each firewall policy's name wrapped as text a console admin wrote."""
+    if not isinstance(detail, dict) or not isinstance(detail.get("flows"), list):
+        return detail
+    return detail | {"flows": [f | {"rules": [r | {"name": normalize.label("firewall_rule", r["name"])} if admin_named(r)
+                                             else r for r in f.get("rules") or []]} if isinstance(f, dict) else f
+                               for f in detail["flows"]]}
+
+
 def title_suffix(flows):
-    """Controller data only (rule category, addresses): never a name a device chose."""
+    """Controller data only (rule category, addresses): never a name a device or a console admin wrote."""
     if not flows:
         return ""
     f = flows[0]
-    cat = next((r.get("name") or r.get("category") for r in f.get("rules") or [] if r.get("name") or r.get("category")), None)
+    cat = next((rule_text(r) for r in f.get("rules") or [] if rule_text(r)), None)
     s, d = f["source"].get("ip"), f["destination"].get("ip")
     parts = [x for x in (cat, f"{s} → {d}" if s and d else None) if x]
     return f" ({': '.join(parts)})" if parts else ""

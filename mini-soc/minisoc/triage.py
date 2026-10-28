@@ -17,7 +17,7 @@ import time
 
 import requests
 
-from . import actions, normalize
+from . import actions, evidence, normalize
 
 ASSESSMENTS = ("likely_benign", "likely_malicious", "uncertain")
 REQUEST_TIMEOUT_S = 180
@@ -59,6 +59,12 @@ SYSTEM = (
 MINI_SOC_CHECKS_BY = "the Mini SOC's own lookups of controller data; no text a device chose"
 
 
+def _model_detail(detail):
+    """The alert's detail as the model sees it: the rule's default action withheld, and a firewall policy's
+    name wrapped as text a console admin wrote."""
+    return evidence.wrap_rule_names({k: v for k, v in (detail or {}).items() if k != "default_action"})
+
+
 def _messages(alert, known_normal, networks, notable_events, site_environment="unknown", checks=None):
     from .rules import ENVIRONMENTS
     env = site_environment if isinstance(site_environment, str) and site_environment in ENVIRONMENTS else "unknown"
@@ -68,7 +74,7 @@ def _messages(alert, known_normal, networks, notable_events, site_environment="u
            "mini_soc_checks": {"written_by": MINI_SOC_CHECKS_BY, "checks": list(checks or [])},
            # alert last; the rule's default action is withheld so the model's pick is its own
            "alert": {k: alert[k] for k in ("id", "rule", "severity", "title")}
-                    | {"detail": {k: v for k, v in (alert.get("detail") or {}).items() if k != "default_action"}}}
+                    | {"detail": _model_detail(alert.get("detail"))}}
     return [{"role": "system", "content": SYSTEM}, {"role": "user", "content": json.dumps(ctx, indent=1)}]
 
 

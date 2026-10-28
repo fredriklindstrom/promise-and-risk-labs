@@ -15,7 +15,7 @@ import ipaddress
 import re
 import time
 
-from . import actions, baseline, fingerprints, store
+from . import actions, baseline, evidence, fingerprints, store
 
 CONFIDENCE = ("high", "medium", "low")
 RECORD_REQUIRED = ("medium", "high")  # closing these needs the full record
@@ -57,8 +57,9 @@ def seen(db, a):
     return out
 
 
-def checks(db, a, public=False, scr=None):
-    """Section 2: the checks the Mini SOC ran on its own, each with what it found."""
+def checks(db, a, public=False, scr=None, for_model=False):
+    """Section 2: the checks the Mini SOC ran on its own, each with what it found. for_model: what Qwen is
+    given as the Mini SOC's own lookups, so no text a console admin typed (the alert's detail carries it, wrapped)."""
     det = a.get("detail") if isinstance(a.get("detail"), dict) else {}
     table = fingerprints.load()
     out = []
@@ -81,7 +82,8 @@ def checks(db, a, public=False, scr=None):
         for f in fl[:3]:
             s, d = f.get("source") or {}, f.get("destination") or {}
             # public: the rule's category only; a firewall policy's name is written by the console admin
-            pick = (lambda r: r.get("category") or r.get("type")) if public else (lambda r: r.get("name") or r.get("category"))
+            pick = ((lambda r: r.get("category") or r.get("type")) if public else evidence.rule_text if for_model
+                    else (lambda r: r.get("name") or r.get("category")))
             rule = ", ".join(pick(r) for r in f.get("rules") or [] if pick(r)) or "?"
             ip = (lambda v: (scr.ip(v) or "?") if scr else (f"[{v}]" if v and ":" in str(v) else v))
             out.append({"check": "Gateway flow log",
@@ -144,10 +146,35 @@ def _known_names(db):
 REPORT_WORDS = {"outside", "private", "address", "device", "network", "exploits", "blocked", "allowed", "issue",
                 "rule", "risk", "high", "medium", "low", "shadow", "learning", "your", "wi-fi", "wired"}
 LOOSE_V4 = re.compile(r"\d{1,3}(?:\.\d{1,3}){3}")
-LOOSE_MAC = re.compile(r"[0-9A-Fa-f]{2}(?:[ :.-][0-9A-Fa-f]{2}){5}|[0-9A-Fa-f]{4}\.[0-9A-Fa-f]{4}\.[0-9A-Fa-f]{4}")
+# also macOS arp's spelling without leading zeros (0:1b:63:84:45:e6), and twelve hex digits standing alone (0x001122334455)
+LOOSE_MAC = re.compile(r"[0-9A-Fa-f]{2}(?:[ :._/-][0-9A-Fa-f]{2}){5}|[0-9A-Fa-f]{4}\.[0-9A-Fa-f]{4}\.[0-9A-Fa-f]{4}"
+                       r"|(?<![0-9A-Fa-f:])[0-9A-Fa-f]{1,2}(?::[0-9A-Fa-f]{1,2}){5}(?![0-9A-Fa-f:])"
+                       r"|(?<![0-9A-Fa-f])[0-9A-Fa-f]{12}(?![0-9A-Fa-f])")
 # a private subnet written partly ("192.168.50.x", "10.0.12.*", "172.16.4"): it still names the network
 LOOSE_PRIV = re.compile(r"(?<![\d.])(?:192\.168|172\.(?:1[6-9]|2\d|3[01])|10\.\d{1,3})(?:\.(?:\d{1,3}|[xX*]))+")
 LOOSE_V6 = re.compile(r"[0-9A-Fa-f]{0,4}(?::[0-9A-Fa-f]{0,4}){2,7}(?:%\w+)?")
+
+
+LOOSE_MAC_ANY = re.compile(f"(?=({LOOSE_MAC.pattern}))")  # every start, so an early match can't hide a later one
+STAMP = re.compile(r"\d\d-\d\d-\d\d[ T](?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d")  # after "19" or "20": an ISO date and time
+
+
+def _loose_macs(t):
+    """Remove anything shaped like a MAC, except an ISO date and time ("2026-10-28 14:05:33") with no hex pair
+    joined to either side of it. Other date spellings are over-scrubbed: this is the fail-safe."""
+    spans = []
+    for m in LOOSE_MAC_ANY.finditer(t):
+        a, b = m.span(1)
+        if (STAMP.fullmatch(m.group(1)) and t[max(0, a - 2):a] in ("19", "20") and not re.match(r"[ :.-][0-9A-Fa-f]{2}", t[b:])
+                and not re.search(r"[0-9A-Fa-f]{2}[ :.-]$", t[max(0, a - 5):a - 2])):  # before the "20"
+            continue
+        if spans and a <= spans[-1][1]:
+            spans[-1][1] = max(spans[-1][1], b)
+        else:
+            spans.append([a, b])
+    for a, b in reversed(spans):
+        t = t[:a] + "[MAC removed]" + t[b:]
+    return t
 
 
 TOKEN_RE = re.compile(r"[0-9A-Za-z:.%\[\]_-]+")
@@ -163,10 +190,13 @@ class Scrubber:
         self.aliases, self.names = {}, names
 
     def mac(self, v):
-        h = re.sub(r"[^0-9a-fA-F]", "", str(v or "")).lower()
+        parts = re.split(r"[:.-]", str(v or ""))
+        h = ("".join(x.zfill(2) for x in parts) if len(parts) == 6 and all(1 <= len(x) <= 2 for x in parts)
+             else re.sub(r"[^0-9a-fA-F]", "", str(v or ""))).lower()
         if len(h) != 12:
             return None
-        return self.aliases.setdefault(h, f"device {chr(65 + len(self.aliases) % 26)}")
+        n = len(self.aliases)  # A..Z, then A2..Z2: two devices never share an alias
+        return self.aliases.setdefault(h, f"device {chr(65 + n % 26)}{n // 26 + 1 if n >= 26 else ''}")
 
     def ip(self, v):
         t = str(v or "").strip("[]")
@@ -181,7 +211,8 @@ class Scrubber:
             a = a.ipv4_mapped
         return "a private address" if (a.is_private or a.is_loopback or a.is_link_local) else "an outside address"
 
-    MAC_FORMS = re.compile(r"[0-9A-Fa-f]{2}([:.-]?[0-9A-Fa-f]{2}){5}|[0-9A-Fa-f]{4}\.[0-9A-Fa-f]{4}\.[0-9A-Fa-f]{4}")
+    MAC_FORMS = re.compile(r"[0-9A-Fa-f]{2}([:.-]?[0-9A-Fa-f]{2}){5}|[0-9A-Fa-f]{4}\.[0-9A-Fa-f]{4}\.[0-9A-Fa-f]{4}"
+                           r"|[0-9A-Fa-f]{1,2}(?::[0-9A-Fa-f]{1,2}){5}")
 
     def _one(self, core):
         out = self.ip(core) or (self.mac(core) if self.MAC_FORMS.fullmatch(core) else None)
@@ -211,10 +242,10 @@ class Scrubber:
         t = TOKEN_RE.sub(lambda m: self._token(m.group(0)), str(t))
         # fail-safe, before names (a device-chosen name could otherwise eat part of an address): anything still
         # shaped like an address or a MAC goes, even at the cost of over-scrubbing
-        t = LOOSE_MAC.sub("[MAC removed]", t)
+        t = _loose_macs(t)
         t = LOOSE_V4.sub("[address removed]", t)
         t = LOOSE_PRIV.sub("[address removed]", t)
-        t = LOOSE_V6.sub(lambda m: "[address removed]" if (m.group(0).count(":") >= 2 and
+        t = LOOSE_V6.sub(lambda m: "[address removed]" if (m.group(0).count(":") >= 5 or m.group(0).count(":") >= 2 and
                          (re.search(r"[0-9A-Fa-f]{3,}", m.group(0)) or "::" in m.group(0))) else m.group(0), t)
         for n in self.names:
             t = re.sub(re.escape(n), "a device", t, flags=re.IGNORECASE)

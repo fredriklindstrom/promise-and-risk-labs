@@ -941,6 +941,41 @@ priv_fl = investigation.report(idb, store.get_alert(idb, fl_alert))
 check("a public report gives a firewall rule's category, never the name the admin wrote",
       "Block Test-Tablet" not in pub_fl and "Test-Phone" not in pub_fl and "Firewall policy" in pub_fl
       and "FIREWALL" in pub_fl and "Block Test-Tablet" in priv_fl)
+from minisoc import triage
+fa = store.get_alert(idb, fl_alert)
+model_checks = " ".join(c["found"] for c in investigation.checks(idb, fa, for_model=True))
+mctx = json.loads(triage._messages(fa, [], [], [])[1]["content"])
+mrules = mctx["alert"]["detail"]["flows"][0]["rules"]
+check("Qwen gets a firewall policy's name only wrapped as console-admin text, never among the Mini SOC's own lookups",
+      "Test-Tablet" not in model_checks and "Firewall policy" in model_checks
+      and mrules[0]["name"] == {"text": "Block Test-Tablet at night", "written_by": normalize.SOURCES["firewall_rule"],
+                                "shape": normalize.shape("Block Test-Tablet at night")}
+      and fa["detail"]["flows"][0]["rules"][0]["name"] == "Block Test-Tablet at night")
+check("a title names an IPS rule but not a firewall policy",
+      evidence.title_suffix(fa["detail"]["flows"]) == " (Firewall policy: 10.0.0.70 → 203.0.113.20)"
+      and evidence.rule_text({"type": "INTRUSION_PREVENTION", "category": "EMERGING_EXPLOIT", "name": "Exploits"}) == "Exploits")
+stamp = scr.text("seen 2026-10-28 14:05:33, MAC 0a 1b 2c 3d 4e 5f and 12-34-56-78-90-12")
+check("an ISO date and time survive the loose MAC pass; a MAC with spaces or digits only does not",
+      "2026-10-28 14:05:33" in stamp and "0a 1b" not in stamp and "12-34-56" not in stamp)
+mixed = [scr.text(x) for x in ("router 00:11:22 33:44:55 is it", "printer: 00-11-22 33-44-55", "it is 00 11 22:33:44:55",
+                               "at 14:05 00 11 22 33 44 55", "on 2026-10-28 00 11 22 33 44 55 joined",
+                               "at 14:05 0a 1b 2c 3d 4e 5f", "at 2026-10-28 14:05:33 44 55 66",
+                               "VMware 00-50-56 12:34:56", "id 00.50.56 12:34:56")]
+check("a MAC next to a date or a time, or with mixed separators, is still removed whole",
+      not any(x in m for m in mixed for x in ("22 33", "22:33", "33:44", "33-44", "44 55", "4e 5f", "55 66", "50-56", "50.56")))
+arp = scr.text("? (10.0.0.9) at 0:1b:63:84:45:e6 on en0, also 8:0:27:a:b:c and 0x001122334455, 00_11_22_33_44_55")
+check("macOS arp's MACs without leading zeros, a 0x-prefixed MAC and an underscored one are scrubbed",
+      not any(x in arp for x in ("1b:63", "8:0:27", "001122", "00_11")))
+glued_v6 = scr.text("84:7:36:57:25:08:443 b7.9a.0d/c4/03 82 and 0:1b:63:84:45:e6:7 and a:0:1b:63:84:45:e6")
+check("a short-form MAC glued to another colon group is scrubbed", not any(x in glued_v6 for x in ("84:7:36", "1b:63")))
+many = investigation.Scrubber()
+check("past 26 devices, aliases don't repeat", len({many.mac(f"02:00:00:00:00:{i:02x}") for i in range(60)}) == 60)
+check("a MAC without leading zeros gets the same alias as its full spelling",
+      scr.mac("0:1b:63:84:45:e6") == scr.mac("00:1b:63:84:45:e6"))
+if FAILS and "arp" in FAILS[-1]:
+    print("   scrubbed:", arp)
+if FAILS and "removed whole" in FAILS[-1]:
+    print("   scrubbed:", mixed)
 loc_alert = store.add_alert(idb, "admin_login_new_ip", "medium", "203.0.113.9", "Admin login",
                             {"location": {"summary": "Springfield, US", "country": "United States"}}, "loc1")
 check("a public report gives an admin login's country, not its city",

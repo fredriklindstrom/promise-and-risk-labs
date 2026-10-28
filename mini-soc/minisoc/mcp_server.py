@@ -11,7 +11,7 @@ import time
 
 from mcp.server.mcpserver import MCPServer
 
-from . import actions, config, normalize, store, watcher
+from . import actions, config, evidence, normalize, store, watcher
 
 mcp = MCPServer("qwen-mini-soc", instructions=(
     "Read-only security view of a home UniFi network, fed by a watcher that polls every 2 minutes. "
@@ -31,6 +31,7 @@ def _alert_view(a):
     v = {k: a[k] for k in ("id", "created", "rule", "severity", "entity", "title", "status",
                            "detail", "acked_at", "ack_note")} | {"created_at": normalize.iso(a["created"]),
                                                                  "issue_id": a.get("issue_id") or a["id"]}
+    v["detail"] = evidence.wrap_rule_names(v["detail"])  # a firewall policy's name is console-admin text
     ra = watcher.recommended_action(a)
     if ra["action_id"]:
         v["recommended_action"] = {**ra, "steps": actions.ACTIONS[ra["action_id"]]["steps"],
