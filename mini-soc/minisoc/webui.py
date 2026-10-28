@@ -16,13 +16,14 @@ touch the UniFi controller or change a rule.
 """
 import json
 import re
+import sqlite3
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from . import actions, baseline, config, fingerprints, geo, normalize, segments, segmentation, store, traffic, triage, watcher
+from . import actions, baseline, blocked, config, exposure, fingerprints, geo, investigation, normalize, segments, segmentation, store, traffic, triage, watcher
 
 HOST, PORT = "127.0.0.1", 8095
 WEB = Path(__file__).parent / "web"
@@ -73,11 +74,13 @@ def alert_view(db, a, full=False):
         v["wifi"] = w
     if full:
         v["connections"] = connection_view(db, a)
+        v["investigation"] = investigation.record(db, a)
         issue = a.get("issue_id") or a["id"]
         v["issue"] = {"id": issue, "is_first": issue == a["id"], "macs": store.issue_macs(db, issue),
+                      "about": store.issue_about(db, issue),
                       "occurrences": store.issue_occurrences(db, issue)}
         if t:
-            v["triage"]["model_text"] = {k: t.get(k) for k in ("reason", "action_reason", "next_step")}
+            v["triage"]["model_text"] = {k: t.get(k) for k in ("seen", "checked", "reason", "action_reason", "next_step")}
         v["detail"] = a["detail"]
         ev = (a["detail"] or {}).get("event") if isinstance(a["detail"], dict) else None
         if a["rule"] in ("admin_login", "admin_login_new_ip", "config_change") and isinstance(ev, dict) \
@@ -132,6 +135,19 @@ def inventory_view(db):
     briefs = traffic.briefs(db, now)
     bmode = baseline.mode(db, now)
     unreviewed = store.baseline_open_counts(db, now - 7 * 86400)
+    served = exposure.served_by_device(store.traffic_served(db, time.strftime("%Y-%m-%d", time.localtime(now - 30 * 86400))))
+    pf = store.get_meta(db, "port_forwards") or {}
+    fwd = exposure.forwards_by_ip(pf.get("rules") if isinstance(pf, dict) else None)
+    # a forward goes to an address: credit every device that holds or last held it, so no device can take a
+    # forward off another by claiming its address; a forward no online device holds is listed as unmatched
+    online_ips = {d["ip"] for d in devices if d.get("ip") and d.get("active")}
+    try:  # the table appears with the watcher's first poll after an upgrade; until then, no counts
+        blocked_7d = {r[0]: r[1] for r in db.execute("SELECT mac, COUNT(*) FROM blocked_flows WHERE time_ms >= ? "
+                                                      "GROUP BY mac", ((now - 7 * 86400) * 1000,))}
+    except sqlite3.OperationalError as ex:
+        if "no such table" not in str(ex):
+            raise
+        blocked_7d = {}
     out = []
     for d in devices:
         fp = fingerprints.resolve(table, d) or {}
@@ -155,13 +171,20 @@ def inventory_view(db):
             "uplink_mac": d.get("uplink_mac"), "uplink_name": g.get("name") or d.get("uplink_name"),
             "uplink_model": g.get("model"), "port": d.get("uplink_port"), "link_mbps": d.get("link_mbps"),
             "signal_dbm": d.get("signal_dbm"), "open_alerts": sorted(open_alerts.get(d["mac"], []))[-20:],
-            "current_vlan": vlan, "recommended": rec,
+            "current_vlan": vlan, "recommended": rec, "blocked_7d": blocked_7d.get(d["mac"], 0),
+            "exposure": exposure.assess(d, fp, served.get(d["mac"]), fwd.get(d.get("ip")), gear=d["mac"] in gear,
+                                        now=now),
             "baseline": {**baseline.status(db, d["mac"], now, bmode), "unreviewed": unreviewed.get(d["mac"], 0)},
             "traffic": {k: v for k, v in t.items() if k != "local_peers_seen"} | {"local_peers": len(t["local_peers_seen"])}
                        if t else None})
     out.sort(key=lambda x: (not x["online"], -(x["last_seen"] or 0)))
+    pf_at = pf.get("at") if isinstance(pf, dict) else None
     return {"devices": out, "traffic_visibility": traffic.VISIBILITY,
-            "traffic_since": store.get_meta(db, "traffic_since")}
+            "traffic_since": store.get_meta(db, "traffic_since"),
+            "exposure": {"advisory": exposure.ADVISORIES[exposure.CURRENT], "visibility": exposure.VISIBILITY,
+                         "port_forwards_read_at": pf_at,
+                         "port_forwards": [{"text": exposure.forward_text(x), "online_holder": ip in online_ips}
+                                           for ip, v in fwd.items() for x in v][:50]}}
 
 
 def baseline_view(db):
@@ -169,20 +192,37 @@ def baseline_view(db):
     since = store.get_meta(db, "traffic_since")
     names = {d["mac"]: d for d in store.all_devices(db)}
     table = fingerprints.load()
-    devs = []
-    for x in store.baseline_deviations(db):
+    def row(x):
         d = names.get(x["mac"]) or {}
         fp = fingerprints.resolve(table, d) if d else None
-        devs.append({"id": x["id"], "mac": x["mac"], "what": (fp or {}).get("model") or d.get("vendor") or "unknown device",
-                     "name": normalize.label("name", d.get("name")), "day": x["day"], "kind": x["kind"],
-                     "kind_means": baseline.KINDS.get(x["kind"], ""), "key": baseline.key_view(x["kind"], x["key"]),
-                     "detail": x["detail"], "first_at": x["first_at"], "last_at": x["last_at"],
-                     "verdict": x["verdict"], "note": x["note"]})
+        return {"id": x["id"], "mac": x["mac"], "what": (fp or {}).get("model") or d.get("vendor") or "unknown device",
+                "name": normalize.label("name", d.get("name")), "day": x["day"], "kind": x["kind"],
+                "kind_means": baseline.KINDS.get(x["kind"], ""), "key": baseline.key_view(x["kind"], x["key"]),
+                "detail": x["detail"], "first_at": x["first_at"], "last_at": x["last_at"],
+                "verdict": x["verdict"], "note": x["note"]}
+    devs = [row(x) for x in store.baseline_deviations(db)]
+    sample = baseline.sample_view(db)
+    sample_rows = [row(x) for x in store.baseline_deviations_by_ids(db, sample["ids"])] if sample else []
     return {"mode": baseline.mode(db, now), "learn_days": baseline.LEARN_DAYS, "min_days": baseline.MIN_DAYS,
             "learning_until": since + baseline.LEARN_DAYS * 86400 if since else None,
             "kinds": {k: {"means": v, **store.baseline_kind_stats(db).get(k, {"count": 0, "expected": 0, "suspicious": 0})}
                       for k, v in baseline.KINDS.items()},
-            "verdicts": list(baseline.VERDICTS), "deviations": devs}
+            "verdicts": list(baseline.VERDICTS), "deviations": devs, "sample": sample, "sample_rows": sample_rows}
+
+
+def draw_sample(body):
+    if not isinstance(body, dict):
+        raise Refused(400, "expected a JSON object")
+    size = body.get("size", baseline.SAMPLE_SIZE)
+    if not isinstance(size, int) or isinstance(size, bool) or not 10 <= size <= 200:
+        raise Refused(400, "size must be a whole number from 10 to 200")
+    db = store.connect()
+    try:
+        s = baseline.draw_sample(db, size=size)
+        db.commit()
+        return {"ok": True, "drawn_at": s["drawn_at"], "population": s["population"]}
+    finally:
+        db.close()
 
 
 def label_deviation(deviation_id, body):
@@ -236,6 +276,20 @@ def wifi_view(db, a):
             "facts": rules.wifi_facts(db, ssid, bssid)}
 
 
+def _prompt_checks(prompt):
+    """The Mini SOC's checks exactly as a stored triage prompt gave them to the model ([] for older prompts),
+    so a training answer never states a result the model wasn't shown."""
+    try:
+        ctx = json.loads(json.loads(prompt)[-1]["content"])
+        got = ctx.get("mini_soc_checks", {}).get("checks")
+    except (ValueError, TypeError, KeyError, IndexError, AttributeError, RecursionError):
+        return []
+    if not isinstance(got, list):
+        return []
+    return [{"what": c["check"][:120], "showed": c["found"][:200]} for c in got
+            if isinstance(c, dict) and isinstance(c.get("check"), str) and isinstance(c.get("found"), str)][:7]
+
+
 def training_examples(db):
     """(ready examples, stats). An example is the exact prompt Qwen saw plus the answer you said
     it should have given, in the chat format mlx_lm.lora trains on."""
@@ -255,10 +309,20 @@ def training_examples(db):
         if not reason:
             no_reason += 1
             continue
-        # Qwen's evidence list is attacker-influenced; it only enters the label when you agreed with Qwen
-        target = {"assessment": lab["assessment"], "confidence": "high", "reason": reason,
-                  "evidence": json.loads(l2["evidence"] or "[]") if model_agrees else [], "action": lab["action"],
-                  "action_reason": reason, "next_step": actions.ACTIONS.get(lab["action"] or "", {}).get("title", "")}
+        alert = store.get_alert(db, alert_id)
+        # the four-part shape, from data the model may learn from: the rule's own facts, the Mini SOC's checks,
+        # and your own notes; never the model's earlier text (it was written from attacker-influenced input).
+        # The Mini SOC's checks as the stored prompt gave them, not as they read today: otherwise the target would
+        # teach the model to state results it was never shown. Same for "seen": the occurrence count moves on
+        own_checks = _prompt_checks(l2["prompt"])
+        if (lab.get("checks") or "").strip():
+            own_checks.append({"what": "the owner's own checks", "showed": lab["checks"].strip()[:200]})
+        seen = [x for x in investigation.seen(db, alert) if not x.startswith("Issue #")]
+        target = {"seen": " ".join(seen[:2])[:300], "checked": own_checks,
+                  "assessment": lab["assessment"], "confidence": lab.get("confidence") or "high", "reason": reason,
+                  "evidence": [c["what"] for c in own_checks], "action": lab["action"],
+                  "action_reason": (lab.get("action_reason") or "").strip() or reason,
+                  "next_step": actions.ACTIONS.get(lab["action"] or "", {}).get("title", "")}
         ready.append({"messages": json.loads(l2["prompt"]) + [{"role": "assistant", "content": json.dumps(target)}]})
     stats = {"labelled": len(labels), "ready": len(ready), "no_prompt": no_prompt, "no_reason": no_reason,
              "model_agreed": agreed, "model_compared": compared, "target": TRAINING_TARGET,
@@ -360,6 +424,12 @@ def classify(alert_id, body):
         action = body.get("action")
         note = body.get("note") or ""
         close = body.get("close") is True
+        seen = body.get("seen_ids")  # the occurrences on the person's screen: nothing else gets closed
+        if seen is not None:
+            if not (isinstance(seen, list) and len(seen) <= 1000
+                    and all(isinstance(i, int) and not isinstance(i, bool) and 0 <= i < 2 ** 53 for i in seen)):
+                raise Refused(400, "seen_ids must be a list of alert ids")
+            seen = set(seen)
         if should_fire not in SHOULD_FIRE:
             raise Refused(400, "should_fire must be yes or no")
         if assessment not in triage.ASSESSMENTS:
@@ -370,11 +440,28 @@ def classify(alert_id, body):
             raise Refused(400, "that action isn't available for this rule")
         if not isinstance(note, str) or len(note) > 500:
             raise Refused(400, "note must be text of at most 500 characters")
-        store.add_label(db, alert_id, should_fire, assessment, action, note, close)
+        checks, confidence, action_reason = body.get("checks") or "", body.get("confidence"), body.get("action_reason") or ""
+        if not isinstance(checks, str) or len(checks) > 2000:
+            raise Refused(400, "your checks must be text of at most 2000 characters")
+        if not isinstance(action_reason, str) or len(action_reason) > 1000:
+            raise Refused(400, "the reason for the action must be text of at most 1000 characters")
+        if confidence is not None and confidence not in investigation.CONFIDENCE:
+            raise Refused(400, "confidence must be high, medium or low")
+        # the record is required by the worst open occurrence this close would take with it
+        closing_sev = {a["severity"]} | ({r[0] for r in db.execute(
+            "SELECT severity FROM alerts WHERE issue_id=? AND id<>? AND status='open'", (alert_id, alert_id))}
+            if a.get("issue_id") in (None, alert_id) else set())
+        if close and a["status"] == "open" and closing_sev & set(investigation.RECORD_REQUIRED):
+            missing = [n for n, v in (("your conclusion (why)", note.strip()), ("your confidence", confidence),
+                                      ("the action", action), ("why that action", action_reason.strip())) if not v]
+            if missing:
+                raise Refused(400, f"closing a medium or high issue needs the full record: {', '.join(missing)}")
+        store.add_label(db, alert_id, should_fire, assessment, action, note, close, checks=checks.strip() or None,
+                        confidence=confidence, action_reason=action_reason.strip() or None)
         store.add_verdict(db, a, "human", watcher.rule_version(), verdict=assessment,
                           human_decision=f"should_fire={should_fire}; action={action}; {note}"[:600])
         if close and a["status"] == "open":
-            store.ack(db, alert_id, note or "classified in web UI")
+            store.ack(db, alert_id, note or "classified in web UI", seen=seen)
         db.commit()
         try:
             watcher.write_state(db, config.load())
@@ -439,6 +526,20 @@ class Handler(BaseHTTPRequestHandler):
                         "severity", "occurrences", "open_occurrences", "last_at", "kinds", "macs")}} for a in rows])
                 finally:
                     db.close()
+            m = re.fullmatch(r"/api/alerts/(\d{1,9})/report\.md", u.path)
+            if m:
+                public = (parse_qs(u.query).get("public") or ["0"])[0] == "1"
+                db = _ro()
+                try:
+                    a = store.get_alert(db, int(m.group(1)))
+                    if not a:
+                        raise Refused(404, "no such alert")
+                    name = f"investigation-{a['id']}{'-public' if public else ''}.md"
+                    return self._send(200, investigation.report(db, a, public=public).encode(),
+                                      "text/markdown; charset=utf-8",
+                                      extra={"Content-Disposition": f'attachment; filename="{name}"'})
+                finally:
+                    db.close()
             m = re.fullmatch(r"/api/alerts/(\d{1,9})", u.path)
             if m:
                 db = _ro()
@@ -447,6 +548,25 @@ class Handler(BaseHTTPRequestHandler):
                     if not a:
                         raise Refused(404, "no such alert")
                     return self._send(200, alert_view(db, a, full=True))
+                finally:
+                    db.close()
+            if u.path == "/api/blocked":
+                q = parse_qs(u.query)
+                mac = (q.get("mac") or [None])[0]
+                days = (q.get("days") or ["7"])[0]
+                if mac is not None and not re.fullmatch(r"[0-9a-f]{2}(?::[0-9a-f]{2}){5}", mac):
+                    raise Refused(400, "mac must be a lower-case MAC address")
+                if not re.fullmatch(r"\d{1,2}", days) or not 1 <= int(days) <= blocked.KEEP_DAYS:
+                    raise Refused(400, f"days must be 1 to {blocked.KEEP_DAYS}")
+                db = _ro()
+                try:
+                    return self._send(200, blocked.view(db, mac=mac, days=int(days)))
+                except sqlite3.OperationalError as ex:  # no table until the watcher's first poll after an upgrade
+                    if "no such table" not in str(ex):
+                        raise
+                    return self._send(200, {"days": int(days), "mac": mac, "groups": [], "group_total": 0,
+                                            "not_stored": {}, "since": None, "gaps": [], "incomplete": False,
+                                            "about": "Not collected yet."})
                 finally:
                     db.close()
             if u.path == "/api/inventory":
@@ -501,6 +621,8 @@ class Handler(BaseHTTPRequestHandler):
             m = re.fullmatch(r"/api/alerts/(\d{1,9})/label", path)
             if m:
                 return self._send(200, classify(int(m.group(1)), body))
+            if path == "/api/baseline/sample":
+                return self._send(200, draw_sample(body))
             m = re.fullmatch(r"/api/baseline/deviations/(\d{1,9})/label", path)
             if m:
                 return self._send(200, label_deviation(int(m.group(1)), body))

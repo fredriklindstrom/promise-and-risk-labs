@@ -120,7 +120,52 @@ check("alert list shows the issue once, with its occurrence count", row and row[
 det = json.loads(req(f"/api/alerts/{again}")[1])
 check("an occurrence's page points to its issue and lists every occurrence",
       det["issue"]["id"] == first and not det["issue"]["is_first"] and len(det["issue"]["occurrences"]) == 2)
+db = store.connect()
+f1 = store.add_alert(db, "label_changed", "medium", "aa:bb:cc:dd:ee:09", "Hostname changed", {}, "seen1")
+f2 = store.add_alert(db, "label_changed", "medium", "aa:bb:cc:dd:ee:09", "Hostname changed", {}, "seen2")
+db.commit(); db.close()
+closing = json.dumps({"should_fire": "yes", "assessment": "likely_benign", "action": "RENAME_DEVICE", "note": "x",
+                      "close": True, "seen_ids": [f1], "confidence": "high",
+                      "action_reason": "rename it in the console"}).encode()
+check("malformed seen_ids are refused", req(f"/api/alerts/{f1}/label", "POST",
+      json.dumps({"should_fire": "yes", "assessment": "likely_benign", "close": True, "seen_ids": [True, "x"]}).encode(), good)[0] == 400)
+check("closing with seen_ids accepted", req(f"/api/alerts/{f1}/label", "POST", closing, good)[0] == 200)
+check("an occurrence that wasn't shown stays open", json.loads(req(f"/api/alerts/{f2}")[1])["status"] == "open")
+check("drawing a sample without X-MiniSOC is refused", req("/api/baseline/sample", "POST", json.dumps({"size": 50}).encode(),
+      {"Content-Type": "application/json"})[0] == 403)
+check("a sample size out of range is refused", req("/api/baseline/sample", "POST", json.dumps({"size": 5000}).encode(), good)[0] == 400)
+check("drawing a sample works and shows on the page", req("/api/baseline/sample", "POST", json.dumps({"size": 10}).encode(), good)[0] == 200
+      and json.loads(req("/api/baseline")[1])["sample"]["size"] == 10)
+# the investigation record: closing medium/high needs it; the report exports private or scrubbed
+db = store.connect()
+inv_id = store.add_alert(db, "new_device", "medium", "aa:bb:cc:dd:ee:0a", "New device on the network",
+                         {"default_action": "IDENTIFY_DEVICE"}, "inv1")
+db.commit(); db.close()
+inv_body = {"should_fire": "yes", "assessment": "likely_benign", "action": "IDENTIFY_DEVICE", "note": "my laptop's dock",
+            "close": True, "seen_ids": [inv_id]}
+check("closing a medium issue without confidence or the action's reason is refused",
+      req(f"/api/alerts/{inv_id}/label", "POST", json.dumps(inv_body).encode(), good)[0] == 400)
+check("an unknown confidence is refused", req(f"/api/alerts/{inv_id}/label", "POST",
+      json.dumps({**inv_body, "confidence": "certain", "action_reason": "x"}).encode(), good)[0] == 400)
+full = {**inv_body, "confidence": "high", "action_reason": "it's mine; nothing to do",
+        "checks": "Looked at the dock's MAC aa:bb:cc:dd:ee:0a and its address 10.0.0.9 in the console"}
+check("closing with the full record is accepted", req(f"/api/alerts/{inv_id}/label", "POST", json.dumps(full).encode(), good)[0] == 200)
+st, body = req(f"/api/alerts/{inv_id}")
+rec = json.loads(body)["investigation"]
+check("the alert page carries the four-part record with your answers", st == 200 and rec["seen"] and rec["yours"]["confidence"] == "high"
+      and rec["yours"]["action_reason"].startswith("it's mine"))
+st, priv = req(f"/api/alerts/{inv_id}/report.md")
+st2, pub = req(f"/api/alerts/{inv_id}/report.md?public=1")
+check("the private report has all four sections", st == 200 and all(f"## {i}." in priv.decode() for i in (1, 2, 3, 4)))
+check("the public report has no MAC or address, even in your own notes", st2 == 200 and "aa:bb:cc:dd:ee:0a" not in pub.decode()
+      and "10.0.0.9" not in pub.decode() and "a private address" in pub.decode())
 check("verdict shows in the false-alarm table", json.loads(req("/api/baseline")[1])["kinds"]["new_domain"]["expected"] == 1)
+
+st, body = req("/api/blocked?days=7")
+check("blocked connections answer with groups", st == 200 and "groups" in json.loads(body))
+check("blocked: a bad MAC or day count is refused",
+      req("/api/blocked?mac=nope")[0] == 400 and req("/api/blocked?days=0")[0] == 400 and req("/api/blocked?days=999")[0] == 400)
+check("blocked is read-only", req("/api/blocked", "POST", b"{}", good)[0] == 404)
 
 srv.shutdown()
 print("\nWEBUI", "PASS" if not FAILS else f"FAIL ({len(FAILS)})")

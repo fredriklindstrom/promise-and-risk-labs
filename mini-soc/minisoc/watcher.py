@@ -16,7 +16,7 @@ import time
 import traceback
 from collections import defaultdict
 
-from . import actions, baseline, config, evidence, fingerprints, geo, normalize, notify, rules, store, traffic, triage
+from . import actions, baseline, blocked, config, evidence, fingerprints, geo, investigation, normalize, notify, rules, store, traffic, triage
 from .unifi import UniFi
 
 WHOAMI_EVERY = 3600
@@ -124,6 +124,10 @@ def backfill_flows(client, db, now, limit=3, deadline=None):
         if cand["title"] != a["title"]:
             cand["detail"]["title_before"] = a["title"]
         store.update_alert_detail(db, aid, cand["detail"], cand["title"] if cand["title"] != a["title"] else None)
+        # now that its rule is known, a lone threat alert can join the issue for the same source, target and rule
+        if a.get("issue_id") in (None, aid) and not db.execute("SELECT 1 FROM alerts WHERE issue_id=? AND id<>?",
+                                                                 (aid, aid)).fetchone():
+            store.attach_issue(db, aid, a["entity"], a["rule"], cand["detail"])
         done += 1
 
 
@@ -181,7 +185,8 @@ def triage_backlog(db, cfg, now, rv):
             log("triage: time budget spent, the rest carry over")
             break
         try:
-            t = triage.assess(a, cfg, known, nets, notable, log)
+            mini_checks = [c for c in investigation.checks(db, a) if c["check"] != "Qwen's assessment"]
+            t = triage.assess(a, cfg, known, nets, notable, log, checks=mini_checks)
         except Exception as ex:  # the alert stands without triage, and says so
             log(f"triage failed for alert {a['id']}: {ex!r}")
             t = {"assessment": "not_triaged", "confidence": "low", "escalated": True,
@@ -216,6 +221,11 @@ def poll(client, db, cfg, now=None, do_triage=True, do_notify=True):
                 store.set_meta(db, "known_ssids", sorted(known | {v["essid"] for v in radios["vaps"] if v.get("essid")}))
             except Exception as ex:  # enrichment only: a failure here must not stop the poll
                 log(f"own_radios refresh failed: {type(ex).__name__}")
+        if hasattr(client, "port_forwards"):
+            try:  # enrichment: which of your devices the internet can reach, for the exposure assessment
+                store.set_meta(db, "port_forwards", {"at": now, "rules": client.port_forwards()})
+            except Exception as ex:
+                log(f"port_forwards refresh failed: {type(ex).__name__}")
 
     if now - (store.get_meta(db, "geo_refresh_at") or 0) >= geo.REFRESH_EVERY_S:
         store.set_meta(db, "geo_refresh_at", now)  # one attempt a day, success or not
@@ -245,6 +255,13 @@ def poll(client, db, cfg, now=None, do_triage=True, do_notify=True):
             baseline.update(db, now)
         except Exception as ex:
             log(f"baseline update failed: {type(ex).__name__}")
+
+    if hasattr(client, "blocked_flows") and now - (store.get_meta(db, "blocked_at") or 0) >= blocked.EVERY_S:
+        store.set_meta(db, "blocked_at", now)  # one attempt per interval, success or not
+        try:  # every blocked connection to the second, bounded by a page budget and a deadline
+            blocked.collect(db, client, now)
+        except Exception as ex:
+            log(f"blocked-flow refresh failed: {type(ex).__name__}")
 
     cursor = store.get_meta(db, "event_cursor_ms")
     since = (cursor - cfg["event_overlap_seconds"] * 1000) if cursor else (now - BOOTSTRAP_EVENT_DAYS * 86400) * 1000

@@ -38,7 +38,8 @@ def _alert_view(a):
     t = a.get("triage")
     if t:  # the model's free text is wrapped like any other untrusted text
         v["triage"] = {k: t.get(k) for k in ("assessment", "confidence", "escalated", "model", "quant", "seconds")}
-        v["triage"]["model_text"] = {"reason": t.get("reason"), "next_step": t.get("next_step"),
+        v["triage"]["model_text"] = {"seen": t.get("seen"), "checked": t.get("checked"),
+                                     "reason": t.get("reason"), "next_step": t.get("next_step"),
                                      "evidence": t.get("evidence"), "written_by": MODEL_TEXT}
     return v
 

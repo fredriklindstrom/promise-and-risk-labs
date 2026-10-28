@@ -26,7 +26,7 @@ This folder is the code only. The runtime output describes a real home network, 
 
 | Guardrail | Where |
 |---|---|
-| Read-only: an allowlist of six GETs and two query POSTs, the system log and the flow log (full-path match); anything else raises before a request is sent. Redirects refused, system proxies ignored. Writes, when an action earns them, will go through a separate component with its own narrow credential, a per-action allowlist, undo and an audit log; this reader stays read-only | `minisoc/unifi.py` |
+| Read-only: an allowlist of seven GETs and two query POSTs, the system log and the flow log (full-path match); anything else raises before a request is sent. Redirects refused, system proxies ignored. Writes, when an action earns them, will go through a separate component with its own narrow credential, a per-action allowlist, undo and an audit log; this reader stays read-only | `minisoc/unifi.py` |
 | The console's self-signed certificate is pinned by SHA-256, so an impostor on the network never receives the API key | `minisoc/unifi.py` |
 | The model annotates alerts and never opens, closes, silences or reorders one. Notifications are rule-driven, sent before triage and retried until delivered | `minisoc/triage.py`, `minisoc/watcher.py` |
 | Free text reaches the model wrapped with who wrote it (device, console user, audit log), plus a standing rule that free text is evidence, never instruction | `minisoc/normalize.py` |
@@ -36,7 +36,8 @@ This folder is the code only. The runtime output describes a real home network, 
 | The MCP server opens the database read-only, and labels the model's free text as model output from attacker-influenced input | `minisoc/mcp_server.py` |
 | One bad record is skipped and reported, never allowed to stop polling; three failed polls in a row notify you | `minisoc/watcher.py` |
 | The web UI has no login, so it guards against other web pages in the same browser: loopback only, Host allowlist (DNS rebinding), a custom header and JSON on every write, Origin check, strict CSP, and device names only ever inserted as text | `minisoc/webui.py`, `minisoc/web/app.js` |
-| Training labels stay human: the form pre-fills nothing from the model, and the model's evidence only enters an example when the human agreed with it | `minisoc/webui.py`, `minisoc/web/app.js` |
+| Training labels stay human: the form pre-fills nothing from the model, and no model-written text enters a training target, even when the person agreed with the model. What a target says was checked comes from the prompt the model was shown | `minisoc/webui.py`, `minisoc/web/app.js` |
+| A public report parses every MAC and address out of everything, the person's own notes included, replaces network and device names, and ends with a fail-safe pass | `minisoc/investigation.py` |
 
 ## Rules
 
@@ -55,7 +56,7 @@ The first poll records every known device as the starting point and raises no al
 
 Dedup only suppresses repeats while an alert is open: acknowledging it lets the same thing fire again.
 
-**Issues.** While an issue is open, every alert about exactly the same device or set of devices is an occurrence of it. The alert list, widget and menu bar show one row per issue with an occurrence count, and the issue page lists every occurrence. Closing the issue's first alert closes all of them; the next alert about those devices starts a new issue. Grouping is by the exact device set, so an alert naming two devices (a hostname collision) never gathers either device's other alerts: a device that copies your laptop's name can't pull the laptop's alerts under an issue you'd close as fine. Grouping never keeps an occurrence from the model. Same-kind repeats are summarised in at most one notification per issue per hour; anything high, a UniFi security detection, a tamper call, a new kind of alert or a higher severity notifies on its own. Don't add iCloud Private Relay or other shared egress addresses to the baseline; they vouch for everyone behind them.
+**Issues.** While an issue is open, every alert about exactly the same device or set of devices is an occurrence of it. The alert list, widget and menu bar show one row per issue with an occurrence count, and the issue page lists every occurrence. Closing the issue's first alert closes all of them; the next alert about those devices starts a new issue. Grouping is by the exact device set, so an alert naming two devices (a hostname collision) never gathers either device's other alerts: a device that copies your laptop's name can't pull the laptop's alerts under an issue you'd close as fine. Grouping never keeps an occurrence from the model. UniFi threat alerts group the way an analyst reads an incident: everything aimed at one of your devices is one issue (and, when your device is the source, everything it did). Threats between two outside addresses aren't grouped, and neither are rogue access points. Closing from the web UI closes only the occurrences that were on screen; anything that arrived while you were reading stays open as a new issue. Same-kind repeats are summarised in at most one notification per issue per hour; anything high, a UniFi security detection, a tamper call, a new kind of alert or a higher severity notifies on its own. Don't add iCloud Private Relay or other shared egress addresses to the baseline; they vouch for everyone behind them.
 
 ## Rogue access points
 
@@ -106,6 +107,57 @@ names; the network's registered name, which its owner chooses, stays in the deta
 On the web UI's Alerts page, **Triage mode** takes the open issues in order (highest severity, then what the
 model escalated, then oldest) one at a time with the classify form, "close" ticked. Saving moves to the next;
 Skip and Previous (keys j and k) move without saving.
+
+## An honest false-alarm rate
+
+Reviewing deviations in the order they arrive drifts towards the easy ones. A button on the Baseline page
+draws a random sample of up to 50 deviations per kind (all of a kind when it has fewer). The sample is fixed
+once drawn; re-drawing is an explicit, confirmed action. Per kind the page shows how far the review has got
+and the false-alarm share (marked expected over reviewed) with its 95% range (Wilson). That figure is the
+bar a kind of deviation has to clear before it's allowed to notify anyone.
+
+## The investigation record
+
+Every alert page walks through an investigation in four parts: what was seen, what was checked, what you
+conclude (with your confidence), and what to do about it and why. The four-question structure is
+Daniel Oseghale's. The first two parts are filled in from the
+alert and the Mini SOC's own lookups: inventory, fingerprint, baseline, the flow behind it, location, the
+Wi-Fi pattern, earlier occurrences. Closing a medium or high issue needs the full record.
+
+The model answers in the same four parts, shown as untrusted text. Its prompt carries the same lookups,
+labelled as controller data, never as text a device chose. A device name from UniFi's fingerprint or the MAC
+vendor is marked as not proof.
+
+Reports export as Markdown, private or public. The public version is meant for posting: no addresses, no MACs, no
+network or device names the Mini SOC knows, device types instead of models, and a login's country instead of its
+city. Read it before posting all the same: your own notes are free text.
+
+## What is likely running on each device
+
+The inventory gives each device a passive assessment, prompted by the PHP2Shell vulnerabilities
+(CVE-2026-109618, CVE-2026-109619): the likely system, how likely it is to serve web pages with PHP, a
+priority (check first, check, low), the reasons, and the exact check to run. It's built from UniFi's
+fingerprint, the MAC vendor, services that other networks or the internet reached on the device, and the
+controller's port forwards (one more read-only GET, refreshed hourly; the admin-written rule name is dropped).
+"Unlikely" is given only for named consumer kinds of device; anything else is unknown. A device's own name can
+only raise its priority, and any port forward to it makes it check first. An error from the controller is
+refused, not read as "no forwards". It's an estimate from the outside: nothing is scanned or probed.
+
+## Blocked connections, to the second
+
+The daily traffic totals say that a device was blocked. The Blocked page says when, to what and by which
+rule: every blocked connection to or from one of your devices, with its exact time, the name the device asked DNS for (wrapped:
+the device chose it), the country and network owner from the local IP database (for one of the group's addresses), and the firewall rule. It
+exists so a blocked attempt can be matched to what was running on the device at that second. The inventory
+links each device's count for the last seven days.
+
+It uses the same read-only flow-log query, filtered to blocked flows. The controller keeps about three days;
+the Mini SOC keeps 90. Every 15 minutes it reads newest first and walks back from the oldest flow returned,
+so within a run no page is read twice, however busy the network is. A run stops after 100 pages or about
+20 seconds; what it
+can't finish waits for the next run, and anything that ages out of the controller first is recorded as a gap,
+with its cause. Storage is capped per device and day; beyond the cap connections are counted, not stored. The
+page says when collection is behind, incomplete or has a gap, rather than showing a quiet week.
 
 ## Run it
 

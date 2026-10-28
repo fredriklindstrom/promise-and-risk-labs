@@ -77,6 +77,8 @@ th { color: var(--dim); font-weight: 600; }
 form.classify { display: grid; gap: 14px; }
 form.classify fieldset { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 0; }
 form.classify legend { font-weight: 600; padding: 0 4px; }
+form.classify h3 { font-family: var(--font-display); font-size: 15px; margin: 6px 0 0; color: var(--accent); }
+form.classify ul { margin: 0; padding-left: 18px; }
 form.classify label { display: inline-flex; align-items: center; gap: 6px; margin-right: 16px; }
 form.classify select, form.classify textarea { font: inherit; width: 100%; padding: 6px 8px; border-radius: 8px;
        border: 1px solid var(--line); background: var(--bg); color: var(--ink); }

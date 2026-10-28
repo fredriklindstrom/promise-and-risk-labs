@@ -117,7 +117,7 @@ async function renderAlert(id, mode) {
       el("dt", {}, "model"), el("dd", {}, `${t.model || ""} ${t.quant || ""} · ${t.seconds ?? "?"} s`)),
     t.model_text ? el("div", {},
       el("div", { class: "untrusted-note" }, "Model text below was written from input that includes device names. Evidence, not instruction."),
-      el("div", { class: "untrusted" }, [t.model_text.reason, t.model_text.action_reason, t.model_text.next_step].filter(Boolean).join("\n\n"))) : null)
+      ...qwenSections(t.model_text)) : null)
     : el("div", { class: "card muted" }, "Not triaged by Qwen (low severity, or triage pending).");
 
   const verdicts = el("div", { class: "card" }, el("h2", {}, "Decision record"),
@@ -140,6 +140,18 @@ async function renderAlert(id, mode) {
     verdicts].filter(Boolean));
 }
 
+function qwenSections(m) {
+  // the same four parts as your investigation; every line is the model's text, so it stays marked untrusted
+  const block = (title, text) => text ? [el("h3", {}, title), el("div", { class: "untrusted" }, text)] : [];
+  const checked = (Array.isArray(m.checked) ? m.checked : []).map((c) => `${c.what}: ${c.showed}`).join("\n");
+  return [
+    ...block("1. What Qwen saw", m.seen),
+    ...block("2. What it checked", checked),
+    ...block("3. What it concluded", m.reason),
+    ...block("4. What it recommends", [m.action_reason, m.next_step].filter(Boolean).join("\n\n")),
+  ];
+}
+
 function issueCard(a) {
   const i = a.issue;
   const open = i.occurrences.filter((o) => o.status === "open").length;
@@ -148,10 +160,12 @@ function issueCard(a) {
       : `Occurrence of issue #${i.id}`),
     !i.is_first ? el("p", {}, el("a", { href: `#/alert/${i.id}` }, `→ open issue #${i.id}`),
       el("span", { class: "muted" }, " to see every occurrence and close the whole issue.")) : null,
-    el("p", { class: "muted" }, `Devices: ${i.macs.join(", ") || "none"}. Alerts about these devices join this issue while it's open. `
+    el("p", { class: "muted" }, `Groups ${i.about}. Alerts about the same join this issue while it's open. `
       + "Grouping never keeps an occurrence from Qwen. Repeats of the same kind are summarised in at most one notification an hour; "
-      + "anything high, a security detection, a tamper call, a new kind of alert or a higher severity notifies on its own. "
-      + "Closing the issue closes every occurrence; the next alert about these devices starts a new issue."),
+      + "a threat repeats only when it's the same source and target with the same IPS category, protocol and service port; "
+      + "anything else high, a tamper call, a new kind of alert, a new attacker or a higher severity notifies on its own. "
+      + "Closing closes only what's listed here; anything that arrives or joins while you read stays open. "
+      + "Once it's closed, the next alert about these starts a new issue."),
     el("table", {}, el("thead", {}, el("tr", {}, ["#", "when", "what", "severity", "status"].map((h) => el("th", {}, h)))),
       el("tbody", {}, i.occurrences.map((o) => el("tr", {},
         el("td", {}, o.id === a.id ? `#${o.id} (this)` : el("a", { href: `#/alert/${o.id}` }, `#${o.id}`)),
@@ -234,6 +248,7 @@ function wifiCard(w) {
 
 function classifyForm(a, onSaved, closeByDefault) {
   const o = a.options;
+  const inv = a.investigation || {};
   const cur = a.label || {};
   const t = a.triage || {};
   const radio = (name, value, text, checked) =>
@@ -250,12 +265,26 @@ function classifyForm(a, onSaved, closeByDefault) {
         await api(`/api/alerts/${a.id}/label`, {
           should_fire: f.get("should_fire"), assessment: f.get("assessment"),
           action: f.get("action") || null, note: f.get("note") || "", close: f.get("close") === "on",
+          checks: f.get("checks") || "", confidence: f.get("confidence") || null, action_reason: f.get("action_reason") || "",
+          // exactly the occurrences on screen: anything else in the issue stays open
+          seen_ids: a.issue ? a.issue.occurrences.map((o) => o.id) : [a.id],
         });
         msg.className = "ok"; msg.textContent = "Saved.";
         if (onSaved) onSaved(f.get("close") === "on"); else setTimeout(route, 400);
       } catch (e) { msg.className = "err"; msg.textContent = e.message; save.disabled = false; }
     } },
-    el("h2", {}, "Classify"),
+    el("h2", {}, "Investigation"),
+    el("p", {}, el("a", { href: `/api/alerts/${a.id}/report.md`, download: "" }, "Export report (private)"), " · ",
+      el("a", { href: `/api/alerts/${a.id}/report.md?public=1`, download: "" }, "Export report (public, scrubbed)"),
+      el("span", { class: "muted" }, " · the public version replaces MACs and addresses, even in your notes; read it before you publish")),
+    el("h3", {}, "1. What did you see?"),
+    el("ul", {}, (inv.seen || []).map((x) => el("li", {}, x))),
+    el("h3", {}, "2. What did you investigate, and why?"),
+    el("p", { class: "muted" }, "Checks the Mini SOC ran:"),
+    el("ul", {}, (inv.checks || []).map((c) => el("li", {}, el("strong", {}, `${c.check}: `), c.found))),
+    el("fieldset", {}, el("legend", {}, "Your own checks (what you looked at, and why)"),
+      el("textarea", { name: "checks", rows: 3, maxlength: 2000 }, cur.checks || "")),
+    el("h3", {}, "3. What did you conclude?"),
     closeByDefault && cur.created ? el("p", { class: "err" }, `You classified this before (${fmt(cur.created)}). Check your answers: saving will also close it.`) : null,
     el("p", { class: "muted" }, "Your answer is the training label: it records what the rule and Qwen should have said."),
     el("fieldset", {}, el("legend", {}, "Should this alert have fired?"),
@@ -265,12 +294,20 @@ function classifyForm(a, onSaved, closeByDefault) {
     el("fieldset", {}, el("legend", {}, "The correct assessment"),
       t.assessment ? el("p", { class: "muted" }, `Qwen said: ${words(t.assessment)}`) : null,
       o.assessments.map((x) => radio("assessment", x, words(x), cur.assessment === x))),
+    el("fieldset", {}, el("legend", {}, "How confident are you?"),
+      (inv.confidence_options || ["high", "medium", "low"]).map((x) => el("label", {},
+        el("input", { type: "radio", name: "confidence", value: x, checked: cur.confidence === x || null }), x))),
+    el("fieldset", {}, el("legend", {}, "Why (your conclusion; it becomes the reason in the training example, and examples without one aren't exported)"),
+      el("textarea", { name: "note", rows: 3, maxlength: 500 }, cur.note || "")),
+    el("h3", {}, "4. What would you recommend next?"),
     el("fieldset", {}, el("legend", {}, "The correct action"),
       el("select", { name: "action", required: true },
         el("option", { value: "", selected: cur.action ? null : true }, "Choose the action you'd want…"),
         o.actions.map((x) => el("option", { value: x.id, selected: cur.action === x.id || null }, x.title)))),
-    el("fieldset", {}, el("legend", {}, "Why (becomes the reason in the training example; examples without one aren't exported)"),
-      el("textarea", { name: "note", rows: 3, maxlength: 500 }, cur.note || "")),
+    el("fieldset", {}, el("legend", {}, "Why that action"),
+      el("textarea", { name: "action_reason", rows: 2, maxlength: 1000 }, cur.action_reason || "")),
+    inv.required_to_close && a.status === "open"
+      ? el("p", { class: "muted" }, "Closing a medium or high issue needs the full record: your conclusion, confidence, the action and why.") : null,
     el("label", {}, el("input", { type: "checkbox", name: "close", checked: a.status === "open" ? (closeByDefault || null) : true }),
       a.status !== "open" ? "Alert is closed"
         : a.issue && a.issue.is_first && a.issue.occurrences.length > 1 ? `Also close this issue (all ${a.issue.occurrences.length} occurrences)`
@@ -391,21 +428,25 @@ async function renderInventory() {
   counts.offline = counts.all - counts.online;
   counts.unidentified = d.devices.filter((x) => !x.fingerprint).length;
   counts.moves = d.devices.filter((x) => x.recommended.moves).length;
+  const toCheck = (x) => x.exposure && x.exposure.priority !== "low";
+  counts["php2shell"] = d.devices.filter(toCheck).length;
   const keep = (x) => (inv.show === "all" || (inv.show === "online" ? x.online : inv.show === "offline" ? !x.online
-      : inv.show === "moves" ? x.recommended.moves : !x.fingerprint))
+      : inv.show === "moves" ? x.recommended.moves : inv.show === "php2shell" ? toCheck(x) : !x.fingerprint))
     && (!inv.q || hay(x).includes(inv.q.toLowerCase()));
 
   const body = el("tbody", {});
   const shown = el("span", { class: "muted" });
   const draw = () => {
     const rows = d.devices.filter(keep);
+    if (inv.show === "php2shell") rows.sort((a, b) => EXPOSURE_ORDER[a.exposure.priority] - EXPOSURE_ORDER[b.exposure.priority]);
     shown.textContent = `${rows.length} of ${d.devices.length} devices`;
     body.replaceChildren(...rows.map((x) => el("tr", {},
       el("td", {}, el("div", {}, who(x)), el("div", { class: "muted" }, x.mac, x.mac_randomised ? " · private address" : ""),
         x.name ? el("div", { class: "untrusted" }, x.name.text) : null,
         x.hostname ? el("div", { class: "untrusted" }, x.hostname.text) : null,
         x.open_alerts.length ? el("div", {}, x.open_alerts.map((id) => [el("a", { href: `#/alert/${id}` }, `#${id}`), " "])) : null,
-        baselineLine(x.baseline)),
+        baselineLine(x.baseline),
+        x.blocked_7d ? el("div", {}, el("a", { href: `#/blocked/${x.mac}` }, `${x.blocked_7d} blocked in 7 days`)) : null),
       el("td", {}, x.fingerprint
         ? el("div", {}, [x.fingerprint.type, x.fingerprint.family].filter(Boolean).join(" · "),
             el("div", { class: "muted" }, [x.fingerprint.vendor, x.fingerprint.os].filter(Boolean).join(" · ")))
@@ -418,14 +459,15 @@ async function renderInventory() {
           x.link_mbps ? speed(x.link_mbps) : "", x.signal_dbm ? `${x.signal_dbm} dBm` : ""].filter(Boolean).join(" · "))),
       el("td", {}, x.ip || el("span", { class: "muted" }, "none"), el("div", { class: "muted" }, x.network || "")),
       el("td", {}, x.current_vlan === null ? el("span", { class: "muted" }, "?") : `VLAN ${x.current_vlan}`),
-      el("td", {}, recCell(x.recommended), trafficLine(x.traffic)))));
+      el("td", {}, recCell(x.recommended), trafficLine(x.traffic)),
+      el("td", {}, exposureCell(x.exposure)))));
   };
 
   const filters = el("div", { class: "filters" },
-    ["all", "online", "offline", "unidentified", "moves"].map((k) => el("button", {
+    ["all", "online", "offline", "unidentified", "moves", "php2shell"].map((k) => el("button", {
       class: inv.show === k ? "on" : null,
       onclick: (e) => { inv.show = k; e.target.parentNode.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b === e.target)); draw(); },
-    }, `${k} (${counts[k]})`)),
+    }, `${k === "php2shell" ? "PHP2Shell: to check" : k} (${counts[k]})`)),
     el("input", { type: "search", class: "search", placeholder: "search name, MAC, IP, model, switch…", value: inv.q,
       oninput: (e) => { inv.q = e.target.value; draw(); } }));
 
@@ -438,12 +480,43 @@ async function renderInventory() {
     el("p", { class: "muted" }, "Recommended VLAN: your own decision on the Segmentation page first, then the latest "
       + "analysis there, then the device type. Traffic: " + d.traffic_visibility
       + (d.traffic_since ? ` Collecting since ${fmt(d.traffic_since)}.` : " Not collected yet.")),
-    filters, el("p", {}, shown),
+    exposureCard(d.exposure), filters, el("p", {}, shown),
     el("div", { class: "card scroll" }, el("table", {},
-      el("thead", {}, el("tr", {}, ["device", "UniFi fingerprint", "last seen", "where", "IP", "VLAN now", "recommended"]
+      el("thead", {}, el("tr", {}, ["device", "UniFi fingerprint", "last seen", "where", "IP", "VLAN now", "recommended",
+        "likely running · PHP"]
         .map((h) => el("th", {}, h)))),
       body)));
   draw();
+}
+
+const EXPOSURE_ORDER = { act: 0, check: 1, low: 2 };
+const EXPOSURE_TEXT = { act: "check first", check: "check", low: "low" };
+
+function exposureCard(e) {
+  if (!e) return null;
+  const a = e.advisory;
+  return el("div", { class: "card" },
+    el("strong", {}, a.title), el("span", { class: "muted" }, ` · published ${a.published}`),
+    el("p", {}, a.summary),
+    el("p", {}, `Fixed in PHP ${a.fixed}. ${a.older}`),
+    el("p", { class: "muted" }, e.visibility),
+    e.port_forwards_read_at
+      ? el("div", {}, `Port forwards (read ${fmt(e.port_forwards_read_at)}): `,
+          e.port_forwards.length ? null : "none found.",
+          ...e.port_forwards.map((f) => el("div", { class: f.online_holder ? null : "err" },
+            f.text, f.online_holder ? "" : " · no device online holds this address: find out what it reaches")))
+      : el("p", { class: "muted" }, "Port forwards not read yet."));
+}
+
+function exposureCell(x) {
+  if (!x) return null;
+  return el("div", {},
+    el("div", {}, x.runs),
+    el("div", {}, `PHP ${x.php}`, el("span", { class: x.priority === "low" ? "tag" : "tag esc" }, EXPOSURE_TEXT[x.priority])),
+    el("details", {}, el("summary", { class: "muted" }, "why"),
+      ...x.reasons.map((r) => el("div", { class: "muted" }, r)),
+      ...x.evidence.map((r) => el("div", { class: "muted" }, r)),
+      el("div", {}, x.check)));
 }
 
 function baselineLine(b) {
@@ -454,9 +527,87 @@ function baselineLine(b) {
     b.unreviewed ? [" · ", el("a", { href: "#/baseline" }, `${b.unreviewed} to review`)] : null);
 }
 
+// ---------------------------------------------------------------- blocked
+let blockedDays = 7;
+
+async function renderBlocked(mac) {
+  const q = new URLSearchParams({ days: String(blockedDays) });
+  if (mac) q.set("mac", mac);
+  const d = await api(`/api/blocked?${q}`);
+  const who = (g) => [g.device_name && g.device_name.text, g.device_hostname && g.device_hostname.text].filter(Boolean)[0] || g.mac;
+  const dest = (g) => g.destination.address !== undefined
+    ? el("span", {}, g.destination.address || "unknown address")
+    : el("span", { class: "untrusted" }, g.destination.text);
+  const rows = d.groups.map((g) => el("tr", {},
+    el("td", {}, el("a", { href: `#/blocked/${g.mac}` }, el("span", { class: "untrusted" }, who(g))),
+      el("div", { class: "muted" }, g.mac)),
+    el("td", {}, dest(g), g.addresses > 1 ? el("div", { class: "muted" }, `${g.addresses} addresses`) : null),
+    el("td", {}, g.country || el("span", { class: "muted" }, "?"),
+      g.network ? el("div", { class: "muted untrusted" }, g.network.text) : null),
+    el("td", {}, [g.rule.type, g.rule.name].filter(Boolean).map(words).join(" · ") || "?"),
+    el("td", {}, [g.direction, g.protocol, g.ports.length ? `port ${g.ports.join(", ")}` : ""].filter(Boolean).join(" · ")),
+    el("td", {}, String(g.count)),
+    el("td", {}, g.last || "", el("details", {}, el("summary", { class: "muted" }, "exact times"),
+      ...g.recent.map((t) => el("div", { class: "muted" }, t))))));
+  const notStored = Object.values(d.not_stored || {}).reduce((a, b) => a + b, 0);
+  view.replaceChildren(
+    el("h1", {}, "Blocked connections"),
+    el("p", { class: "muted" }, d.about, d.since ? ` Collecting since ${fmt(d.since)}.` : " Not collected yet.",
+      d.incomplete ? " In some moments a device was blocked so often in a single millisecond, or the controller answered "
+        + "so slowly, that not every blocked connection could be listed; some from those moments are missing." : "",
+      (d.gaps || []).map((g) => ` Not collected from ${fmt(g.from)} to ${fmt(g.to)} (`
+        + (g.cause === "behind" ? "collection fell too far behind, during a flood or a controller outage"
+          : "the SOC was off longer than the controller keeps its log") + ").").join(""),
+      notStored ? ` About ${notStored} more past the per-device daily limit were counted but not stored.` : ""),
+    el("div", { class: "filters" },
+      [1, 7, 30, 90].map((n) => el("button", { class: blockedDays === n ? "on" : null,
+        onclick: () => { blockedDays = n; renderBlocked(mac); } }, `${n} day${n > 1 ? "s" : ""}`)),
+      mac ? el("a", { href: "#/blocked", class: "btn" }, "all devices") : null),
+    d.behind_since ? el("p", { class: "err" }, `Catching up: blocked connections since ${fmt(d.behind_since)} `
+      + "are still being collected.") : null,
+    el("p", {}, d.groups.length < d.group_total
+      ? `Showing ${d.groups.length} of ${d.group_total} groups`
+        + (d.per_device_limit ? ` (each device's ${d.per_device_limit} biggest); open a device for all of its groups.` : ", the biggest.")
+      : `${d.group_total} group${d.group_total === 1 ? "" : "s"}${mac ? ` for ${mac}` : ""}`),
+    el("div", { class: "card scroll" }, el("table", {},
+      el("thead", {}, el("tr", {}, ["device", "destination", "where", "rule", "how", "count", "last"].map((h) => el("th", {}, h)))),
+      el("tbody", {}, ...rows))));
+}
+
 // ---------------------------------------------------------------- baseline
+let baselineShow = null;  // "sample" or "all"; defaults to the sample once one is drawn
+
+const pct = (x) => (x === null || x === undefined) ? "–" : `${Math.round(x * 100)}%`;
+
+function sampleCard(d) {
+  const draw = (again) => el("button", { class: again ? "btn" : "btn primary", onclick: async () => {
+      if (again && !confirm("Draw a new sample? The current one is replaced; verdicts you already gave stay on their deviations.")) return;
+      await api("/api/baseline/sample", { size: 50 });
+      baselineShow = "sample";
+      const y = window.scrollY; await renderBaseline(); window.scrollTo(0, y);
+    } }, again ? "Re-draw" : "Draw a random review sample (50 per kind)");
+  if (!d.sample) {
+    return el("div", { class: "card" }, el("h2", {}, "Review sample"),
+      el("p", { class: "muted" }, "Reviewing every deviation isn't realistic. A random sample per kind (all of a kind when it has fewer) gives an honest "
+        + "false-alarm rate: the share you mark expected, with a 95% range. The sample is fixed once drawn, so it can't drift towards the easy ones."),
+      draw(false));
+  }
+  const s = d.sample;
+  return el("div", { class: "card scroll" }, el("h2", {}, "Review sample"),
+    el("p", { class: "muted" }, `Drawn ${fmt(s.drawn_at)}, up to ${s.size} per kind. False-alarm share = marked expected ÷ reviewed, `
+      + "with its 95% range (Wilson). A deviation you mark expected is one that would have been a false alarm had it paged."),
+    el("table", {}, el("thead", {}, el("tr", {}, ["deviation", "recorded", "in sample", "reviewed", "expected", "suspicious", "false-alarm share (95% range)"]
+      .map((h) => el("th", {}, h)))),
+      el("tbody", {}, Object.entries(s.kinds).map(([k, v]) => el("tr", {},
+        el("td", {}, words(k)), el("td", {}, v.population), el("td", {}, v.sample), el("td", {}, `${v.reviewed} of ${v.sample}`),
+        el("td", {}, v.expected), el("td", {}, v.suspicious),
+        el("td", {}, v.false_alarm_share === null ? "–" : `${pct(v.false_alarm_share)} (${pct(v.interval_95[0])}–${pct(v.interval_95[1])})`))))),
+    el("p", {}, draw(true)));
+}
+
 async function renderBaseline() {
   const d = await api("/api/baseline");
+  if (!baselineShow) baselineShow = d.sample ? "sample" : "all";
   const head = [
     el("h1", {}, "Baseline"),
     el("p", {}, el("span", { class: `tag ${d.mode === "shadow" ? "lab" : ""}` }, d.mode), " ",
@@ -474,7 +625,8 @@ async function renderBaseline() {
         el("td", {}, v.suspicious), el("td", {}, v.count - v.expected - v.suspicious))))));
   const keyText = (k) => k.domain ? el("span", { class: "untrusted inline" }, k.domain.text)
     : k.region ? `region ${k.region}` : k.device ? `device ${k.device}` : k.value;
-  const rows = d.deviations.map((x) => {
+  const shown = baselineShow === "sample" && d.sample ? d.sample_rows : d.deviations;
+  const rows = shown.map((x) => {
     const note = el("input", { type: "text", maxlength: 500, placeholder: "why (optional)", value: x.note || "" });
     const msg = el("span", {});
     const btn = (v) => el("button", { class: "btn", onclick: async () => {
@@ -482,6 +634,7 @@ async function renderBaseline() {
         try {
           await api(`/api/baseline/deviations/${x.id}/label`, { verdict: v, note: note.value });
           msg.className = "ok"; msg.textContent = v;
+          const y = window.scrollY; await renderBaseline(); window.scrollTo(0, y);  // refresh the sample figures in place
         } catch (e) { msg.className = "err"; msg.textContent = e.message; }
       } }, v);
     return el("tr", {},
@@ -491,7 +644,9 @@ async function renderBaseline() {
       el("td", {}, x.day, el("div", { class: "muted" }, `last ${fmt(x.last_at)}`)),
       el("td", {}, x.verdict ? el("span", { class: "tag lab" }, x.verdict) : null, note, btn("expected"), " ", btn("suspicious"), " ", msg));
   });
-  view.replaceChildren(...head, kinds, el("div", { class: "card scroll" }, el("h2", {}, "Deviations"),
+  const toggle = d.sample ? el("div", { class: "filters" }, [["sample", `Review the sample (${d.sample_rows.length})`], ["all", "All deviations"]]
+    .map(([k, label]) => el("button", { class: baselineShow === k ? "on" : null, onclick: async () => { baselineShow = k; await renderBaseline(); } }, label))) : null;
+  view.replaceChildren(...head, sampleCard(d), kinds, el("div", { class: "card scroll" }, el("h2", {}, "Deviations"), toggle,
     rows.length ? el("table", {}, el("thead", {}, el("tr", {}, ["device", "what changed", "day", "your verdict"].map((h) => el("th", {}, h)))),
       el("tbody", {}, rows)) : el("p", { class: "muted" }, "None recorded yet.")));
 }
@@ -582,16 +737,19 @@ async function route() {
   const h = location.hash || "#/";
   document.querySelectorAll("[data-nav]").forEach((a) =>
     a.classList.toggle("active", (h.startsWith("#/training") ? "training" : h.startsWith("#/segmentation") ? "segmentation"
-      : h.startsWith("#/inventory") ? "inventory" : h.startsWith("#/baseline") ? "baseline" : "alerts") === a.dataset.nav));
+      : h.startsWith("#/inventory") ? "inventory" : h.startsWith("#/baseline") ? "baseline"
+      : h.startsWith("#/blocked") ? "blocked" : "alerts") === a.dataset.nav));
   try {
     const m = h.match(/^#\/alert\/(\d+)$/);
     const tm = h.match(/^#\/triage(?:\/(\d+))?$/);
+    const bm = h.match(/^#\/blocked(?:\/([0-9a-f]{2}(?::[0-9a-f]{2}){5}))?$/);
     if (m) await renderAlert(m[1]);
     else if (tm) { if (tm[1] === undefined) tq.built = false; await renderTriage(Number(tm[1] || 0)); }
     else if (h.startsWith("#/training")) await renderTraining();
     else if (h.startsWith("#/segmentation")) await renderSegmentation();
     else if (h.startsWith("#/inventory")) await renderInventory();
     else if (h.startsWith("#/baseline")) await renderBaseline();
+    else if (bm) await renderBlocked(bm[1]);
     else await renderList();
   } catch (e) {
     view.replaceChildren(el("p", { class: "err" }, `Couldn't load: ${e.message}`));

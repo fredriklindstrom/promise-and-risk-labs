@@ -58,6 +58,14 @@ CREATE TABLE IF NOT EXISTS baseline_deviations (
   first_at INTEGER, last_at INTEGER, UNIQUE (mac, day, kind, key));
 CREATE TABLE IF NOT EXISTS deviation_labels (
   id INTEGER PRIMARY KEY AUTOINCREMENT, deviation_id INTEGER, verdict TEXT, note TEXT, created INTEGER);
+CREATE TABLE IF NOT EXISTS blocked_flows (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, time_ms INTEGER, day TEXT, mac TEXT, direction TEXT, src_ip TEXT,
+  src_port INTEGER, dst_ip TEXT, dst_port INTEGER, protocol TEXT, domain TEXT, region TEXT, policy_type TEXT,
+  policy_name TEXT, UNIQUE (time_ms, mac, src_ip, src_port, dst_ip, dst_port, protocol));
+CREATE TABLE IF NOT EXISTS blocked_overflow (mac TEXT, day TEXT, n INTEGER, PRIMARY KEY (mac, day));
+CREATE INDEX IF NOT EXISTS blocked_mac_time ON blocked_flows(mac, time_ms);
+CREATE INDEX IF NOT EXISTS blocked_time ON blocked_flows(time_ms);
+CREATE INDEX IF NOT EXISTS blocked_mac_day ON blocked_flows(mac, day);
 CREATE INDEX IF NOT EXISTS alerts_status ON alerts(status, created);
 CREATE INDEX IF NOT EXISTS alerts_rule ON alerts(rule);
 """
@@ -80,7 +88,9 @@ MIGRATIONS = [("devices", "pending_count", "INTEGER DEFAULT 0"), ("devices", "pe
               ("devices", "link_mbps", "INTEGER"), ("devices", "signal_dbm", "INTEGER"),
               ("alerts", "issue_id", "INTEGER"),  # the first alert of an ongoing issue; its own id when it is that first
               ("alerts", "issue_key", "TEXT"),  # on an issue's first alert: the exact set of devices it's about
-              ("alerts", "digest_at", "INTEGER")]  # on an issue's first alert: when repeats were last summarised
+              ("alerts", "digest_at", "INTEGER"),  # on an issue's first alert: when repeats were last summarised
+              # the investigation record: your own checks, how confident you are, why this action
+              ("labels", "checks", "TEXT"), ("labels", "confidence", "TEXT"), ("labels", "action_reason", "TEXT")]
 
 
 def connect(path=None, readonly=False):
@@ -105,6 +115,16 @@ def connect(path=None, readonly=False):
             else:
                 db.execute("UPDATE alerts SET issue_id=id WHERE id=?", (aid,))
         set_meta(db, "issues_grouped", True)
+        db.commit()
+    if not get_meta(db, "threat_issues_grouped"):  # once: open threat alerts from before they were grouped
+        for (aid,) in db.execute("SELECT id FROM alerts WHERE rule='unifi_security_event' AND status='open' "
+                                 "AND issue_id=id ORDER BY id").fetchall():
+            if db.execute("SELECT COUNT(*) FROM alerts WHERE issue_id=? AND id<>?", (aid, aid)).fetchone()[0]:
+                continue  # already the first of an issue with occurrences: leave it
+            a = get_alert(db, aid)
+            det = a["detail"] if isinstance(a["detail"], dict) else {}
+            attach_issue(db, aid, a["entity"], a["rule"], det)
+        set_meta(db, "threat_issues_grouped", True)
         db.commit()
     return db
 
@@ -331,12 +351,68 @@ def add_alert(db, rule, severity, entity, title, detail, dedup_key, now=None):
                      (now or int(time.time()), rule, severity, entity, title, json.dumps(detail), dedup_key))
     if cur.rowcount != 1:
         return None
-    attach_issue(db, cur.lastrowid, entity, rule)
+    attach_issue(db, cur.lastrowid, entity, rule, detail)
     return cur.lastrowid
 
 
 # issues: while one is open, alerts about exactly the same device(s) are occurrences of it ------------------
-UNGROUPED_RULES = {"unifi_security_event"}  # their entity is the reporting UniFi device, not the subject
+SECURITY_RULE = "unifi_security_event"  # entity is the reporting UniFi device, so grouped by what was targeted
+
+
+def _own_device(db, mac=None, ip=None):
+    """The MAC of one of your known devices matching this MAC or address, else None."""
+    if isinstance(mac, str) and get_device(db, mac.lower()):
+        return mac.lower()
+    if isinstance(ip, str) and ip:
+        r = db.execute("SELECT mac FROM devices WHERE ip=? ORDER BY active DESC, last_seen DESC LIMIT 1", (ip,)).fetchone()
+        return r[0] if r else None
+    return None
+
+
+def threat_endpoints(db, detail):
+    """(source, target, source_is_yours, target_is_yours) for a threat. Your devices are named by MAC (found
+    by MAC or by their current address), everything else by address. Event and flow both count, so the
+    variants of one event that name a MAC or an address agree."""
+    ev = (detail or {}).get("event_full") or (detail or {}).get("event") or {}
+    flows = (detail or {}).get("flows") or []
+    s, d = (flows[0].get("source") or {}, flows[0].get("destination") or {}) if flows else ({}, {})
+    src_ip = ev.get("source_address") or s.get("ip")
+    dst_ip = ev.get("destination_address") or d.get("ip")
+    src_own = _own_device(db, (ev.get("source_client") or {}).get("mac") or s.get("mac"), src_ip)
+    dst_own = _own_device(db, (ev.get("destination_client") or {}).get("mac") or d.get("mac"), dst_ip)
+    src, dst = src_own or src_ip, dst_own or dst_ip
+    return (str(src).lower() if src else None, str(dst).lower() if dst else None, bool(src_own), bool(dst_own))
+
+
+def threat_key(db, detail):
+    """Threats are grouped around YOUR device: everything aimed at it, or, when one of your devices is the
+    source, everything it did. A threat between two outside addresses isn't grouped: an outside address
+    shared by several of your devices must never put them in one issue. Rogue access points aren't grouped."""
+    ev = (detail or {}).get("event_full") or (detail or {}).get("event") or {}
+    if "ROGUE" in str(ev.get("type") or "").split("_"):
+        return None
+    src, dst, src_own, dst_own = threat_endpoints(db, detail)
+    if dst_own:
+        return f"target:{dst}"
+    if src_own:
+        return f"source:{src}"
+    return None
+
+
+def threat_signature(detail):
+    """What a threat was: the IPS category and rule name, the protocol, and both ports with the random
+    high ones (49152 and up) left out. Both, because the attacker picks the source port; dropping only the
+    random range keeps a reply from port 53 one thing and an attack on 443 another. UniFi's rule name is only a
+    category ("Exploits"), so category alone would make different exploits look the same."""
+    out = set()
+    for f in (detail or {}).get("flows") or []:
+        s, d = f.get("source") or {}, f.get("destination") or {}
+        ports = [p for p in (s.get("port"), d.get("port")) if isinstance(p, int) and not isinstance(p, bool)]
+        for r in f.get("rules") or []:
+            name = r.get("name") or r.get("category")
+            if name:
+                out.add((name, r.get("category"), f.get("protocol"), tuple(sorted({p for p in ports if p < 49152}))))
+    return frozenset(out)
 
 
 def entity_macs(entity):
@@ -345,13 +421,16 @@ def entity_macs(entity):
     return parts if parts and all(re.fullmatch(r"[0-9a-f]{2}(?::[0-9a-f]{2}){5}", p) for p in parts) else []
 
 
-def attach_issue(db, alert_id, entity, rule=None):
+def attach_issue(db, alert_id, entity, rule=None, detail=None):
     """Join the open issue about exactly the same set of devices, else start a new one. Exact match only:
     an alert naming two devices (a hostname collision) never pulls either device's alerts into its issue,
     so a device that copies your laptop's name can't gather the laptop's alerts under an issue you'd close
     as 'the new device is fine'. Alerts not about devices are always their own issue."""
-    macs = sorted(set(entity_macs(entity)))
-    key = ",".join(macs) if macs and rule not in UNGROUPED_RULES else None
+    if rule == SECURITY_RULE:  # threats: one issue per source, target and rule while it's open
+        key = threat_key(db, detail)
+    else:
+        macs = sorted(set(entity_macs(entity)))
+        key = ",".join(macs) if macs else None
     row = db.execute("SELECT id FROM alerts WHERE issue_id=id AND status='open' AND issue_key=? AND id<>? "
                      "ORDER BY id LIMIT 1", (key, alert_id)).fetchone() if key else None
     issue = row[0] if row else alert_id
@@ -368,23 +447,52 @@ def issue_occurrences(db, issue_id):
 
 def issue_macs(db, issue_id):
     r = db.execute("SELECT issue_key FROM alerts WHERE id=?", (issue_id,)).fetchone()
-    return (r[0] or "").split(",") if r and r[0] else []
+    return entity_macs(r[0]) if r and r[0] else []
+
+
+def issue_about(db, issue_id):
+    """What the issue groups, in words."""
+    r = db.execute("SELECT issue_key FROM alerts WHERE id=?", (issue_id,)).fetchone()
+    key = r[0] if r else None
+    if key and key.startswith("target:"):
+        return f"every threat aimed at your device {key[7:]}"
+    if key and key.startswith("source:"):
+        return f"every threat from your device {key[7:]}"
+    return f"devices {', '.join(entity_macs(key))}" if key else "this alert only"
 
 
 LOCKED_DEFAULTS = {"RESET_TAMPERED_LABEL"}  # a tamper call: never folded into a summary
 
 
 def issue_repeat(db, alert):
-    """True when an occurrence may be summarised with others instead of notifying on its own: a later
-    occurrence of the same kind, at no higher severity, that isn't high, a UniFi security detection or a
-    tamper call. Everything else notifies on its own. Every occurrence still goes to the model."""
+    """True when an occurrence may be summarised with others instead of notifying on its own. A threat:
+    the same source, target and confirmed rule again, at no higher severity. Anything else: a later
+    occurrence of the same kind, at no higher severity, that isn't high or a tamper call. Everything else
+    notifies on its own. Every occurrence still goes to the model."""
     issue = alert.get("issue_id")
-    if issue in (None, alert["id"]) or alert["severity"] == "high" or alert["rule"] in UNGROUPED_RULES:
+    if issue in (None, alert["id"]):
+        return False
+    order = ["info", "low", "medium", "high"]
+    if alert["rule"] == SECURITY_RULE:
+        # the issue is everything around one of your devices; a REPEAT is narrower: the same source and
+        # target with the same confirmed rule, at no higher severity than those same occurrences. A new
+        # source, a new rule or an unconfirmed rule notifies on its own.
+        sig = threat_signature(alert.get("detail"))
+        if not sig:
+            return False
+        ends = threat_endpoints(db, alert.get("detail"))[:2]
+        same = []
+        for (pid,) in db.execute("SELECT id FROM alerts WHERE issue_id=? AND id<? AND rule=?",
+                                 (issue, alert["id"], SECURITY_RULE)).fetchall():
+            p = get_alert(db, pid)
+            if threat_endpoints(db, p["detail"])[:2] == ends and threat_signature(p["detail"]) == sig:
+                same.append(p)
+        return bool(same) and order.index(alert["severity"]) <= max(order.index(p["severity"]) for p in same)
+    if alert["severity"] == "high":
         return False
     if ((alert.get("detail") or {}).get("default_action")) in LOCKED_DEFAULTS:
         return False
     prev = db.execute("SELECT rule, severity FROM alerts WHERE issue_id=? AND id<?", (issue, alert["id"])).fetchall()
-    order = ["info", "low", "medium", "high"]
     return bool(prev) and alert["rule"] in {r["rule"] for r in prev} and \
         order.index(alert["severity"]) <= max(order.index(r["severity"]) for r in prev)
 
@@ -427,19 +535,29 @@ def mark_notified(db, alert_id, how=1):
     db.execute("UPDATE alerts SET notified=? WHERE id=?", (how, alert_id))
 
 
-def ack(db, alert_id, note=""):
+def ack(db, alert_id, note="", seen=None):
     """Acknowledging frees the dedup key, so the same thing happening again raises a new alert
     (dedup only suppresses repeats while an alert is still open). Closing an issue's first alert closes
     the whole issue: every open occurrence with it, and the next alert about those devices starts a new one.
-    Closing a later occurrence closes only that occurrence."""
+    With `seen` (the ids of the occurrences the person was shown), only those close; anything else in the issue,
+    whether it arrived or joined while they were reading, stays open as a new issue. Closing a later
+    occurrence closes only it."""
     now = int(time.time())
     cur = db.execute("UPDATE alerts SET status='acked', acked_at=?, ack_note=?, dedup_key=dedup_key||'#acked'||id "
                      "WHERE id=? AND status='open'", (now, note, alert_id))
     if cur.rowcount != 1:
         return False
-    db.execute("UPDATE alerts SET status='acked', acked_at=?, ack_note=?, dedup_key=dedup_key||'#acked'||id "
-               "WHERE issue_id=? AND id<>? AND status='open'", (now, note or f"closed with issue #{alert_id}",
-                                                                 alert_id, alert_id))
+    others = [r[0] for r in db.execute("SELECT id FROM alerts WHERE issue_id=? AND id<>? AND status='open'",
+                                       (alert_id, alert_id))]
+    close = others if seen is None else [i for i in others if i in seen]
+    db.executemany("UPDATE alerts SET status='acked', acked_at=?, ack_note=?, dedup_key=dedup_key||'#acked'||id "
+                   "WHERE id=? AND status='open'", [(now, note or f"closed with issue #{alert_id}", i) for i in close])
+    left = [r[0] for r in db.execute("SELECT id FROM alerts WHERE issue_id=? AND id<>? AND status='open' ORDER BY id",
+                                     (alert_id, alert_id))]
+    if left:  # what arrived after what you saw becomes its own issue, still open
+        key = db.execute("SELECT issue_key FROM alerts WHERE id=?", (alert_id,)).fetchone()[0]
+        db.executemany("UPDATE alerts SET issue_id=? WHERE id=?", [(left[0], i) for i in left])
+        db.execute("UPDATE alerts SET issue_key=? WHERE id=?", (key, left[0]))
     return True
 
 
@@ -462,9 +580,12 @@ def verdicts_for(db, alert_id):
 
 
 # labels (human classification) ---------------------------------------------------------
-def add_label(db, alert_id, should_fire, assessment, action, note, closed):
-    db.execute("INSERT INTO labels(alert_id,should_fire,assessment,action,note,closed,created) VALUES(?,?,?,?,?,?,?)",
-               (alert_id, should_fire, assessment, action, note, int(bool(closed)), int(time.time())))
+def add_label(db, alert_id, should_fire, assessment, action, note, closed, checks=None, confidence=None,
+              action_reason=None):
+    db.execute("INSERT INTO labels(alert_id,should_fire,assessment,action,note,closed,created,checks,confidence,"
+               "action_reason) VALUES(?,?,?,?,?,?,?,?,?,?)",
+               (alert_id, should_fire, assessment, action, note, int(bool(closed)), int(time.time()), checks,
+                confidence, action_reason))
 
 
 def latest_label(db, alert_id):
@@ -569,6 +690,90 @@ def traffic_prune(db, before_day, before_ts):
                "(SELECT deviation_id FROM deviation_labels)", (before_ts,))
 
 
+BLOCKED_COLS = ("time_ms", "day", "mac", "direction", "src_ip", "src_port", "dst_ip", "dst_port", "protocol", "domain",
+                "region", "policy_type", "policy_name")
+
+
+UNIQUE_BLOCKED = ("time_ms", "mac", "src_ip", "src_port", "dst_ip", "dst_port", "protocol")
+
+
+def blocked_add(db, rows, per_day_cap, count_from_ms=0):
+    """Store blocked flows one by one. A device chooses how often it tries, so each (device, day) keeps at most
+    per_day_cap rows; the rest are only counted. A flow already stored (an overlapping window) is skipped. A flow
+    past the cap is counted only from count_from_ms on (where the last run ended): one in the re-read overlap
+    was counted then, and isn't stored, so it couldn't be recognised as a repeat."""
+    added, tally = 0, {}
+    where = " AND ".join(f"{c}=?" for c in UNIQUE_BLOCKED)
+    for r in rows:
+        if db.execute(f"SELECT 1 FROM blocked_flows WHERE {where}", tuple(r[c] for c in UNIQUE_BLOCKED)).fetchone():
+            continue
+        k = (r["mac"], r["day"])
+        if k not in tally:
+            tally[k] = db.execute("SELECT COUNT(*) FROM blocked_flows WHERE mac=? AND day=?", k).fetchone()[0]
+        if tally[k] >= per_day_cap:
+            if r["time_ms"] < count_from_ms:
+                continue
+            db.execute("INSERT INTO blocked_overflow(mac,day,n) VALUES(?,?,1) ON CONFLICT(mac,day) DO UPDATE SET n=n+1", k)
+            continue
+        db.execute(f"INSERT OR IGNORE INTO blocked_flows({','.join(BLOCKED_COLS)}) "
+                   f"VALUES({','.join('?' * len(BLOCKED_COLS))})", tuple(r[c] for c in BLOCKED_COLS))
+        tally[k] += 1
+        added += 1
+    return added
+
+
+_REMOTE = "CASE WHEN direction='incoming' THEN src_ip ELSE dst_ip END"
+_DEST = f"CASE WHEN domain<>'' THEN domain ELSE {_REMOTE} END"
+_GROUP = f"mac, {_DEST}, domain<>'', protocol, direction, policy_type, policy_name"
+
+
+def blocked_key(g):
+    return (g["mac"], g["dest"], int(g["named"]), g["protocol"], g["direction"], g["policy_type"], g["policy_name"])
+
+
+def blocked_groups(db, since_ms, mac=None, per_device=None, limit=2000):
+    """Blocked flows grouped in SQL: per device, destination (the domain the device asked for, else the remote
+    address), protocol, direction and rule. With per_device, each device keeps at most that many groups (its
+    biggest), so a device hitting many destinations can't push another device off the list."""
+    q = (f"SELECT * FROM (SELECT mac, {_DEST} AS dest, domain<>'' AS named, protocol, direction, policy_type, "
+         f"policy_name, COUNT(*) AS n, MAX(time_ms) AS last_ms, COUNT(DISTINCT {_REMOTE}) AS addrs, "
+         f"MAX({_REMOTE}) AS an_address, GROUP_CONCAT(DISTINCT dst_port) AS ports, "
+         f"ROW_NUMBER() OVER (PARTITION BY mac ORDER BY COUNT(*) DESC, MAX(time_ms) DESC) AS rank_in_device "
+         "FROM blocked_flows WHERE time_ms >= ?" + (" AND mac = ?" if mac else "") + f" GROUP BY {_GROUP}) "
+         "WHERE rank_in_device <= ? ORDER BY n DESC, last_ms DESC LIMIT ?")
+    cap = per_device or 10**9
+    return [dict(r) for r in db.execute(q, (since_ms, mac, cap, limit) if mac else (since_ms, cap, limit))]
+
+
+def blocked_group_count(db, since_ms, mac=None):
+    q = (f"SELECT COUNT(*) FROM (SELECT 1 FROM blocked_flows WHERE time_ms >= ?" + (" AND mac = ?" if mac else "") +
+         f" GROUP BY {_GROUP})")
+    return db.execute(q, (since_ms, mac) if mac else (since_ms,)).fetchone()[0]
+
+
+def blocked_recent_all(db, since_ms, mac, n):
+    """{group key: [time_ms, newest first]} with each group's n most recent times, in one query."""
+    q = (f"SELECT mac, dest, named, protocol, direction, policy_type, policy_name, time_ms FROM (SELECT mac, "
+         f"{_DEST} AS dest, domain<>'' AS named, protocol, direction, policy_type, policy_name, time_ms, "
+         f"ROW_NUMBER() OVER (PARTITION BY {_GROUP} ORDER BY time_ms DESC) AS rn FROM blocked_flows "
+         "WHERE time_ms >= ?" + (" AND mac = ?" if mac else "") + ") WHERE rn <= ? ORDER BY time_ms DESC")
+    out = {}
+    for r in db.execute(q, (since_ms, mac, n) if mac else (since_ms, n)):
+        out.setdefault((r[0], r[1], int(r[2]), r[3], r[4], r[5], r[6]), []).append(r[7])
+    return out
+
+
+def blocked_overflow(db, first_day, mac=None):
+    q = "SELECT mac, SUM(n) FROM blocked_overflow WHERE day >= ?" + (" AND mac = ?" if mac else "") + " GROUP BY mac"
+    return {r[0]: r[1] for r in db.execute(q, (first_day, mac) if mac else (first_day,))}
+
+
+def blocked_prune(db, before_ms):
+    db.execute("DELETE FROM blocked_flows WHERE time_ms < ?", (before_ms,))  # uses the time index
+    db.execute("DELETE FROM blocked_overflow WHERE day < ?",
+               (time.strftime("%Y-%m-%d", time.localtime(before_ms / 1000)),))
+
+
 def traffic_hours_add(db, rows):
     db.executemany("INSERT INTO traffic_hours(mac,day,hour,flows,bytes) VALUES(?,?,?,?,?) ON CONFLICT(mac,day,hour) "
                    "DO UPDATE SET flows=flows+excluded.flows, bytes=bytes+excluded.bytes", rows)
@@ -577,6 +782,13 @@ def traffic_hours_add(db, rows):
 def traffic_rows(db, mac, first_day, last_day):
     return [dict(r) for r in db.execute("SELECT kind, peer, service, day, flows, bytes FROM traffic "
                                         "WHERE mac=? AND day>=? AND day<=?", (mac, first_day, last_day))]
+
+
+def traffic_served(db, first_day):
+    """(mac, kind, service, flows) for traffic others started towards a device since first_day."""
+    return [tuple(r) for r in db.execute("SELECT mac, kind, service, SUM(flows) FROM traffic WHERE "
+                                         "kind IN ('internet_in','local_in') AND day>=? GROUP BY mac, kind, service",
+                                         (first_day,))]
 
 
 def traffic_hour_rows(db, mac, first_day, last_day):
@@ -637,6 +849,35 @@ def baseline_open_counts(db, since_ts):
     return {r[0]: r[1] for r in db.execute(
         "SELECT mac, COUNT(*) FROM baseline_deviations d WHERE last_at>=? AND NOT EXISTS "
         "(SELECT 1 FROM deviation_labels l WHERE l.deviation_id=d.id) GROUP BY mac", (since_ts,))}
+
+
+def deviation_verdicts(db, ids):
+    """{deviation id: latest verdict} for those of `ids` that have one."""
+    out = {}
+    for i in range(0, len(ids), 500):
+        chunk = ids[i:i + 500]
+        q = ("SELECT l.deviation_id, l.verdict FROM deviation_labels l JOIN (SELECT deviation_id, MAX(id) m FROM "
+             f"deviation_labels WHERE deviation_id IN ({','.join('?' * len(chunk))}) GROUP BY deviation_id) x ON l.id = x.m")
+        out.update({r[0]: r[1] for r in db.execute(q, chunk)})
+    return out
+
+
+def deviation_exists(db, deviation_id):
+    return db.execute("SELECT 1 FROM baseline_deviations WHERE id=?", (deviation_id,)).fetchone() is not None
+
+
+def baseline_deviations_by_ids(db, ids):
+    out = []
+    for i in range(0, len(ids), 500):
+        chunk = ids[i:i + 500]
+        rows = db.execute("SELECT d.*, l.verdict, l.note FROM baseline_deviations d LEFT JOIN deviation_labels l ON l.id = "
+                          "(SELECT MAX(id) FROM deviation_labels WHERE deviation_id=d.id) "
+                          f"WHERE d.id IN ({','.join('?' * len(chunk))}) ORDER BY d.kind, d.id", chunk)
+        for r in rows:
+            x = dict(r)
+            x["detail"] = json.loads(x["detail"] or "{}")
+            out.append(x)
+    return out
 
 
 def deviation_label(db, deviation_id, verdict, note, now):

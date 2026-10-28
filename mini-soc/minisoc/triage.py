@@ -45,18 +45,27 @@ SYSTEM = (
     + normalize.CONTRACT + "\n\n" + PLAYBOOK + "\n\n"
     "Recommend exactly one action from this list (a person carries it out; nothing is automatic):\n"
     + actions.catalogue_text() + "\n\n"
-    'Reply with JSON only: {"assessment": "likely_benign" | "likely_malicious" | "uncertain", '
+    "Work as an analyst writing up an investigation, in four parts: what you saw, what you checked and what "
+    "each check showed, what you conclude and how sure you are, and what should happen next. "
+    "`mini_soc_checks` are lookups the Mini SOC already ran (controller data, not text a device wrote); use them "
+    "and say which ones you relied on.\n\n"
+    'Reply with JSON only: {"seen": "<one sentence: what the alert shows>", '
+    '"checked": [{"what": "<field path or check you relied on>", "showed": "<what it showed, a few words>"}], '
+    '"assessment": "likely_benign" | "likely_malicious" | "uncertain", '
     '"confidence": "high" | "medium" | "low", "reason": "<one or two sentences>", '
-    '"evidence": ["<field paths you relied on>"], "action": "<one ID from the list>", '
-    '"action_reason": "<one sentence>", "next_step": "<one sentence>"}')
+    '"action": "<one ID from the list>", "action_reason": "<one sentence>", "next_step": "<one sentence>"}')
 
 
-def _messages(alert, known_normal, networks, notable_events, site_environment="unknown"):
+MINI_SOC_CHECKS_BY = "the Mini SOC's own lookups of controller data; no text a device chose"
+
+
+def _messages(alert, known_normal, networks, notable_events, site_environment="unknown", checks=None):
     from .rules import ENVIRONMENTS
     env = site_environment if isinstance(site_environment, str) and site_environment in ENVIRONMENTS else "unknown"
     ctx = {"site": {"environment": env, "means": ENVIRONMENTS[env], "set_by": "the owner, in config.json"},
            "known_normal": known_normal, "networks": networks,
            "recent_notable_events": notable_events,
+           "mini_soc_checks": {"written_by": MINI_SOC_CHECKS_BY, "checks": list(checks or [])},
            # alert last; the rule's default action is withheld so the model's pick is its own
            "alert": {k: alert[k] for k in ("id", "rule", "severity", "title")}
                     | {"detail": {k: v for k, v in (alert.get("detail") or {}).items() if k != "default_action"}}}
@@ -71,8 +80,11 @@ def _parse(text):
         return None
     if not isinstance(v, dict) or v.get("assessment") not in ASSESSMENTS or v.get("confidence") not in CONFIDENCES:
         return None
-    ev = v.get("evidence") if isinstance(v.get("evidence"), list) else []
+    checked = [{"what": str(c.get("what", ""))[:120], "showed": str(c.get("showed", ""))[:200]}
+               for c in (v.get("checked") if isinstance(v.get("checked"), list) else []) if isinstance(c, dict)][:8]
+    ev = v.get("evidence") if isinstance(v.get("evidence"), list) else [c["what"] for c in checked]
     return {"assessment": v["assessment"], "confidence": v["confidence"],
+            "seen": str(v.get("seen", ""))[:300], "checked": checked,
             "reason": str(v.get("reason", ""))[:600], "evidence": [str(x)[:120] for x in ev][:10],
             "next_step": str(v.get("next_step", ""))[:300],
             # an ID outside the catalogue is dropped, and the rule's default action stands
@@ -85,13 +97,13 @@ def escalated(verdict):
     return (verdict is None or verdict["assessment"] != "likely_benign" or verdict["confidence"] == "low")
 
 
-def assess(alert, cfg, known_normal, networks, notable_events, log=print, retries=1):
-    msgs = _messages(alert, known_normal, networks, notable_events, cfg.get("site_environment", "unknown"))
+def assess(alert, cfg, known_normal, networks, notable_events, log=print, retries=1, checks=None):
+    msgs = _messages(alert, known_normal, networks, notable_events, cfg.get("site_environment", "unknown"), checks)
     prompt_hash = hashlib.sha256(json.dumps(msgs, sort_keys=True).encode()).hexdigest()[:16]
     raw, verdict, t0 = "", None, time.time()
     for attempt in range(retries + 1):  # malformed output is rejected and retried, never routed on
         r = requests.post(cfg["model_url"], timeout=REQUEST_TIMEOUT_S, json={
-            "messages": msgs, "max_tokens": 500, "temperature": 0,
+            "messages": msgs, "max_tokens": 900, "temperature": 0,
             "chat_template_kwargs": {"enable_thinking": False}})
         r.raise_for_status()
         raw = r.json()["choices"][0]["message"].get("content") or ""

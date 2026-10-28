@@ -1,8 +1,8 @@
 """Read-only UniFi Network client.
 
 Every request goes through _request(), which refuses anything not on the allowlist:
-GETs to a handful of read endpoints, and POSTs only to the system-log *query* endpoint (UniFi
-uses POST for log searches). Nothing here can change the controller, whatever rights
+GETs to a handful of read endpoints, and POSTs only to two *query* endpoints, the system log and
+the flow log (UniFi uses POST for searches). Nothing here can change the controller, whatever rights
 the API key has.
 """
 import pathlib
@@ -22,6 +22,7 @@ ALLOWED = [
     ("GET", re.compile(r"api/s/[\w-]+/stat/device", re.ASCII)),  # read for radio BSSIDs; only those are kept
     ("GET", re.compile(r"api/self", re.ASCII)),
     ("GET", re.compile(r"v2/api/fingerprint_devices/0", re.ASCII)),  # UniFi's fingerprint name table
+    ("GET", re.compile(r"api/s/[\w-]+/rest/portforward", re.ASCII)),  # read: which devices the internet can reach
     ("POST", re.compile(r"v2/api/site/[\w-]+/system-log/all", re.ASCII)),
     ("POST", re.compile(r"v2/api/site/[\w-]+/traffic-flows", re.ASCII)),  # a query: flows the gateway routed
 ]
@@ -111,6 +112,21 @@ class UniFi:
                                         "radio": v.get("radio"), "device_mac": mac, "device_name": d.get("name")})
         return out
 
+    def port_forwards(self):
+        """The controller's port forwards: only the fields that say what is reachable from the internet. Each
+        rule's name is written by a console user and isn't needed, so it's dropped here."""
+        d = self._request("GET", f"api/s/{self.site}/rest/portforward")
+        if (d.get("meta") or {}).get("rc", "ok") != "ok":  # an error answer must not read as "no forwards"
+            raise RuntimeError("port forward list refused")
+        out = []
+        for r in d.get("data") or []:
+            if isinstance(r, dict):  # a rule without the field counts as enabled: missing it must not hide a forward
+                out.append({"enabled": r.get("enabled", True) is not False, "fwd": str(r.get("fwd") or "")[:45] or None,
+                            "fwd_port": str(r.get("fwd_port") or "")[:40] or None,
+                            "dst_port": str(r.get("dst_port") or "")[:40] or None,
+                            "proto": str(r.get("proto") or "")[:10] or None})
+        return sorted(out, key=lambda r: not r["enabled"])[:200]  # enabled rules first, so the cap never hides one
+
     def fingerprint_table(self):
         return self._request("GET", "v2/api/fingerprint_devices/0")
 
@@ -137,6 +153,31 @@ class UniFi:
                 return rows
             page += 1
 
+
+    def blocked_flows(self, since_ms, until_ms, max_pages=10, deadline=None):
+        """Only the flows the gateway blocked in the window (the same read-only query, filtered by the controller).
+        Kept apart from traffic_flows because that one's page cap can cut blocked flows from a busy window.
+        Filtered here too, in case a controller version ignores the filter. Both ends are inclusive (checked on
+        the live controller, 2026-10-27). Sets self.blocked_truncated, self.blocked_pages (queries made) and
+        self.blocked_oldest_ms (the oldest time among every row returned, blocked or not)."""
+        rows, page = [], 0
+        self.blocked_truncated, self.blocked_pages, self.blocked_oldest_ms = False, 0, None
+        while True:
+            d = self._request("POST", f"v2/api/site/{self.site}/traffic-flows", json={
+                "timestampFrom": since_ms, "timestampTo": until_ms, "pageSize": 100, "pageNumber": page,
+                "action": ["blocked"]})
+            self.blocked_pages += 1
+            got = [_slim_flow(x) for x in d.get("data") or [] if isinstance(x, dict)]
+            times = [f["time"] for f in got if isinstance(f.get("time"), int) and not isinstance(f.get("time"), bool)]
+            if times:
+                self.blocked_oldest_ms = min(times + ([self.blocked_oldest_ms] if self.blocked_oldest_ms else []))
+            rows += [f for f in got if f.get("action") == "blocked"]
+            if not d.get("has_next"):
+                return rows
+            page += 1
+            if page >= max_pages or (deadline is not None and time.monotonic() > deadline):
+                self.blocked_truncated = True
+                return rows
 
     def traffic_flows(self, since_ms, until_ms, max_pages=MAX_FLOW_PAGES):
         """Flows the gateway routed in the window. Sets self.flows_truncated when the page cap cut it short."""

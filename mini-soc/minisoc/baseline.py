@@ -191,3 +191,53 @@ def key_view(kind, key):
     if kind == "new_peer":
         return {"device": key}
     return {"value": key}
+
+
+# ---- review sample: an honest false-alarm rate without reviewing every deviation ------------------------
+SAMPLE_SIZE = 50  # per kind; a kind with fewer deviations is reviewed in full
+
+
+def draw_sample(db, now=None, size=SAMPLE_SIZE):
+    """A random sample per kind of everything recorded so far, drawn once and stored, so the set you review
+    can't drift towards the easy ones. Re-drawing replaces it (and says when)."""
+    import secrets
+    now = int(now or time.time())
+    rng = secrets.SystemRandom()
+    by_kind = {}
+    for r in db.execute("SELECT id, kind FROM baseline_deviations WHERE first_at<=? ORDER BY id", (now,)):
+        by_kind.setdefault(r["kind"], []).append(r["id"])
+    sample = {"drawn_at": now, "size": size, "population": {k: len(v) for k, v in by_kind.items()},
+              "ids": {k: sorted(v if len(v) <= size else rng.sample(v, size)) for k, v in by_kind.items()}}
+    store.set_meta(db, "baseline_sample", sample)
+    return sample
+
+
+def wilson(k, n, z=1.96):
+    """95% interval for a share k/n (Wilson): honest for small samples and for 0 or n."""
+    if n <= 0:
+        return None
+    p = k / n
+    d = 1 + z * z / n
+    c = (p + z * z / (2 * n)) / d
+    h = z * ((p * (1 - p) / n + z * z / (4 * n * n)) ** 0.5) / d
+    return [round(max(0.0, c - h), 3), round(min(1.0, c + h), 3)]
+
+
+def sample_view(db):
+    """Per kind: how big the population and sample are, how far the review got, and the share of reviewed
+    deviations you marked expected (a false alarm, had it paged), with its 95% interval."""
+    s = store.get_meta(db, "baseline_sample")
+    if not isinstance(s, dict) or not isinstance(s.get("ids"), dict):
+        return None
+    verdicts = store.deviation_verdicts(db, [i for ids in s["ids"].values() for i in ids])
+    kinds = {}
+    for kind, ids in s["ids"].items():
+        got = [verdicts[i] for i in ids if i in verdicts]
+        e, sus = sum(v == "expected" for v in got), sum(v == "suspicious" for v in got)
+        n = e + sus
+        kinds[kind] = {"population": s["population"].get(kind, len(ids)), "sample": len(ids),
+                       "still_recorded": sum(1 for i in ids if i in verdicts or store.deviation_exists(db, i)),
+                       "reviewed": n, "expected": e, "suspicious": sus,
+                       "false_alarm_share": round(e / n, 3) if n else None, "interval_95": wilson(e, n)}
+    return {"drawn_at": s["drawn_at"], "size": s["size"], "kinds": kinds,
+            "ids": [i for ids in s["ids"].values() for i in ids]}
