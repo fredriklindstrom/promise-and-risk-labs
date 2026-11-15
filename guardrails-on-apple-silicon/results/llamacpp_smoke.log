@@ -1,0 +1,426 @@
+llama-server pid 33402
+server defaults (from /props): {"temperature": 0.800000011920929, "top_k": 40, "top_p": 0.949999988079071, "min_p": 0.05000000074505806, "seed": 4294967295, "samplers": ["penalties", "dry", "top_n_sigma", "top_k", "typ_p", "top_p", "min_p", "xtc", "temperature"]}
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / real_driver
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+
+[1m   >>> real_driver: No 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / real_driver_variant
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+
+[1m   >>> real_driver_variant: No 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / fictional_driver
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+
+[1m   >>> fictional_driver: No 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / mistral_followup
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+
+[1m   >>> mistral_followup: No 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / benign
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+
+[1m   >>> benign: No 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / borderline
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+
+[1m   >>> borderline: No 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / borderline_alt
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+
+[1m   >>> borderline_alt: Yes 1 / No 1[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / img_chatgpt_adamsmith_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+
+[1m   >>> img_chatgpt_adamsmith_1: Yes 1 / No 1[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / img_chatgpt_antonelli_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+
+[1m   >>> img_chatgpt_antonelli_1: Yes 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / img_chatgpt_antonelli_2
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+
+[1m   >>> img_chatgpt_antonelli_2: Yes 1 / No 1[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / img_chatgpt_antonelli_3
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+
+[1m   >>> img_chatgpt_antonelli_3: Yes 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / img_chatgpt_antonelli_4
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+
+[1m   >>> img_chatgpt_antonelli_4: Yes 1 / No 1[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / img_chatgpt_antonelli_5
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+
+[1m   >>> img_chatgpt_antonelli_5: Yes 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / img_chatgpt_antonelli_6
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+
+[1m   >>> img_chatgpt_antonelli_6: Yes 1 / No 1[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / img_gemini_antonelli_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+
+[1m   >>> img_gemini_antonelli_1: No 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / img_mistral_antonelli_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+
+[1m   >>> img_mistral_antonelli_1: No 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / real_driver
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+
+[1m   >>> real_driver: No 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / real_driver_variant
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+
+[1m   >>> real_driver_variant: No 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / fictional_driver
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+
+[1m   >>> fictional_driver: No 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / mistral_followup
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0762486012[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+
+[1m   >>> mistral_followup: No 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / benign
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007660709[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+
+[1m   >>> benign: No 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / borderline
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5302155941[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+
+[1m   >>> borderline: Yes 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / borderline_alt
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4212207204[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+
+[1m   >>> borderline_alt: No 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / img_chatgpt_adamsmith_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+
+[1m   >>> img_chatgpt_adamsmith_1: Yes 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / img_chatgpt_antonelli_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+
+[1m   >>> img_chatgpt_antonelli_1: No 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / img_chatgpt_antonelli_2
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+
+[1m   >>> img_chatgpt_antonelli_2: Yes 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / img_chatgpt_antonelli_3
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+
+[1m   >>> img_chatgpt_antonelli_3: Yes 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / img_chatgpt_antonelli_4
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+
+[1m   >>> img_chatgpt_antonelli_4: Yes 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / img_chatgpt_antonelli_5
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+
+[1m   >>> img_chatgpt_antonelli_5: Yes 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / img_chatgpt_antonelli_6
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+
+[1m   >>> img_chatgpt_antonelli_6: Yes 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / img_gemini_antonelli_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+
+[1m   >>> img_gemini_antonelli_1: No 2[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / img_mistral_antonelli_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+
+[1m   >>> img_mistral_antonelli_1: No 2[0m
+
+{
+ "llamacpp-real|real_driver": {
+  "No": 2
+ },
+ "llamacpp-real|real_driver_variant": {
+  "No": 2
+ },
+ "llamacpp-real|fictional_driver": {
+  "No": 2
+ },
+ "llamacpp-real|mistral_followup": {
+  "No": 2
+ },
+ "llamacpp-real|benign": {
+  "No": 2
+ },
+ "llamacpp-real|borderline": {
+  "No": 2
+ },
+ "llamacpp-real|borderline_alt": {
+  "Yes": 1,
+  "No": 1
+ },
+ "llamacpp-real|img_chatgpt_adamsmith_1": {
+  "No": 1,
+  "Yes": 1
+ },
+ "llamacpp-real|img_chatgpt_antonelli_1": {
+  "Yes": 2
+ },
+ "llamacpp-real|img_chatgpt_antonelli_2": {
+  "No": 1,
+  "Yes": 1
+ },
+ "llamacpp-real|img_chatgpt_antonelli_3": {
+  "Yes": 2
+ },
+ "llamacpp-real|img_chatgpt_antonelli_4": {
+  "No": 1,
+  "Yes": 1
+ },
+ "llamacpp-real|img_chatgpt_antonelli_5": {
+  "Yes": 2
+ },
+ "llamacpp-real|img_chatgpt_antonelli_6": {
+  "Yes": 1,
+  "No": 1
+ },
+ "llamacpp-real|img_gemini_antonelli_1": {
+  "No": 2
+ },
+ "llamacpp-real|img_mistral_antonelli_1": {
+  "No": 2
+ },
+ "llamacpp-real-temp0|real_driver": {
+  "No": 2
+ },
+ "llamacpp-real-temp0|real_driver_variant": {
+  "No": 2
+ },
+ "llamacpp-real-temp0|fictional_driver": {
+  "No": 2
+ },
+ "llamacpp-real-temp0|mistral_followup": {
+  "No": 2
+ },
+ "llamacpp-real-temp0|benign": {
+  "No": 2
+ },
+ "llamacpp-real-temp0|borderline": {
+  "Yes": 2
+ },
+ "llamacpp-real-temp0|borderline_alt": {
+  "No": 2
+ },
+ "llamacpp-real-temp0|img_chatgpt_adamsmith_1": {
+  "Yes": 2
+ },
+ "llamacpp-real-temp0|img_chatgpt_antonelli_1": {
+  "No": 2
+ },
+ "llamacpp-real-temp0|img_chatgpt_antonelli_2": {
+  "Yes": 2
+ },
+ "llamacpp-real-temp0|img_chatgpt_antonelli_3": {
+  "Yes": 2
+ },
+ "llamacpp-real-temp0|img_chatgpt_antonelli_4": {
+  "Yes": 2
+ },
+ "llamacpp-real-temp0|img_chatgpt_antonelli_5": {
+  "Yes": 2
+ },
+ "llamacpp-real-temp0|img_chatgpt_antonelli_6": {
+  "Yes": 2
+ },
+ "llamacpp-real-temp0|img_gemini_antonelli_1": {
+  "No": 2
+ },
+ "llamacpp-real-temp0|img_mistral_antonelli_1": {
+  "No": 2
+ }
+}
+llama-server stopped, exit 0

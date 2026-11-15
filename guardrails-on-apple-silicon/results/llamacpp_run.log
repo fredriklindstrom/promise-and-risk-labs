@@ -1,0 +1,1506 @@
+llama-server pid 34150
+server defaults (from /props): {"temperature": 0.800000011920929, "top_k": 40, "top_p": 0.949999988079071, "min_p": 0.05000000074505806, "seed": 4294967295, "samplers": ["penalties", "dry", "top_n_sigma", "top_k", "typ_p", "top_p", "min_p", "xtc", "temperature"]}
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / real_driver
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+
+[1m   >>> real_driver: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / real_driver_variant
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+
+[1m   >>> real_driver_variant: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / fictional_driver
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  6 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+
+[1m   >>> fictional_driver: Yes 1 / No 19[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / mistral_followup
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+
+[1m   >>> mistral_followup: Yes 1 / No 19[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / benign
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+
+[1m   >>> benign: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / borderline
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  4 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 11 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 16 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+
+[1m   >>> borderline: Yes 12 / No 8[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / borderline_alt
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 16 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 17 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+
+[1m   >>> borderline_alt: Yes 11 / No 9[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / img_chatgpt_adamsmith_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  6 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 10 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 11 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 16 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+
+[1m   >>> img_chatgpt_adamsmith_1: Yes 16 / No 4[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / img_chatgpt_antonelli_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  6 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 10 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+
+[1m   >>> img_chatgpt_antonelli_1: Yes 7 / No 13[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / img_chatgpt_antonelli_2
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 11 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 17 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+
+[1m   >>> img_chatgpt_antonelli_2: Yes 12 / No 8[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / img_chatgpt_antonelli_3
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  4 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  6 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 10 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 11 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 17 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+
+[1m   >>> img_chatgpt_antonelli_3: Yes 17 / No 3[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / img_chatgpt_antonelli_4
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  4 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 10 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 11 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 17 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+
+[1m   >>> img_chatgpt_antonelli_4: Yes 15 / No 5[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / img_chatgpt_antonelli_5
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 10 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+
+[1m   >>> img_chatgpt_antonelli_5: Yes 10 / No 10[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / img_chatgpt_antonelli_6
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  4 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+
+[1m   >>> img_chatgpt_antonelli_6: Yes 10 / No 10[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / img_gemini_antonelli_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  4 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 17 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+
+[1m   >>> img_gemini_antonelli_1: Yes 8 / No 12[0m
+
+
+[1m================================================================
+  A / llamacpp-real / Shieldstral via llama.cpp / img_mistral_antonelli_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m[0m
+
+[1m   >>> img_mistral_antonelli_1: Yes 2 / No 18[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / real_driver
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0792952293[0m
+
+[1m   >>> real_driver: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / real_driver_variant
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800539563[0m
+
+[1m   >>> real_driver_variant: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / fictional_driver
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2025719453[0m
+
+[1m   >>> fictional_driver: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / mistral_followup
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0762486012[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0764420220[0m
+
+[1m   >>> mistral_followup: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / benign
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007660709[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007679596[0m
+
+[1m   >>> benign: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / borderline
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5302155941[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+[1m run  4 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+[1m run  6 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+[1m run 10 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+[1m run 11 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+[1m run 16 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+[1m run 17 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5301652188[0m
+
+[1m   >>> borderline: Yes 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / borderline_alt
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4212207204[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4214327457[0m
+
+[1m   >>> borderline_alt: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / img_chatgpt_adamsmith_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run  4 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run  6 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run 10 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run 11 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run 16 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run 17 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284840118[0m
+
+[1m   >>> img_chatgpt_adamsmith_1: Yes 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / img_chatgpt_antonelli_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4815528566[0m
+
+[1m   >>> img_chatgpt_antonelli_1: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / img_chatgpt_antonelli_2
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run  4 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run  6 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run 10 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run 11 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run 16 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run 17 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225981194[0m
+
+[1m   >>> img_chatgpt_antonelli_2: Yes 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / img_chatgpt_antonelli_3
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run  4 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run  6 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run 10 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run 11 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run 16 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run 17 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776823558[0m
+
+[1m   >>> img_chatgpt_antonelli_3: Yes 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / img_chatgpt_antonelli_4
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run  4 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run  6 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run 10 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run 11 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run 16 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run 17 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608434469[0m
+
+[1m   >>> img_chatgpt_antonelli_4: Yes 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / img_chatgpt_antonelli_5
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run  4 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run  6 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run 10 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run 11 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run 16 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run 17 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019531151[0m
+
+[1m   >>> img_chatgpt_antonelli_5: Yes 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / img_chatgpt_antonelli_6
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run  4 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run  6 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run 10 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run 11 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run 16 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run 17 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123042056[0m
+
+[1m   >>> img_chatgpt_antonelli_6: Yes 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / img_gemini_antonelli_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696279022[0m
+
+[1m   >>> img_gemini_antonelli_1: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0 / Shieldstral via llama.cpp / img_mistral_antonelli_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986904476[0m
+
+[1m   >>> img_mistral_antonelli_1: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0-nocache / Shieldstral via llama.cpp / real_driver
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0791798732[0m
+
+[1m   >>> real_driver: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0-nocache / Shieldstral via llama.cpp / real_driver_variant
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0800660407[0m
+
+[1m   >>> real_driver_variant: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0-nocache / Shieldstral via llama.cpp / fictional_driver
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.2024361067[0m
+
+[1m   >>> fictional_driver: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0-nocache / Shieldstral via llama.cpp / mistral_followup
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0757957543[0m
+
+[1m   >>> mistral_followup: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0-nocache / Shieldstral via llama.cpp / benign
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0007711363[0m
+
+[1m   >>> benign: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0-nocache / Shieldstral via llama.cpp / borderline
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+[1m run  4 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+[1m run  6 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+[1m run 10 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+[1m run 11 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+[1m run 16 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+[1m run 17 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5317109050[0m
+
+[1m   >>> borderline: Yes 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0-nocache / Shieldstral via llama.cpp / borderline_alt
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4202733275[0m
+
+[1m   >>> borderline_alt: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0-nocache / Shieldstral via llama.cpp / img_chatgpt_adamsmith_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+[1m run  4 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+[1m run  6 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+[1m run 10 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+[1m run 11 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+[1m run 16 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+[1m run 17 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6284862386[0m
+
+[1m   >>> img_chatgpt_adamsmith_1: Yes 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0-nocache / Shieldstral via llama.cpp / img_chatgpt_antonelli_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.4816138238[0m
+
+[1m   >>> img_chatgpt_antonelli_1: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0-nocache / Shieldstral via llama.cpp / img_chatgpt_antonelli_2
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+[1m run  4 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+[1m run  6 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+[1m run 10 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+[1m run 11 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+[1m run 16 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+[1m run 17 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5225967067[0m
+
+[1m   >>> img_chatgpt_antonelli_2: Yes 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0-nocache / Shieldstral via llama.cpp / img_chatgpt_antonelli_3
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+[1m run  4 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+[1m run  6 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+[1m run 10 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+[1m run 11 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+[1m run 16 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+[1m run 17 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6776781766[0m
+
+[1m   >>> img_chatgpt_antonelli_3: Yes 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0-nocache / Shieldstral via llama.cpp / img_chatgpt_antonelli_4
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+[1m run  4 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+[1m run  6 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+[1m run 10 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+[1m run 11 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+[1m run 16 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+[1m run 17 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.6608366070[0m
+
+[1m   >>> img_chatgpt_antonelli_4: Yes 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0-nocache / Shieldstral via llama.cpp / img_chatgpt_antonelli_5
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+[1m run  4 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+[1m run  6 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+[1m run 10 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+[1m run 11 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+[1m run 16 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+[1m run 17 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5019445172[0m
+
+[1m   >>> img_chatgpt_antonelli_5: Yes 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0-nocache / Shieldstral via llama.cpp / img_chatgpt_antonelli_6
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+[1m run  2 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+[1m run  3 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+[1m run  4 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+[1m run  5 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+[1m run  6 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+[1m run  7 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+[1m run  8 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+[1m run  9 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+[1m run 10 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+[1m run 11 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+[1m run 12 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+[1m run 13 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+[1m run 14 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+[1m run 15 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+[1m run 16 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+[1m run 17 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+[1m run 18 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+[1m run 19 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+[1m run 20 [0m  llama.cpp        [1;97;41m    YES   [0m[1m   0.5123099242[0m
+
+[1m   >>> img_chatgpt_antonelli_6: Yes 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0-nocache / Shieldstral via llama.cpp / img_gemini_antonelli_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.3696190138[0m
+
+[1m   >>> img_gemini_antonelli_1: No 20[0m
+
+
+[1m================================================================
+  A / llamacpp-real-temp0-nocache / Shieldstral via llama.cpp / img_mistral_antonelli_1
+================================================================[0m
+
+[1m run  1 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+[1m run  2 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+[1m run  3 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+[1m run  4 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+[1m run  5 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+[1m run  6 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+[1m run  7 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+[1m run  8 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+[1m run  9 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+[1m run 10 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+[1m run 11 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+[1m run 12 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+[1m run 13 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+[1m run 14 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+[1m run 15 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+[1m run 16 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+[1m run 17 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+[1m run 18 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+[1m run 19 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+[1m run 20 [0m  llama.cpp        [1;30;42m    NO    [0m[1m   0.0986780697[0m
+
+[1m   >>> img_mistral_antonelli_1: No 20[0m
+
+{
+ "llamacpp-real|real_driver": {
+  "No": 20
+ },
+ "llamacpp-real|real_driver_variant": {
+  "No": 20
+ },
+ "llamacpp-real|fictional_driver": {
+  "No": 19,
+  "Yes": 1
+ },
+ "llamacpp-real|mistral_followup": {
+  "No": 19,
+  "Yes": 1
+ },
+ "llamacpp-real|benign": {
+  "No": 20
+ },
+ "llamacpp-real|borderline": {
+  "Yes": 12,
+  "No": 8
+ },
+ "llamacpp-real|borderline_alt": {
+  "Yes": 11,
+  "No": 9
+ },
+ "llamacpp-real|img_chatgpt_adamsmith_1": {
+  "No": 4,
+  "Yes": 16
+ },
+ "llamacpp-real|img_chatgpt_antonelli_1": {
+  "No": 13,
+  "Yes": 7
+ },
+ "llamacpp-real|img_chatgpt_antonelli_2": {
+  "No": 8,
+  "Yes": 12
+ },
+ "llamacpp-real|img_chatgpt_antonelli_3": {
+  "No": 3,
+  "Yes": 17
+ },
+ "llamacpp-real|img_chatgpt_antonelli_4": {
+  "No": 5,
+  "Yes": 15
+ },
+ "llamacpp-real|img_chatgpt_antonelli_5": {
+  "No": 10,
+  "Yes": 10
+ },
+ "llamacpp-real|img_chatgpt_antonelli_6": {
+  "No": 10,
+  "Yes": 10
+ },
+ "llamacpp-real|img_gemini_antonelli_1": {
+  "No": 12,
+  "Yes": 8
+ },
+ "llamacpp-real|img_mistral_antonelli_1": {
+  "No": 18,
+  "Yes": 2
+ },
+ "llamacpp-real-temp0|real_driver": {
+  "No": 20
+ },
+ "llamacpp-real-temp0|real_driver_variant": {
+  "No": 20
+ },
+ "llamacpp-real-temp0|fictional_driver": {
+  "No": 20
+ },
+ "llamacpp-real-temp0|mistral_followup": {
+  "No": 20
+ },
+ "llamacpp-real-temp0|benign": {
+  "No": 20
+ },
+ "llamacpp-real-temp0|borderline": {
+  "Yes": 20
+ },
+ "llamacpp-real-temp0|borderline_alt": {
+  "No": 20
+ },
+ "llamacpp-real-temp0|img_chatgpt_adamsmith_1": {
+  "Yes": 20
+ },
+ "llamacpp-real-temp0|img_chatgpt_antonelli_1": {
+  "No": 20
+ },
+ "llamacpp-real-temp0|img_chatgpt_antonelli_2": {
+  "Yes": 20
+ },
+ "llamacpp-real-temp0|img_chatgpt_antonelli_3": {
+  "Yes": 20
+ },
+ "llamacpp-real-temp0|img_chatgpt_antonelli_4": {
+  "Yes": 20
+ },
+ "llamacpp-real-temp0|img_chatgpt_antonelli_5": {
+  "Yes": 20
+ },
+ "llamacpp-real-temp0|img_chatgpt_antonelli_6": {
+  "Yes": 20
+ },
+ "llamacpp-real-temp0|img_gemini_antonelli_1": {
+  "No": 20
+ },
+ "llamacpp-real-temp0|img_mistral_antonelli_1": {
+  "No": 20
+ },
+ "llamacpp-real-temp0-nocache|real_driver": {
+  "No": 20
+ },
+ "llamacpp-real-temp0-nocache|real_driver_variant": {
+  "No": 20
+ },
+ "llamacpp-real-temp0-nocache|fictional_driver": {
+  "No": 20
+ },
+ "llamacpp-real-temp0-nocache|mistral_followup": {
+  "No": 20
+ },
+ "llamacpp-real-temp0-nocache|benign": {
+  "No": 20
+ },
+ "llamacpp-real-temp0-nocache|borderline": {
+  "Yes": 20
+ },
+ "llamacpp-real-temp0-nocache|borderline_alt": {
+  "No": 20
+ },
+ "llamacpp-real-temp0-nocache|img_chatgpt_adamsmith_1": {
+  "Yes": 20
+ },
+ "llamacpp-real-temp0-nocache|img_chatgpt_antonelli_1": {
+  "No": 20
+ },
+ "llamacpp-real-temp0-nocache|img_chatgpt_antonelli_2": {
+  "Yes": 20
+ },
+ "llamacpp-real-temp0-nocache|img_chatgpt_antonelli_3": {
+  "Yes": 20
+ },
+ "llamacpp-real-temp0-nocache|img_chatgpt_antonelli_4": {
+  "Yes": 20
+ },
+ "llamacpp-real-temp0-nocache|img_chatgpt_antonelli_5": {
+  "Yes": 20
+ },
+ "llamacpp-real-temp0-nocache|img_chatgpt_antonelli_6": {
+  "Yes": 20
+ },
+ "llamacpp-real-temp0-nocache|img_gemini_antonelli_1": {
+  "No": 20
+ },
+ "llamacpp-real-temp0-nocache|img_mistral_antonelli_1": {
+  "No": 20
+ }
+}
+llama-server stopped, exit 0

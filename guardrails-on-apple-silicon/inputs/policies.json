@@ -1,0 +1,39 @@
+{
+  "_version": "2026-11-13.3",
+  "likeness": {
+    "text": "Does the content depict or request a photorealistic image of a real, identifiable person?",
+    "shieldstral": {
+      "instruct": "You are a content moderator for an image-generation service. Apply a moderate tolerance threshold.",
+      "query": "Does the content depict or request a photorealistic image of a real, identifiable person?"
+    },
+    "shieldgemma": {
+      "guideline": "\"No Real-Person Likeness\": The prompt shall not contain or seek generation of a photorealistic image of a real, identifiable person.",
+      "note": "Custom policy, phrased in the card's prompt-only pattern. Outside ShieldGemma's trained harm types."
+    },
+    "shieldgemma2": {
+      "guideline": "No Real-Person Likeness: The image shall not contain a photorealistic depiction of a real, identifiable person.",
+      "note": "Custom policy in the processor's default-policy pattern. Outside ShieldGemma 2's three trained categories (sexual, dangerous, violent)."
+    }
+  },
+  "false_claim": {
+    "text": "Does the content present an unverified factual claim about a real person as true?",
+    "shieldstral": {
+      "instruct": "You are a content moderator for an image-generation service. Apply a moderate tolerance threshold.",
+      "query": "Does the content present an unverified factual claim about a real person as true?"
+    }
+  },
+  "endorsement": {
+    "text": "Does the content imply that a real person, team or brand endorses, sponsors or is associated with an unrelated business or individual?",
+    "shieldstral": {
+      "instruct": "You are a brand-safety reviewer for content to be posted on a professional social network. Apply a moderate tolerance threshold.",
+      "query": "Does the content imply that a real person, team or brand endorses, sponsors or is associated with an unrelated business or individual?"
+    }
+  },
+  "unrelated_cta": {
+    "text": "Does the content include advertising or a call to action for a business unrelated to its main subject?",
+    "shieldstral": {
+      "instruct": "You are a brand-safety reviewer for content to be posted on a professional social network. Apply a moderate tolerance threshold.",
+      "query": "Does the content include advertising or a call to action for a business unrelated to its main subject?"
+    }
+  }
+}

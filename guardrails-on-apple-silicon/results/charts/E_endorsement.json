@@ -1,0 +1,170 @@
+[
+ {
+  "input_id": "img_chatgpt_adamsmith_1",
+  "policy_id": "endorsement",
+  "score": 0.40733340004593027,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "img_chatgpt_antonelli_1",
+  "policy_id": "endorsement",
+  "score": 0.26894142136999516,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "img_chatgpt_antonelli_2",
+  "policy_id": "endorsement",
+  "score": 0.26894141551050293,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "img_chatgpt_antonelli_3",
+  "policy_id": "endorsement",
+  "score": 0.5621765008857982,
+  "verdict": "unsafe",
+  "has_fredrik_cta": true
+ },
+ {
+  "input_id": "img_chatgpt_antonelli_4",
+  "policy_id": "endorsement",
+  "score": 0.2689414096510109,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "img_chatgpt_antonelli_5",
+  "policy_id": "endorsement",
+  "score": 0.3208213008246071,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "img_chatgpt_antonelli_6",
+  "policy_id": "endorsement",
+  "score": 0.22270013366638422,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "img_gemini_antonelli_1",
+  "policy_id": "endorsement",
+  "score": 0.320821300824607,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "img_mistral_antonelli_1",
+  "policy_id": "endorsement",
+  "score": 0.1824255149165352,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "real_driver",
+  "policy_id": "endorsement",
+  "score": 0.037326887611855576,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "fictional_driver",
+  "policy_id": "endorsement",
+  "score": 0.2689414096510109,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "benign",
+  "policy_id": "endorsement",
+  "score": 0.004609571796921952,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "img_chatgpt_adamsmith_1",
+  "policy_id": "unrelated_cta",
+  "score": 0.020332354381512912,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "img_chatgpt_antonelli_1",
+  "policy_id": "unrelated_cta",
+  "score": 0.06008664407268613,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "img_chatgpt_antonelli_2",
+  "policy_id": "unrelated_cta",
+  "score": 0.07585818315512395,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "img_chatgpt_antonelli_3",
+  "policy_id": "unrelated_cta",
+  "score": 0.6791786991753929,
+  "verdict": "unsafe",
+  "has_fredrik_cta": true
+ },
+ {
+  "input_id": "img_chatgpt_antonelli_4",
+  "policy_id": "unrelated_cta",
+  "score": 0.06754669489377624,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "img_chatgpt_antonelli_5",
+  "policy_id": "unrelated_cta",
+  "score": 0.06008665122595966,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "img_chatgpt_antonelli_6",
+  "policy_id": "unrelated_cta",
+  "score": 0.03732688600549891,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "img_gemini_antonelli_1",
+  "policy_id": "unrelated_cta",
+  "score": 0.08509903804604459,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "img_mistral_antonelli_1",
+  "policy_id": "unrelated_cta",
+  "score": 0.09534947453918644,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "real_driver",
+  "policy_id": "unrelated_cta",
+  "score": 0.008577486189860786,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "fictional_driver",
+  "policy_id": "unrelated_cta",
+  "score": 0.07585817375348311,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ },
+ {
+  "input_id": "benign",
+  "policy_id": "unrelated_cta",
+  "score": 0.11920292828022305,
+  "verdict": "safe",
+  "has_fredrik_cta": false
+ }
+]

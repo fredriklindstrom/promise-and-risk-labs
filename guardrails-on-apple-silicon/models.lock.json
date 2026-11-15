@@ -1,0 +1,75 @@
+{
+  "shieldstral-3b": {
+    "repo": "mistralai/Shieldstral-1.0-3B",
+    "revision": "003ec7e2b0bab5f0e6307edbaf186fa5822b76f5",
+    "status": "ok",
+    "weights_sha256": {
+      "model.safetensors": "87753e30c8c321da478b83bbabebcd813cc9b3d0cee5c5b3d64349a8ee4172f7"
+    },
+    "excluded": [
+      "consolidated.safetensors"
+    ],
+    "default_dtype": "bf16",
+    "default_device": "mps"
+  },
+  "promptguard2-86m": {
+    "repo": "meta-llama/Llama-Prompt-Guard-2-86M",
+    "revision": "a8ded8e697ce7c355e395a0df51f94adb4a2fd27",
+    "status": "ok",
+    "weights_sha256": {
+      "model.safetensors": "e72017dbbe89c1232dcbc4a74ce0c389db5b468c42afd05850347b2a8c5f6b09"
+    },
+    "excluded": [],
+    "default_dtype": "bf16",
+    "default_device": "mps"
+  },
+  "promptguard2-22m": {
+    "repo": "meta-llama/Llama-Prompt-Guard-2-22M",
+    "revision": "11614a155199674a0a95e6602d6ab0417b790ed0",
+    "status": "ok",
+    "weights_sha256": {
+      "model.safetensors": "5120e30bcd536ce285345d9ec104bea6bd6e8f94365b99a340c764f417ea5fa1"
+    },
+    "excluded": [],
+    "default_dtype": "bf16",
+    "default_device": "mps"
+  },
+  "shieldgemma-2b": {
+    "repo": "google/shieldgemma-2b",
+    "revision": "d1dffc9c8c9237a90aab09c61383791e718ef9e8",
+    "status": "ok",
+    "weights_sha256": {
+      "model-00001-of-00002.safetensors": "343f39c3f075eda5077dab58476d3e3231432ea3cddeb81e6f5ad106b0b524f5",
+      "model-00002-of-00002.safetensors": "ce68ef43056ff896f0fa55bada30885eb192a1a439cc984d44d836329c752f21"
+    },
+    "excluded": [],
+    "default_dtype": "bf16",
+    "default_device": "mps"
+  },
+  "shieldgemma-9b": {
+    "repo": "google/shieldgemma-9b",
+    "revision": "b8b636016df4540721a098c7aab91c97ec6ee508",
+    "status": "ok",
+    "weights_sha256": {
+      "model-00001-of-00004.safetensors": "abcbc2d2d3682d16f156238744a14d9f34d23521a5fd60e319f34e70e4f542ae",
+      "model-00002-of-00004.safetensors": "41201a66dfbd9743677a5f6060e2819624d569236a7795352c00e1e2ab133cdf",
+      "model-00003-of-00004.safetensors": "865c917f2ba77ce31818538dd25f89c60af46335d4376571c3149ae63817432b",
+      "model-00004-of-00004.safetensors": "24c747abbe456bc47382c6efb89fe505e605aca759d21a7f98753458f72b8c82"
+    },
+    "excluded": [],
+    "default_dtype": "bf16",
+    "default_device": "mps"
+  },
+  "shieldgemma2-4b": {
+    "repo": "google/shieldgemma-2-4b-it",
+    "revision": "eaf60452b5fc41a911338a022e628b0c15283897",
+    "status": "ok",
+    "weights_sha256": {
+      "model-00001-of-00002.safetensors": "73601c4b6c6431a9bc1d7544f40e96a53f88da367a903075f66245ef547f68a2",
+      "model-00002-of-00002.safetensors": "285c39591046c68520b23d4addd953b8c4b33aaf39d6fe28e18f5a5f0d5d56f3"
+    },
+    "excluded": [],
+    "default_dtype": "bf16",
+    "default_device": "mps"
+  }
+}

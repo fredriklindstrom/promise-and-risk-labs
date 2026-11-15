@@ -1,0 +1,5 @@
+# Not published: the cards (a real athlete, team marks, the author's branding), model weights, llama.cpp checkout
+inputs/images/
+models/
+vendor/
+.venv*/
